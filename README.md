@@ -44,22 +44,42 @@ then, good news - it's working!
 
 ### Persisting to Stitch
 
-Streaming data into your console isn't very useful. To get the data to
-Stitch, you need to install the [Stitch
+But, streaming data into your console isn't very useful. To get the
+data to Stitch, you need to install the [Stitch
 Persister](https://github.com/stitchstreams/persist-stitch), following
 the instructions in its repository.
 
-Then, to send your Streamer's data to Stitch, simply pipe the output
-of the Streamer into the Stitch Persister, like this:
+Then, to send your Streamer's data to Stitch, [generate an Stitch
+Import API
+token](https://docs.stitchdata.com/hc/en-us/articles/223759228-Getting-Started-with-the-Import-API#accesstoken),
+and pipe the output of the Streamer into the Stitch Persister, like
+this:
 
-```bash › DRIFT_CLIENT_ID=<drift oauth client id>
-DRIFT_REDIRECT_URI=<drift oauth callback> DRIFT_USERNAME=<drift
-username> DRIFT_PASSWORD=<drift_password> python stream_drift.py |
-persist-stitch -C <your stitch client ID> -T <stitch import API token
+```bash › DRIFT_CLIENT_ID=<Drift OAuth client ID>
+DRIFT_REDIRECT_URI=<Drift OAuth callback> DRIFT_USERNAME=<Drift
+username> DRIFT_PASSWORD=<Drift password> python stream_drift.py |
+persist-stitch -C <your Stitch client ID> -T <the Stitch import API token
 id> ```
+
+In about 20 minutes or less, you'll have the data in your data
+warehouse.
 
 ### Using Bookmarks
 
+Many Streamers output Bookmark values to keep track of what data has
+been replicated.  A common example of a Bookmark value is an *updated
+at* field on a record - if a Streamer knows that it has replicated all
+data prior to a certain value of the *updated at* field, then, the
+next time it runs, it only needs to replicate the data updated after
+that value.
 
+Bookmark values are output to the same *stdout* stream that you saw
+when you ran the Streamer.  When the Stitch Persister encounters a
+Bookmark, it writes the value to *stdout* once it has successfully
+persisted all prior records.  Streamers that support bookmarks will
+take a filename containing the last bookmark as an input parameter. To
+provide this value to the Streamer, pipe the Persister's stdout to
+`tail -1` and redirect that to a file - that's the file you should
+pass to the Streamer on the next run.
 
 ## Building a new Streamer
