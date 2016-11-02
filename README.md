@@ -17,26 +17,26 @@ Streams.
 
 Start by installing the Streamer you intend to use, following the
 instructions provided by that Streamer.  The Streamer will also have
-instructions for being run.  For example, the Drift streamer is run with:
+instructions for being run.  For example, the GitHub Streamer is run with:
 
 ```bash
-› DRIFT_CLIENT_ID=<drift oauth client id> DRIFT_REDIRECT_URI=<drift oauth callback> DRIFT_USERNAME=<drift username> DRIFT_PASSWORD=<drift_password> python stream_drift.py
+› GITHUB_ACCESS_TOKEN=<token> GITHUB_REPO_PATH=<repo> python stream_github.py
 ```
 
-Notice that this Streamer reads OAuth credentials out of the
-environment. This is a common pattern, and means that you'll have to
-login to the service in question to retrieve those parameters.  As
-much as possible, Streamers will also have instructions about where to
-find these values.
+Notice that this Streamer reads a token out of the environment. This
+is a common pattern, and means that you'll have to login to the
+service in question to retrieve those parameters.  As much as
+possible, Streamers will also have instructions about where to find
+these values.
 
 Once you have the necessary parameters, you can run the streamer.  If
 you see something like this:
 
 ```bash
 stitchstream/0.1
-Content-Type: transit
+Content-Type: jsonline
 --
-["^ ","type","RECORD","record",["^ ","orgId",9999,"name","Stitch Support","id",9999,"status","ENABLED","createdAt","~m1468435557000","openConversationCount",24,"totalConversationCount",616],"stream","inboxes","key_fields",["id"]]
+{"type": "RECORD", "key_fields": ["sha"], "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "7c2f541396ff5b25d3f842ce617295ce50b027de", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/7c2f541396ff5b25d3f842ce617295ce50b027de", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T17:15:02Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "add using bookmarks section", ...}, "committer": { ... }, ...}}
 ...
 ```
 
@@ -55,11 +55,9 @@ token](https://docs.stitchdata.com/hc/en-us/articles/223759228-Getting-Started-w
 and pipe the output of the Streamer into the Stitch Persister, like
 this:
 
-```bash › DRIFT_CLIENT_ID=<Drift OAuth client ID>
-DRIFT_REDIRECT_URI=<Drift OAuth callback> DRIFT_USERNAME=<Drift
-username> DRIFT_PASSWORD=<Drift password> python stream_drift.py |
-persist-stitch -C <your Stitch client ID> -T <the Stitch import API token
-id> ```
+```bash
+› GITHUB_ACCESS_TOKEN=<token> GITHUB_REPO_PATH=<repo> python stream_github.py | persist-stitch -C <your Stitch client ID> -T <the Stitch import API token>
+```
 
 In about 20 minutes or less, you'll have the data in your data
 warehouse.
@@ -83,3 +81,64 @@ provide this value to the Streamer, pipe the Persister's stdout to
 pass to the Streamer on the next run.
 
 ## Building a new Streamer
+
+### Overview
+
+If you can't find an existing Streamer for the data source you want to
+replicate, then it's time to build your own Streamer.  A Streamer is
+just a program, written in any language, that outputs data records and
+bookmarks to *stdout* in the Stitch Stream format.  You can read a
+detailed description of the format [here](format.html), but most of
+what you need to know can be seen in this simple example, which is the
+commit data from this repository produced by the
+[stream-github](https://github.com/stitchstreams/stream-github)
+Streamer:
+
+```json
+stitchstream/0.1
+Content-Type: jsonline
+--
+{"type": "RECORD", "key_fields": ["sha"], "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "7c2f541396ff5b25d3f842ce617295ce50b027de", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/7c2f541396ff5b25d3f842ce617295ce50b027de", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T17:15:02Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "add using bookmarks section", ...}, "committer": { ... }, ...}}
+{"type": "RECORD", "key_fields": ["sha"], "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "4f961d199e8f96c4eb4c7bc071e5028b75640271", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/4f961d199e8f96c4eb4c7bc071e5028b75640271", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T14:12:51Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "persisting to Stitch section", ...}, "committer": { ... }, ...}}
+{"type": "RECORD", "key_fields": ["sha"], "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "55b7d7590ba0f0f56e4e0d9bafccf549cb56744e", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/55b7d7590ba0f0f56e4e0d9bafccf549cb56744e", "commit": {"comment_count": 0, "author": {"date": "2016-10-31T17:29:13Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "using existing pt1", ...}, "committer": { ... }, ...}}
+{"type": "RECORD", "key_fields": ["sha"], "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ... }, "sha": "beb2d759464a067c44aebebe772c6e6c0f26c252", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/beb2d759464a067c44aebebe772c6e6c0f26c252", "commit": {"comment_count": 0, "author": {"date": "2016-10-31T16:55:48Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "first commit", ...}, "committer": { ... }, ...}}
+{"type": "BOOKMARK", "value": "2016-11-01T17:15:02Z"}
+```
+
+You can see that there's a two line header, a separator, and a bunch
+of JSON encoded data. JSON encoding is explicitly specified in the
+`Content-Type` header, and `jsonline` is currently the only supported
+data format (and we're working on providing support for richer data
+types - stay tuned).  `jsonline` means that each message is on a
+separate line, and there are two `type`s of message: `RECORD` and
+`BOOKMARK`.
+
+`RECORD` messages contain actual data points, and have
+these properties:
+
+ - `stream` is the name of the data stream, which will eventually get
+   mapped to a table in your data warehouse.  A single Streamer can
+   produce messages with any number of streams, and different data
+   tables or collections in a data source are frequently separated
+   into different streams.
+
+ - `record` is the actual data point encoded as a JSON map
+
+ - `key_fields` is an array of field names from the record that
+   uniquely identify that record, analogous to the concept of a
+   primary key on a database table.
+
+`BOOKMARK` messages allow the Streamer to checkpoint its progress.
+Use of BOOKMARKs is optional, but strongly encouraged for efficiency
+and fault tolerance. When a persister encounters a BOOKMARK message,
+it holds on to it, and then outputs that message once it has
+successfully persisted all RECORDs messages that occurred prior to the
+BOOKMARK. The structure of a BOOKMARK message's `value` property is
+entirely up to the Streamer that creates it - as long as it is
+JSON-encoded and below 1MB.  A BOOKMARK value should apply to the
+*entire* Streamer, not an individual sub-stream, so if the Streamer
+replicates multi sub-streams that all have different check points, it
+is common to put the check point values into a map keyed by the stream
+name.
+
+### Example - the GitHub Streamer
