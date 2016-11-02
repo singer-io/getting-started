@@ -132,7 +132,7 @@ these properties:
 Use of BOOKMARKs is optional, but strongly encouraged for efficiency
 and fault tolerance. When a persister encounters a BOOKMARK message,
 it holds on to it, and then outputs that message once it has
-successfully persisted all RECORDs messages that occurred prior to the
+successfully persisted all RECORD messages that occurred prior to the
 BOOKMARK. The structure of a BOOKMARK message's `value` property is
 entirely up to the Streamer that creates it - as long as it is
 JSON-encoded and below 1MB.  A BOOKMARK value should apply to the
@@ -142,3 +142,146 @@ is common to put the check point values into a map keyed by the stream
 name.
 
 ### Example - the GitHub Streamer
+
+Lets look at how these messages are created using the [GitHub
+Streamer](https://github.com/stitchstreams/stream-github) - written in
+Python - as an example. Although Streamers can be written in any
+programming language that can send data to *stdout*, we intend to
+publish libraries and guides for Python first, since it is commonly
+used for data processing.
+
+It's only about 75 lines of code, so lets walk through it starting at
+the beginning:
+
+```python
+import os
+import argparse
+import logging
+import requests
+import stitchstream
+```
+
+The `os` and `argparse` modules are used to read environment variables
+and command-line variables, respectively.  `requests` is a fantastic
+Python HTTP library that we'll use to make requests to the GitHub API.
+`stitchstream` is a library that we've written to make it easy to
+write `RECORD` and `BOOKMARK` messages. Using the `logging` library is
+a good practice, and helps ensure that we don't `print` any lines to
+stdout that would corrupt our data output.
+
+```python
+session = requests.Session()
+logger = logging.getLogger()
+```
+
+Initialize the logger and a [Requests
+session](http://docs.python-requests.org/en/master/user/advanced/#session-objects).
+
+```python
+def get_env_or_throw(key):
+    value = os.environ.get(key)
+
+    if value == None:
+        raise Exception('Missing ' + key + ' environment variable!')
+
+    return value
+```
+
+This is a helper method to read environment variables, and fail hard
+if one is not set.
+
+```python
+def configure_logging(level=logging.DEBUG):
+    global logger
+    logger.setLevel(level)
+    ch = logging.StreamHandler()
+    ch.setLevel(level)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+```
+
+This is a helper method to properly configure the logger.
+
+```python
+def authed_get(url):
+    return session.request(method='get', url=url)
+
+def authed_get_all_pages(url):
+    while True:
+        r = authed_get(url)
+        yield r
+        if 'next' in r.links:
+            url = r.links['next']['url']
+        else:
+            break
+```
+
+These methods make requests to the GitHub API using the previously
+established Requests session.  The `authed_get_all_pages` helper
+method is a [generator](https://wiki.python.org/moin/Generators) that
+automatically reads all pages of a paginated result set.
+
+```python
+def get_all_commits(repo_path, since_date):
+    query_string = '?since={}'.format(since_date) if since_date else ''
+    latest_commit_time = None
+
+    for response in authed_get_all_pages('https://api.github.com/repos/{}/commits{}'.format(repo_path, query_string)):
+        commits = response.json()
+        stitchstream.write_records('commits', ['sha'], commits)
+        if not latest_commit_time:
+            latest_commit_time = commits[0]['commit']['committer']['date']
+
+    stitchstream.write_bookmark(latest_commit_time)
+```
+
+This is the meat - it calls out to the appropriate GitHub API
+endpoint, using a `?since=` parameter to get only values that have
+occurred since a certain date - which lays the groundwork for this
+Streamer to use a bookmark.  It encodes the API response as JSON, and
+uses the `stitchstream.write_records(stream_name, key_fields, record)`
+function to write each record to *stdout* in the appropriate
+format. After it has written all records, it writes a bookmark, with
+the value of the latest commit time of the repository.  Since the
+GitHub API responds with commits ordered with the most recent first,
+that value is grabbed from the very first commit that the API returns.
+
+```python
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(prog='GitHub Streamer')
+    parser.add_argument('FILENAME', help='File containing the last bookmark value', nargs='?')
+    args = parser.parse_args()
+
+    configure_logging()
+
+    access_token = get_env_or_throw('GITHUB_ACCESS_TOKEN')
+    repo_path = get_env_or_throw('GITHUB_REPO_PATH')
+
+    session.headers.update({'authorization': 'token ' + access_token})
+
+    bookmark = None
+    if args.FILENAME:
+        with open(args.FILENAME, 'r') as file:
+            for line in file:
+                bookmark = line.strip()
+
+    if bookmark:
+        logger.info('Replicating commits since %s from %s', bookmark, repo_path)
+    else:
+        logger.info('Replicating all commits from %s', repo_path)
+
+    get_all_commits(repo_path, bookmark)
+
+```
+
+Finally, the `main` function:
+
+- reads the token and repository path out of the environment, setting the
+token onto the Requests session to properly authenticate with the
+GitHub API.
+
+- if a bookmark file is passed in, reads the bookmark value out the last line of the file
+
+- kicks off the `get_all_commits` function
