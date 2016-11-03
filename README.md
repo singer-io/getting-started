@@ -36,7 +36,7 @@ you see something like this:
 stitchstream/0.1
 Content-Type: jsonline
 --
-{"type": "RECORD", "key_fields": ["sha"], "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "7c2f541396ff5b25d3f842ce617295ce50b027de", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/7c2f541396ff5b25d3f842ce617295ce50b027de", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T17:15:02Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "add using bookmarks section", ...}, "committer": { ... }, ...}}
+{"type": "RECORD", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}, "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "7c2f541396ff5b25d3f842ce617295ce50b027de", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/7c2f541396ff5b25d3f842ce617295ce50b027de", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T17:15:02Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "add using bookmarks section", ...}, "committer": { ... }, ...}}
 ...
 ```
 
@@ -98,10 +98,10 @@ Streamer:
 stitchstream/0.1
 Content-Type: jsonline
 --
-{"type": "RECORD", "key_fields": ["sha"], "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "7c2f541396ff5b25d3f842ce617295ce50b027de", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/7c2f541396ff5b25d3f842ce617295ce50b027de", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T17:15:02Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "add using bookmarks section", ...}, "committer": { ... }, ...}}
-{"type": "RECORD", "key_fields": ["sha"], "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "4f961d199e8f96c4eb4c7bc071e5028b75640271", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/4f961d199e8f96c4eb4c7bc071e5028b75640271", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T14:12:51Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "persisting to Stitch section", ...}, "committer": { ... }, ...}}
-{"type": "RECORD", "key_fields": ["sha"], "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "55b7d7590ba0f0f56e4e0d9bafccf549cb56744e", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/55b7d7590ba0f0f56e4e0d9bafccf549cb56744e", "commit": {"comment_count": 0, "author": {"date": "2016-10-31T17:29:13Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "using existing pt1", ...}, "committer": { ... }, ...}}
-{"type": "RECORD", "key_fields": ["sha"], "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ... }, "sha": "beb2d759464a067c44aebebe772c6e6c0f26c252", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/beb2d759464a067c44aebebe772c6e6c0f26c252", "commit": {"comment_count": 0, "author": {"date": "2016-10-31T16:55:48Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "first commit", ...}, "committer": { ... }, ...}}
+{"type": "RECORD", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}, "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "7c2f541396ff5b25d3f842ce617295ce50b027de", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/7c2f541396ff5b25d3f842ce617295ce50b027de", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T17:15:02Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "add using bookmarks section", ...}, "committer": { ... }, ...}}
+{"type": "RECORD", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}, "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "4f961d199e8f96c4eb4c7bc071e5028b75640271", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/4f961d199e8f96c4eb4c7bc071e5028b75640271", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T14:12:51Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "persisting to Stitch section", ...}, "committer": { ... }, ...}}
+{"type": "RECORD", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}, "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "55b7d7590ba0f0f56e4e0d9bafccf549cb56744e", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/55b7d7590ba0f0f56e4e0d9bafccf549cb56744e", "commit": {"comment_count": 0, "author": {"date": "2016-10-31T17:29:13Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "using existing pt1", ...}, "committer": { ... }, ...}}
+{"type": "RECORD", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}, "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ... }, "sha": "beb2d759464a067c44aebebe772c6e6c0f26c252", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/beb2d759464a067c44aebebe772c6e6c0f26c252", "commit": {"comment_count": 0, "author": {"date": "2016-10-31T16:55:48Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "first commit", ...}, "committer": { ... }, ...}}
 {"type": "BOOKMARK", "value": "2016-11-01T17:15:02Z"}
 ```
 
@@ -124,9 +124,10 @@ these properties:
 
  - `record` is the actual data point encoded as a JSON map
 
- - `key_fields` is an array of field names from the record that
-   uniquely identify that record, analogous to the concept of a
-   primary key on a database table.
+ - `schema` is a [JSON Schema](http://json-schema.org/) that describes
+   the structure of of the record. The `schema` can be used to
+   indicate data types (included extended types like date times), key
+   fields, and required fields.
 
 `BOOKMARK` messages allow the Streamer to checkpoint its progress.
 Use of BOOKMARKs is optional, but strongly encouraged for efficiency
@@ -223,13 +224,47 @@ method is a [generator](https://wiki.python.org/moin/Generators) that
 automatically reads all pages of a paginated result set.
 
 ```python
+
+commit_schema = {'type': 'object',
+                 'properties': {
+                     'sha': {
+                         'type': 'string',
+                         'key': True
+                     },
+                     'commit': {
+                         'type': 'object',
+                         'properties': {
+                             'committer': {
+                                 'type': 'object',
+                                 'properties': {
+                                     'date': {
+                                         'type': 'string',
+                                         'format': 'date-time'
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                 },
+                 'required': ['sha']
+             }
+```
+
+This is a partial schema of the commit data returned by the GitHub
+API.  It doesn't capture all of the properties of the data, but it
+does ensure that the `sha` field is required and treated as a key, and
+that the `commit.committer.date` field is treated like a date time,
+meaning it will be loaded into a `timestamp` field in the data
+warehouse.
+
+```python
 def get_all_commits(repo_path, since_date):
     query_string = '?since={}'.format(since_date) if since_date else ''
     latest_commit_time = None
 
     for response in authed_get_all_pages('https://api.github.com/repos/{}/commits{}'.format(repo_path, query_string)):
         commits = response.json()
-        stitchstream.write_records('commits', ['sha'], commits)
+        stitchstream.write_records('commits', commit_schema, commits)
         if not latest_commit_time:
             latest_commit_time = commits[0]['commit']['committer']['date']
 
@@ -240,7 +275,7 @@ This is the meat - it calls out to the appropriate GitHub API
 endpoint, using a `?since=` parameter to get only values that have
 occurred since a certain date - which lays the groundwork for this
 Streamer to use a bookmark.  It encodes the API response as JSON, and
-uses the `stitchstream.write_records(stream_name, key_fields, record)`
+uses the `stitchstream.write_records(stream_name, schema, record)`
 function to write each record to *stdout* in the appropriate
 format. After it has written all records, it writes a bookmark, with
 the value of the latest commit time of the repository.  Since the
