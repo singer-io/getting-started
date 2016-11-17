@@ -1,5 +1,5 @@
 # Stitch Streamer Specification
-## Version 0.1
+### Version 0.1
 
 A Stitch Streamer is an application that takes configuration and an
 optional Bookmark as input, and produces an ordered stream of Records
@@ -97,7 +97,7 @@ stream.
 Example:
 
 ```json
-{"type": "RECORD", "stream": "users", "schema": {"properties":{"id":{"type":"integer"}}}, "record": {"id": 0, "name": "Chris"}]}
+{"type": "RECORD", "stream": "users", "schema": {"properties":{"id":{"type":"integer"}}}, "record": {"id": 0, "name": "Chris"}}
 ```
 
 #### BOOKMARK
