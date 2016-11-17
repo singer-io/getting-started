@@ -1,4 +1,5 @@
 # Stitch Streamer Specification
+## Version 0.1
 
 A Stitch Streamer is an application that takes configuration and an
 optional Bookmark as input, and produces an ordered stream of Records
@@ -62,12 +63,12 @@ Streamer exits with a zero exit code on success, non-zero on failure.
 
 A Streamer must write a Header to `stdout` prior to any other
 output. The first line of the Header MUST define the protocol version.
-The last line of the Header MUST be “--”.  Lines in between define
-properties of the stream in a “Key: value” format.  Permitted keys
+The last line of the Header MUST be `--`.  Lines in between define
+properties of the stream in a `Key: value` format.  Permitted keys
 are:
 
- - Content-Type (required): defines the encoding of the
-   body. Permitted values are: jsonline.
+ - `Content-Type` **Required**. Defines the encoding of the
+   body. Permitted values are: `jsonline`.
 
 
 ### Body
@@ -82,12 +83,12 @@ following `type`s have specific meaning:
 RECORD messages contain the data from the data stream. They must have
 the following properties:
 
- - `record`: *Required*. A JSON map containing a streamed data point
+ - `record` **Required**. A JSON map containing a streamed data point
  
- - `schema`: *Required*. A [JSON Schema][schema] describing the
+ - `schema` **Required**. A [JSON Schema][schema] describing the
    contents of `record`
 
- - stream: *Required*. The name of the stream
+ - `stream` **Required**. The string name of the stream
 
 A single Streamer may output RECORDS messages with different stream
 names.  A single RECORDS entry may only contain records for a single
@@ -99,8 +100,6 @@ Example:
 {"type": "RECORD", "stream": "users", "schema": {"properties":{"id":{"type":"integer"}}}, "record": {"id": 0, "name": "Chris"}]}
 ```
 
-[schema]: http://json-schema.org/ "JSON Schema"
-
 #### BOOKMARK
 
 BOOKMARK messages contain a value that identifies the point in the
@@ -111,7 +110,7 @@ value, and all subsequent RECORDS entries come after or equal to the
 point in the stream corresponding to the BOOKMARK value. BOOKMARK
 messages have the following properties:
 
- - `value`: *Required*. The JSON formatted Bookmark value
+ - `value` **Required**. The JSON formatted Bookmark value
 
 The semantics of a BOOKMARK value are not part of the specification,
 and should be determined independently by each Streamer.
@@ -130,7 +129,12 @@ Content-Type: jsonline
 
 ## Versioning
 
-TODO
+A Streamer's API encompasses its input and output - including its
+configuration, how it interprets Bookmarks, and how the data it
+produces is structured and interpretted. Streamers should follow
+[Semantic Versioning](semver), meaning that breaking changes to any of
+these should be a new MAJOR version, and backwards-compatible changes
+should be a new MINOR version.
 
 ## Packaging
 
@@ -143,3 +147,6 @@ TODO
 ## Security Restrictions
 
 TODO
+
+[schema]: http://json-schema.org/ "JSON Schema"
+[semver]: http://semver.org/ "Semantic Versioning"
