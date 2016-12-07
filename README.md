@@ -10,14 +10,15 @@ data to a destination.
 ### Running a Streamer
 
 [Drift](https://github.com/stitchstreams/stream-drift),
-[Chargebee](https://github.com/stitchstreams/stream-chargebee) and
+[Chargebee](https://github.com/stitchstreams/stream-chargebee),
+[PagerDuty](https://github.com/stitchstreams/stream-pagerduty) and
 [GitHub](https://github.com/stitchstreams/stream-github) are a few
 examples of the data sources that have already been built with Stitch
 Streams.
 
-Start by installing the Streamer you intend to use, following the
-instructions provided by that Streamer.  The Streamer will also have
-instructions for being run.  For example, the GitHub Streamer is run with:
+Start by following the installation instructions provided by the
+Streamer you intend to use.  The Streamer will also have instructions
+for being run.  For example, the GitHub Streamer is run with:
 
 ```bash
 › GITHUB_ACCESS_TOKEN=<token> GITHUB_REPO_PATH=<repo> python stream_github.py
@@ -36,7 +37,8 @@ you see something like this:
 stitchstream/0.1
 Content-Type: jsonline
 --
-{"type": "RECORD", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}, "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "7c2f541396ff5b25d3f842ce617295ce50b027de", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/7c2f541396ff5b25d3f842ce617295ce50b027de", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T17:15:02Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "add using bookmarks section", ...}, "committer": { ... }, ...}}
+{"type": "SCHEMA", "stream": "commits", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}}
+{"type": "RECORD", "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "7c2f541396ff5b25d3f842ce617295ce50b027de", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/7c2f541396ff5b25d3f842ce617295ce50b027de", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T17:15:02Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "add using bookmarks section", ...}, "committer": { ... }, ...}}
 ...
 ```
 
@@ -44,19 +46,19 @@ then, good news - it's working!
 
 ### Persisting to Stitch
 
-But, streaming data into your console isn't very useful. To get the
+Streaming data into your console isn't very useful. To get the
 data to Stitch, you need to install the [Stitch
 Persister](https://github.com/stitchstreams/persist-stitch), following
 the instructions in its repository.
 
-Then, to send your Streamer's data to Stitch, [generate an Stitch
+To send your Streamer's data to Stitch, [generate an Stitch
 Import API
 token](https://docs.stitchdata.com/hc/en-us/articles/223759228-Getting-Started-with-the-Import-API#accesstoken),
 and pipe the output of the Streamer into the Stitch Persister, like
 this:
 
 ```bash
-› GITHUB_ACCESS_TOKEN=<token> GITHUB_REPO_PATH=<repo> python stream_github.py | persist-stitch -C <your Stitch client ID> -T <the Stitch import API token>
+› STITCH_TOKEN=<token> STITCH_CLIENT_ID=<number> GITHUB_ACCESS_TOKEN=<token> GITHUB_REPO_PATH=<repo> persist-stitch python stream_github.py
 ```
 
 In about 20 minutes or less, you'll have the data in your data
@@ -86,11 +88,11 @@ pass to the Streamer on the next run.
 
 If you can't find an existing Streamer for the data source you want to
 replicate, then it's time to build your own Streamer.  A Streamer is
-just a program, written in any language, that outputs data records and
-bookmarks to *stdout* in the Stitch Stream format.  You can read a
-detailed description of the format [here](format.html), but most of
-what you need to know can be seen in this simple example, which is the
-commit data from this repository produced by the
+just a program, written in any language, that outputs data to *stdout*
+in the Stitch Stream format.  You can read a detailed description of
+the format [here](format.html), but most of what you need to know can
+be seen in this simple example, which is the commit data from this
+repository produced by the
 [stream-github](https://github.com/stitchstreams/stream-github)
 Streamer:
 
@@ -98,19 +100,19 @@ Streamer:
 stitchstream/0.1
 Content-Type: jsonline
 --
-{"type": "RECORD", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}, "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "7c2f541396ff5b25d3f842ce617295ce50b027de", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/7c2f541396ff5b25d3f842ce617295ce50b027de", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T17:15:02Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "add using bookmarks section", ...}, "committer": { ... }, ...}}
-{"type": "RECORD", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}, "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "4f961d199e8f96c4eb4c7bc071e5028b75640271", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/4f961d199e8f96c4eb4c7bc071e5028b75640271", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T14:12:51Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "persisting to Stitch section", ...}, "committer": { ... }, ...}}
-{"type": "RECORD", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}, "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "55b7d7590ba0f0f56e4e0d9bafccf549cb56744e", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/55b7d7590ba0f0f56e4e0d9bafccf549cb56744e", "commit": {"comment_count": 0, "author": {"date": "2016-10-31T17:29:13Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "using existing pt1", ...}, "committer": { ... }, ...}}
-{"type": "RECORD", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}, "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ... }, "sha": "beb2d759464a067c44aebebe772c6e6c0f26c252", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/beb2d759464a067c44aebebe772c6e6c0f26c252", "commit": {"comment_count": 0, "author": {"date": "2016-10-31T16:55:48Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "first commit", ...}, "committer": { ... }, ...}}
+{"type": "SCHEMA", "stream": "commits", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}}
+{"type": "RECORD", "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "7c2f541396ff5b25d3f842ce617295ce50b027de", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/7c2f541396ff5b25d3f842ce617295ce50b027de", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T17:15:02Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "add using bookmarks section", ...}, "committer": { ... }, ...}}
+{"type": "RECORD", "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "4f961d199e8f96c4eb4c7bc071e5028b75640271", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/4f961d199e8f96c4eb4c7bc071e5028b75640271", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T14:12:51Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "persisting to Stitch section", ...}, "committer": { ... }, ...}}
+{"type": "RECORD", "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "55b7d7590ba0f0f56e4e0d9bafccf549cb56744e", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/55b7d7590ba0f0f56e4e0d9bafccf549cb56744e", "commit": {"comment_count": 0, "author": {"date": "2016-10-31T17:29:13Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "using existing pt1", ...}, "committer": { ... }, ...}}
+{"type": "RECORD", "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ... }, "sha": "beb2d759464a067c44aebebe772c6e6c0f26c252", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/beb2d759464a067c44aebebe772c6e6c0f26c252", "commit": {"comment_count": 0, "author": {"date": "2016-10-31T16:55:48Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "first commit", ...}, "committer": { ... }, ...}}
 {"type": "BOOKMARK", "value": "2016-11-01T17:15:02Z"}
 ```
 
 You can see that there's a two line header, a separator, and a bunch
 of JSON encoded data. JSON encoding is explicitly specified in the
 `Content-Type` header, and `jsonline` is currently the only supported
-data format (and we're working on providing support for richer data
-types - stay tuned).  `jsonline` means that each message is on a
-separate line, and there are two `type`s of message: `RECORD` and
+data format.  `jsonline` means that each message is on a separate
+line, and there are three `type`s of message: `RECORD`, `SCHEMA` and
 `BOOKMARK`.
 
 `RECORD` messages contain actual data points, and have
@@ -124,10 +126,15 @@ these properties:
 
  - `record` is the actual data point encoded as a JSON map
 
- - `schema` is a [JSON Schema](http://json-schema.org/) that describes
-   the structure of of the record. The `schema` can be used to
-   indicate data types (included extended types like date times), key
-   fields, and required fields.
+`SCHEMA` messages describe the structure of `data` in `RECORD`
+messages, and have these properties:
+
+-  `stream` is the name of the data stream being described
+
+- `schema` is a [JSON Schema](http://json-schema.org/) that describes
+  the structure of of the data. The `schema` can be used to indicate
+  data types (included extended types like date times), key fields,
+  and required fields.
 
 `BOOKMARK` messages allow the Streamer to checkpoint its progress.
 Use of BOOKMARKs is optional, but strongly encouraged for efficiency
