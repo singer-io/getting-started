@@ -84,9 +84,6 @@ RECORD messages contain the data from the data stream. They must have
 the following properties:
 
  - `record` **Required**. A JSON map containing a streamed data point
- 
- - `schema` **Required**. A [JSON Schema][schema] describing the
-   contents of `record`
 
  - `stream` **Required**. The string name of the stream
 
@@ -97,7 +94,28 @@ stream.
 Example:
 
 ```json
-{"type": "RECORD", "stream": "users", "schema": {"properties":{"id":{"type":"integer"}}}, "record": {"id": 0, "name": "Chris"}}
+{"type": "RECORD", "stream": "users", "record": {"id": 0, "name": "Chris"}}
+```
+
+#### SCHEMA
+
+SCHEMA messages describe the structure of data in the stream. They
+must have the following properties:
+ 
+ - `schema` **Required**. A [JSON Schema][schema] describing the
+   `data` property of RECORDs from the same `stream`
+
+ - `stream` **Required**. The string name of the stream that this
+   schema describes
+
+A single Streamer may output SCHEMA messages with different stream
+names.  If a RECORD message from a stream is not preceded by a
+`SCHEMA` message for that stream, it is assumed to be schema-less.
+
+Example:
+
+```json
+{"type": "SCHEMA", "stream": "users", "schema": {"properties":{"id":{"type":"integer"}}}, "record": {"id": 0, "name": "Chris"}}
 ```
 
 #### BOOKMARK
@@ -121,9 +139,11 @@ and should be determined independently by each Streamer.
 stitchstream/0.1
 Content-Type: jsonline
 --
-{"type": "RECORD", "schema": {"required": ["id"], "type": "object", "properties": {"id": {"key": true, "type": "integer"}}}, "stream": "users", "record": {"id": 1, "name": "Chris"}}
-{"type": "RECORD", "schema": {"required": ["id"], "type": "object", "properties": {"id": {"key": true, "type": "integer"}}}, "stream": "users", "record": {"id": 2, "name": "Mike"}}
-{"type": "RECORD", "schema": {"required": ["id"], "type": "object", "properties": {"id": {"key": true, "type": "integer"}}}, "stream": "locations", "record": {"id": 1, "name": "Philadelphia"}}
+{"type": "SCHEMA", "stream": "users", "schema": {"required": ["id"], "type": "object", "properties": {"id": {"key": true, "type": "integer"}}}}
+{"type": "RECORD", "stream": "users", "record": {"id": 1, "name": "Chris"}}
+{"type": "RECORD", "stream": "stream": "users", "record": {"id": 2, "name": "Mike"}}
+{"type": "SCHEMA", "stream": "locations", "schema": {"required": ["id"], "type": "object", "properties": {"id": {"key": true, "type": "integer"}}}}
+{"type": "RECORD", "stream": "locations", "record": {"id": 1, "name": "Philadelphia"}}
 {"type": "BOOKMARK", "value": {"users": 2, "locations": 1}}
 ```
 
