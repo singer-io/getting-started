@@ -5,7 +5,22 @@ A Stitch Stream comprises two applications - a *Streamer* that
 extracts data from a data source, and a *Persister* that saves the
 data to a destination.
 
-## Using an existing Streamer
+Persisters can send data anywhere - like S3, your local filesystem, a
+queue or a database. We have built the [Stitch
+persister](https://github.com/stitchstreams/persist-stitch) to send
+data to the Stitch Import API.
+
+Topics:
+
+ - [Using Streams to get data into Stitch](#using-streams-to-get-data-into-stitch)
+ - Using Streams to get data into other destinations
+ - Developing a Streamer
+   - Why is a code-based solution preferable to a graphical one?
+   - Schemas
+   - How bookmarks work
+ - Running your Streamer with Stitch
+
+## Using Streams to get data into Stitch
 
 ### Running a Streamer
 
