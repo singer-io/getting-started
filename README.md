@@ -299,7 +299,7 @@ scheduling, monitoring, and bookmark handling.  If you'd like to
 participate in the closed beta of the Platform, contact us in our
 [Slack channel]
 
-[Slack channel]: unknown
+[Slack channel]: https://stitch-streams-slack.herokuapp.com/
 [Stitch persister]: https://github.com/stitchstreams/persist-stitch
 [GitHub streamer]: https://github.com/stitchstreams/stream-github
 [JSON Schema]: http://json-schema.org/
