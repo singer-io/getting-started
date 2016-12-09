@@ -1,52 +1,52 @@
 # Getting Started with Streams
 
 Streams are the best way to get new data sources into Stitch.  A
-Stream is produced by a *Streamer* application, and consumed by a
-*Persister* application.
+Stream is produced by a *streamer* application, and consumed by a
+*persister* application.
 
 Persisters typically save data somewhere - anywhere - like S3, your
 local filesystem, a queue or a database. We built the [Stitch
-Persister] to send data to the Stitch Import API.
+persister] to send data to the Stitch Import API.
 
 **Topics**
 
  - [Using Streams to get data into Stitch](#using-streams-to-get-data-into-stitch)
  - [Using Streams to get data into other destinations](#using-streams-to-get-data-into-other-destinations)
- - [Developing a Streamer](#developing-a-streamer)
- - [Running your Streamer from Stitch](#running-your-streamer-from-stitch)
+ - [Developing a streamer](#developing-a-streamer)
+ - [Running your streamer from Stitch](#running-your-streamer-from-stitch)
 
 ## Using Streams to get data into Stitch
 
 Stitch is built on top of the Streams framework, and soon you'll be
-able to run your own custom Streamers from within the Stitch Platform,
+able to run your own custom streamers from within the Stitch Platform,
 which will take care of provisioning hardware, scheduling,
-configuration and monitoring.  Until then, you can run a Streamer on
-your own hardware, and connect it to the [Stitch Persister] to send data
+configuration and monitoring.  Until then, you can run a streamer on
+your own hardware, and connect it to the [Stitch persister] to send data
 to Stitch.
 [Drift](https://github.com/stitchstreams/stream-drift),
 [Chargebee](https://github.com/stitchstreams/stream-chargebee),
 [PagerDuty](https://github.com/stitchstreams/stream-pagerduty) and
-[GitHub](GitHub Streamer) are a few
+[GitHub](GitHub streamer) are a few
 examples of the data sources that have already been built with
 Streams.
 
-### Example - Sending GitHub data to Stitch with the GitHub Streamer
+### Example - Sending GitHub data to Stitch with the GitHub streamer
 
-You can run the [GitHub Streamer] with the [Stitch Persister] to send
+You can run the [GitHub streamer] with the [Stitch persister] to send
 data about a GitHub repository activity to Stitch. The steps required
 are:
 
  - [Setup a Python 3 environment](#setup-a-python-3-environment)
- - [Install the Stitch Persister](#install-the-stitch-persister)
- - [Install the GitHub Streamer](#install-the-github-streamer)
+ - [Install the Stitch persister](#install-the-stitch-persister)
+ - [Install the GitHub streamer](#install-the-github-streamer)
  - [Create a GitHub access token](#create-a-github-access-token)
  - [Create a new Stitch Connection](#create-a-new-stitch-connection)
- - [Run the GitHub Streamer with the Stitch Persister](#run-the-github-streamer-with-the-stitch-persister)
+ - [Run the GitHub streamer with the Stitch persister](#run-the-github-streamer-with-the-stitch-persister)
  - [Save and Use Bookmarks](#save-and-use-bookmarks)
 
 #### Setup a Python 3 environment
 
-The [Stitch Persister] requires Python 3.5.0 or greater. You can check
+The [Stitch persister] requires Python 3.5.0 or greater. You can check
 your Python version with:
 
 ```bash
@@ -73,14 +73,14 @@ with python.  You can check for pip with:
 pip 9.0.1 from /Users/cmerrick/.virtualenvs/stitchstream/lib/python3.5/site-packages (python 3.5)
 ```
 
-Confirm that pip is linked to your python 3 installation, and if not,
+Confirm that `pip` is linked to your Python 3 installation, and if not,
 check to see if it's aliased to `pip3`.  Installation instructions can
 be found in the [pip docs](https://pip.readthedocs.io/en/stable/) if
 yours is missing.
 
-#### Install the Stitch Persister
+#### Install the Stitch persister
 
-The [Stitch Persister] is available as a pip package.  Install it with:
+The [Stitch persister] is available as a pip package.  Install it with:
 
 ```bash
 › pip install persist-stitch
@@ -88,9 +88,9 @@ The [Stitch Persister] is available as a pip package.  Install it with:
 
 This installs an executable called `persist-stitch`.
 
-#### Install the GitHub Streamer
+#### Install the GitHub streamer
 
-Clone the [GitHub Streamer] repository and install its pip
+Clone the [GitHub streamer] repository and install its pip
 dependencies:
 
 ```bash
@@ -105,7 +105,7 @@ dependencies:
 Login to your GitHub account, go to the [Personal Access
 Tokens](https://github.com/settings/tokens) settings page, and
 generate a new token with at least the `repo` scope.  Temporarily
-record this token somewhere secure, you'll need it in just a minute.
+record this token somewhere secure, you'll need it later.
 
 #### Create a new Stitch Connection
 
@@ -115,15 +115,15 @@ You'll need to provide a name for the connection - something like
 'github' is probably appropriate - and temporarily record the token
 somewhere secure.
 
-#### Run the GitHub Streamer with the Stitch Persister
+#### Run the GitHub streamer with the Stitch persister
 
 To run the streamer and persister together you'll need the following
 values:
 
- - Stitch Client ID: This is the number in the URL when you login to Stitch
- - Stitch API Token: The token you saved temporarily when you created the Import API connection.
- - GitHub Token: The token you saved temporarily from GitHub
- - GitHub Repo Path: The relative path of the repository you want to pull activity data for. For example, to pull activity for this repository - http://github.com/stitchstreams/getting-started - the path would be `stitchstreams/getting-started`.
+ - *Stitch Client ID* - This is the number in the URL when you login to Stitch
+ - *Stitch API Token* - The token you saved temporarily when you created the Import API connection.
+ - *GitHub Token* - The token you saved temporarily from GitHub
+ - *GitHub Repo Path* - The relative path of the repository you want to pull activity data for. For example, to pull activity for this repository - http://github.com/stitchstreams/getting-started - the path would be `stitchstreams/getting-started`.
 
 Add these values to your environment:
 
@@ -134,14 +134,14 @@ Add these values to your environment:
 › export GITHUB_REPO_PATH=<github repo path>
 ```
 
-Then, running the Streamer and Persister together is as simple as:
+Then, run the streamer and persister together:
 
 ```bash
 › persist-stitch python stream_github.py
 ```
 
 There are two parts to this command: running `persist-stitch`, and
-passing it the command to run `stream_github.py`.  If successful,
+passing it the command to run the streamer.  If successful,
 you'll see output like this:
 
 ```bash
@@ -169,9 +169,9 @@ persister once it has persisted all data prior to the bookmark.
 
 Streamers like the GitHub streamer can also accept a *FILE* argument
 that, if present, points to a file containing the last persisted
-bookmark value.  This enables Streams to work incrementally - the
+bookmark value.  This enables streamers to work incrementally - the
 bookmark checkpoints the last value that was persisted, and the next
-time the streamer is run it picks up from that point.
+time the streamer is run it should pick up from that point.
 
 To run the GitHub streamer incrementally, point it to a bookmark file
 and capture the persister's `stdout` like this:
@@ -193,29 +193,36 @@ to the last line in it.
 ## Using Streams to get data into other destinations
 
 [Stitch] provides a hosted pipeline for loading data into multiple
-data warehouse platforms. But, different Persisters can be used to
-send streams to different destinations - like files, S3 buckets,
-databases, queues, and APIs. If you'd like to build a different
-persister, check out the [Stitch Persister] for guidance, and join
-our [Slack channel] to get help from our team.
+data warehouse platforms. We wrote the Stitch persister to send data
+to the Stitch API, so that Stitch can handle processing and loading
+the data.  But, different persisters can be used to send streams to
+different destinations - like files, S3 buckets, databases, queues,
+and APIs. If you'd like to build a different persister, check out the
+[Stitch persister] for guidance, and join our [Slack channel] to get
+help from our team.
 
-## Developing a Streamer
+## Developing a streamer
 
-If you can't find an existing Streamer for your data source, then it's
+If you can't find an existing streamer for your data source, then it's
 time to build your own.
 
+**Topics**:
+ - [Hello, world](#hello-world)
+ - [A Python streamer](#a-python-streamer)
+ 
 ### Hello, world
 
-A Streamer is just a program, written in any language, that outputs
-data to *stdout* in the [Stream format] In fact, your first Streamer
+A streamer is just a program, written in any language, that outputs
+data to *stdout* in the [Stream format]. In fact, your first streamer
 can be written from the command line, without any programming at all:
 
 ```bash
 › printf 'stitchstream/0.1\ncontent-type: jsonline\n--\n{"type":"RECORD","stream":"hello","record":{"value":"world"}}\n'
 ```
 
-That data can be sent to Stitch by running the command from the [Stitch
-Persister]:
+This streams the datapoint `{"value":"world"}` to the "hello"
+stream. That data can be sent to Stitch by running the command from
+the [Stitch persister]:
 
 ```bash
 › export STITCH_TOKEN=redacted
@@ -225,10 +232,10 @@ Persister]:
 INFO:root:Persisted 1 records to Stitch
 ```
 
-### A Python Streamer
+### A Python streamer
 
-To move beyond "Hello, world" you'll need a real programming language.
-Although any language will do, we have built a python library to help
+To move beyond *Hello, world* you'll need a real programming language.
+Although any language will do, we have built a Python library to help
 you get up and running quickly.
 
 Let's write a streamer called `stream_ip.py` that retrieves the
@@ -276,14 +283,14 @@ Finally, we make the HTTP request, parse the response, and then make
 two calls to the `stitchstream` library: first, to write the schema of
 the `'my_ip'` stream, and then to write a record to that stream.
 
-We can send this data to Stitch by running our new Streamer with the
-[Stitch Persister]:
+We can send this data to Stitch by running our new streamer with the
+[Stitch persister]:
 
 ```bash
 › persist-stitch python stream_ip.py
 ```
 
-## Running your Streamer from Stitch
+## Running your streamer from Stitch
 
 Soon, the Stitch Platform will be able to run *your* streamers.
 You'll submit your code, along with a manifest describing how to run
@@ -293,8 +300,8 @@ participate in the closed beta of the Platform, contact us in our
 [Slack channel]
 
 [Slack channel]: unknown
-[Stitch Persister]: https://github.com/stitchstreams/persist-stitch
-[GitHub Streamer]: https://github.com/stitchstreams/stream-github
+[Stitch persister]: https://github.com/stitchstreams/persist-stitch
+[GitHub streamer]: https://github.com/stitchstreams/stream-github
 [JSON Schema]: http://json-schema.org/
 [Stream format]: https://github.com/StitchStreams/getting-started/blob/master/SPEC.md
 [homebrew]: http://brew.sh
