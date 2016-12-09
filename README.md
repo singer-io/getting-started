@@ -1,344 +1,294 @@
-# Getting Started with Stitch Streams
+# Getting Started with Streams
 
-Stitch Streams are the best way to get new data sources into Stitch.
-A Stitch Stream comprises two applications - a *Streamer* that
-extracts data from a data source, and a *Persister* that saves the
-data to a destination.
+Streams are the best way to get new data sources into Stitch.  A
+Stream is produced by a Streamer application, and consumed by a
+*Persister* application.
 
-Persisters can send data anywhere - like S3, your local filesystem, a
-queue or a database. We have built the [Stitch
-persister](https://github.com/stitchstreams/persist-stitch) to send
+Persisters typically save data somewhere - anywhere - like S3, your
+local filesystem, a queue or a database. We built the [Stitch
+Persister](https://github.com/stitchstreams/persist-stitch) to send
 data to the Stitch Import API.
 
 Topics:
 
  - [Using Streams to get data into Stitch](#using-streams-to-get-data-into-stitch)
- - Using Streams to get data into other destinations
- - Developing a Streamer
-   - Why is a code-based solution preferable to a graphical one?
-   - Schemas
-   - How bookmarks work
- - Running your Streamer with Stitch
+ - [Using Streams to get data into other destinations](#using-streams-to-get-data-into-other-destinations)
+ - [Developing a Streamer](#developing-a-streamer)
+ - [Running your Streamer from Stitch](#running-your-streamer-from-stitch)
 
 ## Using Streams to get data into Stitch
 
-### Running a Streamer
-
+Stitch is built on top of the Streams framework, and soon you'll be
+able to run your own custom Streamers from within the Stitch Platform,
+which will take care of provisioning hardware, scheduling,
+configuration and monitoring.  Until then, you can run a Streamer on
+your own hardware with the Stitch Persister to send data to Stitch
+from your machine.
 [Drift](https://github.com/stitchstreams/stream-drift),
 [Chargebee](https://github.com/stitchstreams/stream-chargebee),
 [PagerDuty](https://github.com/stitchstreams/stream-pagerduty) and
 [GitHub](https://github.com/stitchstreams/stream-github) are a few
-examples of the data sources that have already been built with Stitch
+examples of the data sources that have already been built with
 Streams.
 
-Start by following the installation instructions provided by the
-Streamer you intend to use.  The Streamer will also have instructions
-for being run.  For example, the GitHub Streamer is run with:
+### Example - Sending GitHub data to Stitch with the GitHub Streamer
+
+You can run the [GitHub
+Streamer](https://github.com/stitchstreams/stream-github) with the
+[Stitch Persister](https://github.com/stitchstreams/persist-stitch) to
+send data about a GitHub repository activity to Stitch. The steps
+required to do this are:
+
+ - [Setup a Python 3 environment](#setup-a-python-3-environment)
+ - [Install the Stitch Persister](#install-the-stitch-persister)
+ - [Install the GitHub Streamer](#install-the-github-streamer)
+ - [Create a new Stitch Connection for your GitHub data](#create-a-new-stitch-connection-for-your-github-data)
+ - [Run the GitHub Streamer with the Stitch Persister](#run-the-github-streamer-with-the-stitch-persister)
+ - [Save and Use Bookmarks](#save-and-use-bookmarks)
+
+#### Setup a Python 3 environment
+
+The Stitch Persister requires Python 3.5.0 or greater. You can check
+your Python version with:
 
 ```bash
-› GITHUB_ACCESS_TOKEN=<token> GITHUB_REPO_PATH=<repo> python stream_github.py
+› python --version
+Python 3.5.2
 ```
 
-Notice that this Streamer reads a token out of the environment. This
-is a common pattern, and means that you'll have to login to the
-service in question to retrieve those parameters.  As much as
-possible, Streamers will also have instructions about where to find
-these values.
+If you aren't on a compatible version, install the latest version of
+Python 3.  If you're on macOS, we recommend using [homebrew][homebrew]
+to `brew install python3`.  Installation instructions for other
+platforms can be found
+[here](http://www.diveintopython3.net/installing-python.html).
 
-Once you have the necessary parameters, you can run the streamer.  If
-you see something like this:
+Depending on how you perform the install, you might end up with Python
+3 aliased as `python3` in your PATH.  Be sure to confirm your `python
+--version`, and swap `python3` for `python` in the commands below if
+necessary.
+
+pip - the python package manager - should have been installed along
+with python.  You can check for pip with:
 
 ```bash
-stitchstream/0.1
-Content-Type: jsonline
---
-{"type": "SCHEMA", "stream": "commits", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}}
-{"type": "RECORD", "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "7c2f541396ff5b25d3f842ce617295ce50b027de", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/7c2f541396ff5b25d3f842ce617295ce50b027de", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T17:15:02Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "add using bookmarks section", ...}, "committer": { ... }, ...}}
+› pip --version
+pip 9.0.1 from /Users/cmerrick/.virtualenvs/stitchstream/lib/python3.5/site-packages (python 3.5)
+```
+
+Confirm that pip is linked to your python 3 installation, and if not,
+check to see if it's aliased to `pip3`.  Installation instructions can
+be found in the [pip docs](https://pip.readthedocs.io/en/stable/) if
+yours is missing.
+
+#### Install the Stitch Persister
+
+The Stitch Persister is available as a pip package.  Install it with:
+
+```bash
+› pip install persist-stitch
+```
+
+This installs an executable called `persist-stitch`.
+
+#### Install the GitHub Streamer
+
+Clone the [GitHub Streamer
+repository](https://github.com/stitchstreams/stream-github) and
+install its pip dependencies:
+
+```bash
+› git clone git@github.com:stitchstreams/stream-github
 ...
+› cd stream-github
+› pip install -r requirements.txt
 ```
 
-then, good news - it's working!
+#### Create a GitHub access token
 
-### Persisting to Stitch
+Login to your GitHub account, go to the [Personal Access
+Tokens](https://github.com/settings/tokens) settings page, and
+generate a new token with at least the `repo` scope.  Temporarily
+record this token somewhere secure, you'll need it in just a minute.
 
-Streaming data into your console isn't very useful. To get the
-data to Stitch, you need to install the [Stitch
-Persister](https://github.com/stitchstreams/persist-stitch), following
-the instructions in its repository.
+#### Create a new Stitch Connection for your GitHub data
 
-To send your Streamer's data to Stitch, [generate an Stitch
-Import API
-token](https://docs.stitchdata.com/hc/en-us/articles/223759228-Getting-Started-with-the-Import-API#accesstoken),
-and pipe the output of the Streamer into the Stitch Persister, like
-this:
+Login to your [Stitch account](https://app.stitchdata.com) and
+[generate an Stitch Import API
+token](https://docs.stitchdata.com/hc/en-us/articles/223759228-Getting-Started-with-the-Import-API#accesstoken).
+You'll need to provide a name for the connection - something like
+'github' is probably appropriate - and temporarily record the token
+somewhere secure.
+
+#### Run the GitHub Streamer with the Stitch Persister
+
+To run the streamer and persister together you'll need the following
+values:
+
+ - Stitch Client ID: This is the number in the URL when you login to Stitch
+ - Stitch API Token: The token you saved temporarily when you created the Import API connection.
+ - GitHub Token: The token you saved temporarily from GitHub
+ - GitHub Repo Path: The relative path of the repository you want to pull activity data for. For example, to pull activity for this repository - http://github.com/stitchstreams/getting-started - the path would be `stitchstreams/getting-started`.
+
+Add these values to your environment:
 
 ```bash
-› STITCH_TOKEN=<token> STITCH_CLIENT_ID=<number> GITHUB_ACCESS_TOKEN=<token> GITHUB_REPO_PATH=<repo> persist-stitch python stream_github.py
+› export STITCH_CLIENT_ID=<stitch client id>
+› export STITCH_TOKEN=<stitch token>
+› export GITHUB_ACCESS_TOKEN=<github token>
+› export GITHUB_REPO_PATH=<github repo path>
 ```
 
-In about 20 minutes or less, you'll have the data in your data
-warehouse.
+Then, running the Streamer and Persister together is as simple as:
 
-### Using Bookmarks
-
-Many Streamers output Bookmark values to keep track of what data has
-been replicated.  A common example of a Bookmark value is an *updated
-at* field on a record - if a Streamer knows that it has replicated all
-data prior to a certain value of the *updated at* field, then, the
-next time it runs, it only needs to replicate the data updated after
-that value.
-
-Bookmark values are output to the same *stdout* stream that you saw
-when you ran the Streamer.  When the Stitch Persister encounters a
-Bookmark, it writes the value to *stdout* once it has successfully
-persisted all prior records.  Streamers that support bookmarks will
-take a filename containing the last bookmark as an input parameter. To
-provide this value to the Streamer, pipe the Persister's stdout to
-`tail -1` and redirect that to a file - that's the file you should
-pass to the Streamer on the next run.
-
-## Building a new Streamer
-
-### Overview
-
-If you can't find an existing Streamer for the data source you want to
-replicate, then it's time to build your own Streamer.  A Streamer is
-just a program, written in any language, that outputs data to *stdout*
-in the Stitch Stream format.  You can read a detailed description of
-the format [here](format.html), but most of what you need to know can
-be seen in this simple example, which is the commit data from this
-repository produced by the
-[stream-github](https://github.com/stitchstreams/stream-github)
-Streamer:
-
-```json
-stitchstream/0.1
-Content-Type: jsonline
---
-{"type": "SCHEMA", "stream": "commits", "schema": {"required": ["sha"], "type": "object", "properties": {"sha": {"key": true, "type": "string"}}}}
-{"type": "RECORD", "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "7c2f541396ff5b25d3f842ce617295ce50b027de", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/7c2f541396ff5b25d3f842ce617295ce50b027de", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T17:15:02Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "add using bookmarks section", ...}, "committer": { ... }, ...}}
-{"type": "RECORD", "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "4f961d199e8f96c4eb4c7bc071e5028b75640271", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/4f961d199e8f96c4eb4c7bc071e5028b75640271", "commit": {"comment_count": 0, "author": {"date": "2016-11-01T14:12:51Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "persisting to Stitch section", ...}, "committer": { ... }, ...}}
-{"type": "RECORD", "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ...}, "sha": "55b7d7590ba0f0f56e4e0d9bafccf549cb56744e", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/55b7d7590ba0f0f56e4e0d9bafccf549cb56744e", "commit": {"comment_count": 0, "author": {"date": "2016-10-31T17:29:13Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "using existing pt1", ...}, "committer": { ... }, ...}}
-{"type": "RECORD", "stream": "commits", "record": {"author": {"id": 207186, "site_admin": false, "login": "cmerrick", "type": "User", "html_url": "https://github.com/cmerrick", ... }, "sha": "beb2d759464a067c44aebebe772c6e6c0f26c252", "url": "https://api.github.com/repos/StitchStreams/getting-started/commits/beb2d759464a067c44aebebe772c6e6c0f26c252", "commit": {"comment_count": 0, "author": {"date": "2016-10-31T16:55:48Z", "email": "cmerrick@rjmetrics.com", "name": "Christopher Merrick"}, "message": "first commit", ...}, "committer": { ... }, ...}}
-{"type": "BOOKMARK", "value": "2016-11-01T17:15:02Z"}
+```bash
+› persist-stitch python stream_github.py
 ```
 
-You can see that there's a two line header, a separator, and a bunch
-of JSON encoded data. JSON encoding is explicitly specified in the
-`Content-Type` header, and `jsonline` is currently the only supported
-data format.  `jsonline` means that each message is on a separate
-line, and there are three `type`s of message: `RECORD`, `SCHEMA` and
-`BOOKMARK`.
+There are two parts to this command: running `persist-stitch`, and
+passing it the command to run `stream_github.py`.  If successful,
+you'll see output like this:
 
-`RECORD` messages contain actual data points, and have
-these properties:
+```bash
+› persist-stitch python stream_github.py
+INFO:root:Subprocess started 48434
+2016-12-08 16:41:55,969 - root - INFO - Replicating all commits from stitchstreams/getting-started
+2016-12-08 16:41:55,998 - requests.packages.urllib3.connectionpool - INFO - Starting new HTTPS connection (1): api.github.com
+2016-12-08 16:41:56,558 - requests.packages.urllib3.connectionpool - DEBUG - "GET /repos/stitchstreams/getting-started/commits HTTP/1.1" 200 None
+2016-12-08 16:41:56,613 - requests.packages.urllib3.connectionpool - DEBUG - "GET /repos/stitchstreams/getting-started/issues?sort=updated&direction=asc HTTP/1.1" 200 None
+INFO:root:Waiting for process 48434 to complete
+INFO:root:Subprocess 48434 returned code 0
+INFO:root:Persisted 15 records to Stitch
+{"issues": "2016-11-05T04:00:33Z", "commits": "2016-12-08T14:56:00Z"}
+```
 
- - `stream` is the name of the data stream, which will eventually get
-   mapped to a table in your data warehouse.  A single Streamer can
-   produce messages with any number of streams, and different data
-   tables or collections in a data source are frequently separated
-   into different streams.
+#### Save and Use Bookmarks
 
- - `record` is the actual data point encoded as a JSON map
+When `persist-stitch` is run as above, it writes log lines to
+`stderr`, but `stdout` is reserved for outputting *bookmarks*. The
+last line in the output above is an example of a bookmark - it
+contains the date of the latest issue and commit extracted by the
+streamer. A bookmark is a JSON-formatted string that is injected into
+the data stream by the streamer, and then output to `stdout` by the
+persister once it has persisted all data prior to the bookmark.
 
-`SCHEMA` messages describe the structure of `data` in `RECORD`
-messages, and have these properties:
+Streamers like the GitHub streamer can also accept a *FILE* argument
+that, if present, points to a file containing the last persisted
+bookmark value.  This enables Streams to work incrementally - the
+bookmark checkpoints the last value that was persisted, and the next
+time the streamer is run it picks up from that point.
 
--  `stream` is the name of the data stream being described
+To run the GitHub streamer incrementally, point it to a bookmark file
+and capture the persister's `stdout` like this:
 
-- `schema` is a [JSON Schema](http://json-schema.org/) that describes
-  the structure of of the data. The `schema` can be used to indicate
-  data types (included extended types like date times), key fields,
-  and required fields.
+```bash
+› persist-stitch python stream_github.py bookmark.out >> bookmark.out
+```
 
-`BOOKMARK` messages allow the Streamer to checkpoint its progress.
-Use of BOOKMARKs is optional, but strongly encouraged for efficiency
-and fault tolerance. When a persister encounters a BOOKMARK message,
-it holds on to it, and then outputs that message once it has
-successfully persisted all RECORD messages that occurred prior to the
-BOOKMARK. The structure of a BOOKMARK message's `value` property is
-entirely up to the Streamer that creates it - as long as it is
-JSON-encoded and below 1MB.  A BOOKMARK value should apply to the
-*entire* Streamer, not an individual sub-stream, so if the Streamer
-replicates multi sub-streams that all have different check points, it
-is common to put the check point values into a map keyed by the stream
-name.
+Notice that we're appending the bookmark to the same bookmark file
+we're reading in, meaning the latest bookmark will be the *last* line
+in that file. The streamer is already configured to look only at the
+last line, so that's OK, and this means the bookmark file will serve
+as a log of the bookmarks that were used, which may be helpful for
+debugging. It also means that the bookmark file will grow without
+bounds, so you may occasionally want to archive or delete lines prior
+to the last line in it.
 
-### Example - the GitHub Streamer
 
-Lets look at how these messages are created using the [GitHub
-Streamer](https://github.com/stitchstreams/stream-github) - written in
-Python - as an example. Although Streamers can be written in any
-programming language that can send data to *stdout*, we intend to
-publish libraries and guides for Python first, since it is commonly
-used for data processing.
+## Using Streams to get data into other destinations
 
-It's only about 75 lines of code, so lets walk through it starting at
-the beginning:
+TODO
+
+## Developing a Streamer
+
+If you can't find an existing Streamer for your data source, then it's
+time to build your own.
+
+### Hello, world
+
+A Streamer is just a program, written in any language, that outputs
+data to *stdout* in the [Stream
+format](https://github.com/StitchStreams/getting-started/blob/master/SPEC.md).
+In fact, your first Streamer can be written from the command line,
+without any programming at all:
+
+```bash
+› printf 'stitchstream/0.1\ncontent-type: jsonline\n--\n{"type":"RECORD","stream":"hello","record":{"value":"world"}}\n'
+```
+
+That data can be sent to Stitch by running the command from the Stitch
+Persister:
+
+```bash
+› export STITCH_TOKEN=redacted
+› export STITCH_CLIENT_ID=redacted
+› persist-stitch printf 'stitchstream/0.1\ncontent-type: jsonline\n--\n{"type":"RECORD","stream":"hello","record":{"value":"world"}}\n'
+...
+INFO:root:Persisted 1 records to Stitch
+```
+
+### A Python Streamer
+
+To move beyond "Hello, world" you'll need a real programming language.
+Although any language will do, we have built a python library to help
+you get up and running quickly.
+
+Let's write a streamer called `stream_ip.py` that retrieves the
+current public IP using icanhazip.com, and writes that data with a
+timestamp.
+
+First, install the `stitchstreams` helper library with `pip`:
+
+```bash
+› pip install stitchstreams
+```
+
+Then, open up a new file called `stream_ip.py` in your favorite editor.
 
 ```python
-import os
-import argparse
-import logging
-import requests
 import stitchstream
+import urllib.request
+from datetime import datetime, timezone
 ```
 
-The `os` and `argparse` modules are used to read environment variables
-and command-line variables, respectively.  `requests` is a fantastic
-Python HTTP library that we'll use to make requests to the GitHub API.
-`stitchstream` is a library that we've written to make it easy to
-write `RECORD` and `BOOKMARK` messages. Using the `logging` library is
-a good practice, and helps ensure that we don't `print` any lines to
-stdout that would corrupt our data output.
+We'll use the `datetime` module to get the current timestamp, the
+`stitchstream` module to write data to `stdout` in the correct format,
+and the `urllib.request` module to make a request to icanhazip.com.
 
 ```python
-session = requests.Session()
-logger = logging.getLogger()
+now = datetime.now(timezone.utc).isoformat()
+schema = {'properties':	
+	  {'ip': {'type': 'string'},
+           'timestamp': {'type': 'string',
+           	         'format': 'date-time'}}}
 ```
 
-Initialize the logger and a [Requests
-session](http://docs.python-requests.org/en/master/user/advanced/#session-objects).
+This sets up some of the data we'll need - the current time, and the
+schema of the data we'll be writing to the stream formatted as a [JSON
+Schema](http://json-schema.org/).
 
 ```python
-def get_env_or_throw(key):
-    value = os.environ.get(key)
-
-    if value == None:
-        raise Exception('Missing ' + key + ' environment variable!')
-
-    return value
+with urllib.request.urlopen('http://icanhazip.com') as response:
+    ip = response.read().decode('utf-8').strip()
+    stitchstream.write_schema('my_ip', schema)
+    stitchstream.write_records('my_ip', [{'timestamp': now,'ip': ip}])
 ```
 
-This is a helper method to read environment variables, and fail hard
-if one is not set.
+Finally, we make the HTTP request, parse the response, and then make
+two calls to the `stitchstream` library: first, to write the schema of
+the `'my_ip'` stream, and then to write a record to that stream.
 
-```python
-def configure_logging(level=logging.DEBUG):
-    global logger
-    logger.setLevel(level)
-    ch = logging.StreamHandler()
-    ch.setLevel(level)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
+We can send this data to Stitch by running our new Streamer with the
+Stitch Persister:
+
+```bash
+› persist-stitch python stream_ip.py
 ```
 
-This is a helper method to properly configure the logger.
+## Running your Streamer from Stitch
 
-```python
-def authed_get(url):
-    return session.request(method='get', url=url)
-
-def authed_get_all_pages(url):
-    while True:
-        r = authed_get(url)
-        yield r
-        if 'next' in r.links:
-            url = r.links['next']['url']
-        else:
-            break
-```
-
-These methods make requests to the GitHub API using the previously
-established Requests session.  The `authed_get_all_pages` helper
-method is a [generator](https://wiki.python.org/moin/Generators) that
-automatically reads all pages of a paginated result set.
-
-```python
-
-commit_schema = {'type': 'object',
-                 'properties': {
-                     'sha': {
-                         'type': 'string',
-                         'key': True
-                     },
-                     'commit': {
-                         'type': 'object',
-                         'properties': {
-                             'committer': {
-                                 'type': 'object',
-                                 'properties': {
-                                     'date': {
-                                         'type': 'string',
-                                         'format': 'date-time'
-                                     }
-                                 }
-                             }
-                         }
-                     }
-                 },
-                 'required': ['sha']
-             }
-```
-
-This is a partial schema of the commit data returned by the GitHub
-API.  It doesn't capture all of the properties of the data, but it
-does ensure that the `sha` field is required and treated as a key, and
-that the `commit.committer.date` field is treated like a date time,
-meaning it will be loaded into a `timestamp` field in the data
-warehouse.
-
-```python
-def get_all_commits(repo_path, since_date):
-    query_string = '?since={}'.format(since_date) if since_date else ''
-    latest_commit_time = None
-
-    for response in authed_get_all_pages('https://api.github.com/repos/{}/commits{}'.format(repo_path, query_string)):
-        commits = response.json()
-        stitchstream.write_records('commits', commit_schema, commits)
-        if not latest_commit_time:
-            latest_commit_time = commits[0]['commit']['committer']['date']
-
-    stitchstream.write_bookmark(latest_commit_time)
-```
-
-This is the meat - it calls out to the appropriate GitHub API
-endpoint, using a `?since=` parameter to get only values that have
-occurred since a certain date - which lays the groundwork for this
-Streamer to use a bookmark.  It encodes the API response as JSON, and
-uses the `stitchstream.write_records(stream_name, schema, record)`
-function to write each record to *stdout* in the appropriate
-format. After it has written all records, it writes a bookmark, with
-the value of the latest commit time of the repository.  Since the
-GitHub API responds with commits ordered with the most recent first,
-that value is grabbed from the very first commit that the API returns.
-
-```python
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(prog='GitHub Streamer')
-    parser.add_argument('FILENAME', help='File containing the last bookmark value', nargs='?')
-    args = parser.parse_args()
-
-    configure_logging()
-
-    access_token = get_env_or_throw('GITHUB_ACCESS_TOKEN')
-    repo_path = get_env_or_throw('GITHUB_REPO_PATH')
-
-    session.headers.update({'authorization': 'token ' + access_token})
-
-    bookmark = None
-    if args.FILENAME:
-        with open(args.FILENAME, 'r') as file:
-            for line in file:
-                bookmark = line.strip()
-
-    if bookmark:
-        logger.info('Replicating commits since %s from %s', bookmark, repo_path)
-    else:
-        logger.info('Replicating all commits from %s', repo_path)
-
-    get_all_commits(repo_path, bookmark)
-
-```
-
-Finally, the `main` function:
-
-- reads the token and repository path out of the environment, setting the
-token onto the Requests session to properly authenticate with the
-GitHub API.
-
-- if a bookmark file is passed in, reads the bookmark value out the last line of the file
-
-- kicks off the `get_all_commits` function
+Soon, the Stitch Platform will be able to run *your* streamers.
+You'll submit your code, along with a manifest describing how to run
+it, and we'll do the rest - configuration, hardware provisioning,
+scheduling, monitoring, and bookmark handling.  If you'd like to
+participate in the closed beta of the Platform, contact us in our
+[Slack channel][]
