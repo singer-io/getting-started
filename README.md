@@ -113,19 +113,21 @@ Login to your [Stitch] account and [generate an Stitch Import API
 token](https://docs.stitchdata.com/hc/en-us/articles/223759228-Getting-Started-with-the-Import-API#accesstoken).
 You'll need to provide a name for the connection - something like
 'github' is probably appropriate - and temporarily record the token
-somewhere secure.
+somewhere secure. Stitch will put the data into a schema of the same
+name in your warehouse.  We recommend creating a new connection for
+each streamer, to avoid table name collisions.
 
-#### Run the GitHub streamer with the Stitch persister
+#### Configure your environment
 
 To run the streamer and persister together you'll need the following
-values:
+values in your environment:
 
  - *Stitch Client ID* - This is the number in the URL when you login to Stitch
- - *Stitch API Token* - The token you saved temporarily when you created the Import API connection.
+ - *Stitch API Token* - The token you saved temporarily when you created the Import API connection for this streamer. 
  - *GitHub Token* - The token you saved temporarily from GitHub
  - *GitHub Repo Path* - The relative path of the repository you want to pull activity data for. For example, to pull activity for this repository - http://github.com/stitchstreams/getting-started - the path would be `stitchstreams/getting-started`.
 
-Add these values to your environment:
+The easiest way to add these to your environment is:
 
 ```bash
 › export STITCH_CLIENT_ID=<stitch client id>
@@ -134,7 +136,12 @@ Add these values to your environment:
 › export GITHUB_REPO_PATH=<github repo path>
 ```
 
-Then, run the streamer and persister together:
+which will keep the values in your environment for the duration of
+your shell session.
+
+#### Run the GitHub streamer with the Stitch persister
+
+Run them together like this:
 
 ```bash
 › persist-stitch python stream_github.py

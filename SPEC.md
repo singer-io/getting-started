@@ -1,11 +1,12 @@
 # Stitch Streamer Specification
 ### Version 0.1
 
-A Stitch Streamer is an application that takes configuration and an
-optional Bookmark as input, and produces an ordered stream of Records
-and Bookmarks as output. A Record is text-encoded data of any kind. A
-Bookmark is a value that indicates an offset in the ordered stream. A
-Streamer may be implemented in any programming language.
+A *streamer* is an application that takes configuration and an
+optional bookmark as input, and produces an ordered stream of
+*records* and *bookmarks* as output. A record is text-encoded data of
+any kind. A bookmark is a value that indicates an offset in the
+ordered stream. A streamer may be implemented in any programming
+language.
 
 Streamers are designed to produce a stream of data from sources like
 databases and web service APIs for use in a data integration or ETL
@@ -15,10 +16,10 @@ pipeline.
 
 ### Configuration
 
-A Streamer can accept configuration through environmental variables or
-command line arguments. A Streamer can optionally accept one positional
+A streamer can accept configuration through environmental variables or
+command line arguments. A streamer can optionally accept one positional
 command line argument corresponding to the path to a file containing
-the lask Bookmark value.  No other positional command line arguments
+the lask bookmark value.  No other positional command line arguments
 are permitted.
 
 Examples:
@@ -43,25 +44,25 @@ $ python streamer.py too many positional arguments
 ### Bookmarks
 
 When a positional command line argument is provided, it must be a path
-containing a Bookmark value.  When passed a Bookmark value, a Streamer
+containing a bookmark value.  When passed a bookmark value, a streamer
 must only produce data with positions in the stream equal to or after
 the position corresponding to that value. The structure and content of
-a Bookmark value is determined entirely by the Streamer.  The file
-containing the last Bookmark value should contain *only* that value,
-and nothing else. A common Bookmark use case is a timestamp
+a bookmark value is determined entirely by the streamer.  The file
+containing the last bookmark value should contain *only* that value,
+and nothing else. A common bookmark use case is a timestamp
 corresponding to the latest modification date of the streamed data.
 
 
 ## Output
 
-A Streamer outputs a header followed by structured messages to
+A streamer outputs a header followed by structured messages to
 `stdout` in JSON format, one message per line. Logs and other
 information can be emitted to `stderr` for aiding debugging. A
-Streamer exits with a zero exit code on success, non-zero on failure.
+streamer exits with a zero exit code on success, non-zero on failure.
 
 ### Header
 
-A Streamer must write a Header to `stdout` prior to any other
+A streamer must write a Header to `stdout` prior to any other
 output. The first line of the Header MUST define the protocol version.
 The last line of the Header MUST be `--`.  Lines in between define
 properties of the stream in a `Key: value` format.  Permitted keys
@@ -87,7 +88,7 @@ the following properties:
 
  - `stream` **Required**. The string name of the stream
 
-A single Streamer may output RECORDS messages with different stream
+A single streamer may output RECORDS messages with different stream
 names.  A single RECORDS entry may only contain records for a single
 stream.
 
@@ -102,13 +103,13 @@ Example:
 SCHEMA messages describe the structure of data in the stream. They
 must have the following properties:
  
- - `schema` **Required**. A [JSON Schema][schema] describing the
+ - `schema` **Required**. A [JSON Schema] describing the
    `data` property of RECORDs from the same `stream`
 
  - `stream` **Required**. The string name of the stream that this
    schema describes
 
-A single Streamer may output SCHEMA messages with different stream
+A single streamer may output SCHEMA messages with different stream
 names.  If a RECORD message from a stream is not preceded by a
 `SCHEMA` message for that stream, it is assumed to be schema-less.
 
@@ -128,10 +129,10 @@ value, and all subsequent RECORDS entries come after or equal to the
 point in the stream corresponding to the BOOKMARK value. BOOKMARK
 messages have the following properties:
 
- - `value` **Required**. The JSON formatted Bookmark value
+ - `value` **Required**. The JSON formatted bookmark value
 
 The semantics of a BOOKMARK value are not part of the specification,
-and should be determined independently by each Streamer.
+and should be determined independently by each streamer.
 
 ### Example
 
@@ -149,10 +150,10 @@ Content-Type: jsonline
 
 ## Versioning
 
-A Streamer's API encompasses its input and output - including its
-configuration, how it interprets Bookmarks, and how the data it
+A streamer's API encompasses its input and output - including its
+configuration, how it interprets bookmarks, and how the data it
 produces is structured and interpretted. Streamers should follow
-[Semantic Versioning](semver), meaning that breaking changes to any of
+[Semantic Versioning], meaning that breaking changes to any of
 these should be a new MAJOR version, and backwards-compatible changes
 should be a new MINOR version.
 
@@ -168,5 +169,5 @@ TODO
 
 TODO
 
-[schema]: http://json-schema.org/ "JSON Schema"
-[semver]: http://semver.org/ "Semantic Versioning"
+[JSON Schema]: http://json-schema.org/ "JSON Schema"
+[Semantic Versioning]: http://semver.org/ "Semantic Versioning"
