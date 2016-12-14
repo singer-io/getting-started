@@ -41,6 +41,7 @@ are:
  - [Install the GitHub streamer](#install-the-github-streamer)
  - [Create a GitHub access token](#create-a-github-access-token)
  - [Create a new Stitch Connection](#create-a-new-stitch-connection)
+ - [Configure your environment](#configure-your-environment)
  - [Run the GitHub streamer with the Stitch persister](#run-the-github-streamer-with-the-stitch-persister)
  - [Save and Use Bookmarks](#save-and-use-bookmarks)
 
@@ -136,8 +137,10 @@ The easiest way to add these to your environment is:
 › export GITHUB_REPO_PATH=<github repo path>
 ```
 
-which will keep the values in your environment for the duration of
-your shell session.
+which will keep the values in your environment for the duration of your
+shell session. We recommend using a different Stitch token for each
+streamer, so these environment variables should probably not be stored in
+any user or global shell profiles.
 
 #### Run the GitHub streamer with the Stitch persister
 
@@ -166,13 +169,19 @@ INFO:root:Persisted 15 records to Stitch
 
 #### Save and Use Bookmarks
 
-When `persist-stitch` is run as above, it writes log lines to
-`stderr`, but `stdout` is reserved for outputting *bookmarks*. The
-last line in the output above is an example of a bookmark - it
-contains the date of the latest issue and commit extracted by the
-streamer. A bookmark is a JSON-formatted string that is injected into
-the data stream by the streamer, and then output to `stdout` by the
-persister once it has persisted all data prior to the bookmark.
+When `persist-stitch` is run as above, it writes log lines to `stderr`,
+but `stdout` is reserved for outputting *bookmarks*. The last line in the
+output above is an example of a bookmark - it contains the date of the
+latest issue and commit extracted by the streamer. A bookmark is a
+JSON-formatted string that is put into the data stream by the streamer
+with a value that describes its location in the stream. Read more about
+bookmarks in the [Stream format] documentation.
+
+The Stitch persister writes the bookmark message to `stdout` once it has
+persisted all data that appeared in the stream before the bookmark. Note
+that although the bookmark is sent into the Stitch persister, the
+persister process doesn't actually store it anywhere or send it to the
+Stitch API, it just repeats it back to *stdout*.
 
 Streamers like the GitHub streamer can also accept a *FILE* argument
 that, if present, points to a file containing the last persisted
