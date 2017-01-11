@@ -1,12 +1,11 @@
 # Stitch Streamer Specification
 ### Version 0.1
 
-A *streamer* is an application that takes configuration and an
-optional bookmark as input, and produces an ordered stream of
-*records* and *bookmarks* as output. A record is text-encoded data of
-any kind. A bookmark is a value that indicates an offset in the
-ordered stream. A streamer may be implemented in any programming
-language.
+A *streamer* is an application that takes *configuration* and an optional
+*state* object as input, and produces an ordered stream of *records* and
+*state* objects as output. A record is text-encoded data of any kind. A
+*state* object is a value that indicates an offset in the ordered stream.
+A streamer may be implemented in any programming language.
 
 Streamers are designed to produce a stream of data from sources like
 databases and web service APIs for use in a data integration or ETL
@@ -14,51 +13,71 @@ pipeline.
 
 ## Input
 
+A streamer should accept two types of input: *configuration* and *state*.
+These will be provided to the streamers as JSON files, through the
+`--config CONFIG` and `--state STATE` command-line arguments.
+
 ### Configuration
 
-A streamer can accept configuration through environmental variables or
-command line arguments. A streamer can optionally accept one positional
-command line argument corresponding to the path to a file containing
-the lask bookmark value.  No other positional command line arguments
-are permitted.
+The Configuration contains whatever parameters the streamer needs in order
+to pull data from the source. Typically this will include the credentials
+for the API or data source.
 
-Examples:
-
-Good:
-
-```bash
-$ ./streamer
-$ ruby streamer.rb
-$ java -cp your.jar com.yours.Streamer
-$ python streamer.py
-$ python streamer.py /path/to/bookmark.file
-$ DEBUG=1 python streamer.py -i 1 --token=abc /path/to/bookmark.file
+```json
+{
+  "api_key" : "ABC123ASDF5432"
+}
 ```
 
-Bad:
+### State
 
-```bash
-$ python streamer.py too many positional arguments
+The State is used to record whatever information the streamer needs to
+persist across different invocations of the program in order to remember
+where it left off the last time it ran. While the streamer is running, it
+should periodically output "STATE" records. The next time the streamer is
+called, it will be called with whatever state value it produced last. The
+state is typically used to record offsets in the ordered stream of data,
+such as values of "last_updated_at" fields.
+
+```json
+{
+  "users" : {
+    "last_updated_at" : "2016-12-14T00:00:00"
+  },
+  "events" : {
+    "last_updated_at" : "2016-12-13T18:00:00"
+  }
+}
 ```
 
-### Bookmarks
-
-When a positional command line argument is provided, it must be a path
-containing a bookmark value.  When passed a bookmark value, a streamer
-must only produce data with positions in the stream equal to or after
-the position corresponding to that value. The structure and content of
-a bookmark value is determined entirely by the streamer.  The file
-containing the last bookmark value should contain *only* that value,
-and nothing else. A common bookmark use case is a timestamp
-corresponding to the latest modification date of the streamed data.
+When a streamer is invoked with a state argument, it must only produce
+data with positions in the stream equal to or after the position
+corresponding to that value. The state value must be valid JSON, but
+beyond that the structure and content of the state is determined entirely
+by the streamer. The file containing the last state value should
+contain *only* that value, and nothing else. A common use case for state is
+a timestamp corresponding to the latest modification date of the streamed
+data.
 
 
+A streamer should interpret the absence of a `--state` argument or an
+empty state object (e.g. `{}`) as an indication that it should start from
+the beginning.
+
+### Examples
+
+```bash
+$ ./streamer --config config.json --state state.json
+$ ruby streamer.rb --config config.json --state state.json
+$ java -cp your.jar com.yours.Streamer --config config.json --state state.json
+$ python streamer.py --config config.json --state state.json
+```
 ## Output
 
-A streamer outputs a header followed by structured messages to
-`stdout` in JSON format, one message per line. Logs and other
-information can be emitted to `stderr` for aiding debugging. A
-streamer exits with a zero exit code on success, non-zero on failure.
+A streamer outputs a header followed by structured messages to `stdout` in
+JSON format, one message per line. Logs and other information can be
+emitted to `stderr` for aiding debugging. A streamer exits with a zero
+exit code on success, non-zero on failure.
 
 ### Header
 
@@ -119,19 +138,19 @@ Example:
 {"type": "SCHEMA", "stream": "users", "schema": {"properties":{"id":{"type":"integer"}}}, "record": {"id": 0, "name": "Chris"}}
 ```
 
-#### BOOKMARK
+#### STATE
 
-BOOKMARK messages contain a value that identifies the point in the
-stream corresponding to the point at which the BOOKMARK entry appears
-in the stream.  All RECORD messages prior to a BOOKMARK entry come
-*before* or equal to the point in the stream described by the BOOKMARK
+STATE messages contain a value that identifies the point in the
+stream corresponding to the point at which the STATE entry appears
+in the stream.  All RECORD messages prior to a STATE entry come
+*before* or equal to the point in the stream described by the STATE
 value, and all subsequent RECORDS entries come after or equal to the
-point in the stream corresponding to the BOOKMARK value. BOOKMARK
+point in the stream corresponding to the STATE value. STATE
 messages have the following properties:
 
- - `value` **Required**. The JSON formatted bookmark value
+ - `value` **Required**. The JSON formatted state value
 
-The semantics of a BOOKMARK value are not part of the specification,
+The semantics of a STATE value are not part of the specification,
 and should be determined independently by each streamer.
 
 ### Example
@@ -145,13 +164,13 @@ Content-Type: jsonline
 {"type": "RECORD", "stream": "stream": "users", "record": {"id": 2, "name": "Mike"}}
 {"type": "SCHEMA", "stream": "locations", "schema": {"required": ["id"], "type": "object", "properties": {"id": {"key": true, "type": "integer"}}}}
 {"type": "RECORD", "stream": "locations", "record": {"id": 1, "name": "Philadelphia"}}
-{"type": "BOOKMARK", "value": {"users": 2, "locations": 1}}
+{"type": "STATE", "value": {"users": 2, "locations": 1}}
 ```
 
 ## Versioning
 
 A streamer's API encompasses its input and output - including its
-configuration, how it interprets bookmarks, and how the data it
+configuration, how it interprets state, and how the data it
 produces is structured and interpretted. Streamers should follow
 [Semantic Versioning], meaning that breaking changes to any of
 these should be a new MAJOR version, and backwards-compatible changes
