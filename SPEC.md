@@ -13,12 +13,17 @@ pipeline.
 
 ## Input
 
-### Command
+### Synopsis
 
-A streamer should support two modes of operation: *sync* and *check*.
-*sync* streams data from the source and writes it to stdout. *check*
-should attempt to quickly check the configuration and test whether we can
-access the data source.
+```
+streamer COMMAND --config CONFIG_FILE [--state STATE_FILE]
+```
+
+Where command is one of:
+
+* `sync` - Stream data from the source and write it to stdout.
+* `check` - Quickly check the configuration and test whether we can access the source.
+
 
 A streamer should accept two types of input: *configuration* and *state*.
 These will be provided to the streamers as JSON files, through the
