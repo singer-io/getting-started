@@ -13,6 +13,13 @@ pipeline.
 
 ## Input
 
+### Command
+
+A streamer should support two modes of operation: *sync* and *check*.
+*sync* streams data from the source and writes it to stdout. *check*
+should attempt to quickly check the configuration and test whether we can
+access the data source.
+
 A streamer should accept two types of input: *configuration* and *state*.
 These will be provided to the streamers as JSON files, through the
 `--config CONFIG` and `--state STATE` command-line arguments.
@@ -59,19 +66,39 @@ contain *only* that value, and nothing else. A common use case for state is
 a timestamp corresponding to the latest modification date of the streamed
 data.
 
-
 A streamer should interpret the absence of a `--state` argument or an
 empty state object (e.g. `{}`) as an indication that it should start from
 the beginning.
 
-### Examples
+### Examples invocations
+
+#### Check the connection information
 
 ```bash
-$ ./streamer --config config.json --state state.json
-$ ruby streamer.rb --config config.json --state state.json
-$ java -cp your.jar com.yours.Streamer --config config.json --state state.json
-$ python streamer.py --config config.json --state state.json
+$ ./streamer check --config config.json
+$ ruby streamer.rb check --config config.json
+$ java -cp your.jar check com.yours.Streamer --config config.json
+$ python streamer.py check --config config.json
 ```
+
+#### Sync from the beginning
+
+```bash
+$ ./streamer sync --config config.json
+$ ruby streamer.rb sync --config config.json
+$ java -cp your.jar sync com.yours.Streamer --config config.json
+$ python streamer.py sync --config config.json
+```
+
+#### Sync starting from a stored state
+
+```bash
+$ ./streamer sync --config config.json --state state.json
+$ ruby streamer.rb sync --config config.json --state state.json
+$ java -cp your.jar sync com.yours.Streamer --config config.json --state state.json
+$ python streamer.py sync --config config.json --state state.json
+```
+
 ## Output
 
 A streamer outputs a header followed by structured messages to `stdout` in
@@ -153,7 +180,7 @@ messages have the following properties:
 The semantics of a STATE value are not part of the specification,
 and should be determined independently by each streamer.
 
-### Example
+### Example output
 
 ```
 stitchstream/0.1
