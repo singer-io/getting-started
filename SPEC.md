@@ -1,11 +1,11 @@
 # Stitch Streamer Specification
 ### Version 0.1
 
-A *streamer* is an application that takes *configuration* and an optional
-*state* object as input, and produces an ordered stream of *records* and
-*state* objects as output. A record is text-encoded data of any kind. A
-*state* object is a value that indicates an offset in the ordered stream.
-A streamer may be implemented in any programming language.
+A *streamer* is an application that takes *configuration* file and an
+optional *state* file as input, and produces an ordered stream of
+*records* and *state* objects as output. A *record* is text-encoded data of
+any kind. A *state* object is a value that indicates an offset in the
+ordered stream. A streamer may be implemented in any programming language.
 
 Streamers are designed to produce a stream of data from sources like
 databases and web service APIs for use in a data integration or ETL
@@ -16,18 +16,27 @@ pipeline.
 ### Synopsis
 
 ```
-streamer COMMAND --config CONFIG_FILE [--state STATE_FILE]
+streamer COMMAND --config CONFIG\_FILE [--state STATE\_FILE]
+
+COMMAND must be one of:
+
+  sync - Stream data from the source and write it to stdout
+  check - Quickly test whether we can access the source
+
+CONFIG_FILE is a required argument that will contain any configuration
+parameters the streamer needs.
+
+STATE_FILE is an optional argument that the streamer can use to remember
+where it left off in the previous invocation.
 ```
 
-Where command is one of:
+### Command
 
-* `sync` - Stream data from the source and write it to stdout.
-* `check` - Quickly check the configuration and test whether we can access the source.
-
-
-A streamer should accept two types of input: *configuration* and *state*.
-These will be provided to the streamers as JSON files, through the
-`--config CONFIG` and `--state STATE` command-line arguments.
+A streamer should support two modes of operation, `sync` and `check`. In
+sync mode, the streamer connects to a data source and writes a stream of
+records to stdout. In check mode, the streamer quickly attempts to
+determine whether it can access the data source with the configuration
+provided.
 
 ### Configuration
 
@@ -43,13 +52,21 @@ for the API or data source.
 
 ### State
 
-The State is used to record whatever information the streamer needs to
-persist across different invocations of the program in order to remember
-where it left off the last time it ran. While the streamer is running, it
+The State is used mark the spot in the stream so that a streamer can start
+close to where it left off the last time it was run. The state must be
+encoded in JSON, but beyond that the structure of the state is determined
+wholely by the streamer. As a streamer runs, it should periodically write
+STATE records to stdout in order to mark the spot in the stream. 
+
+
+
+The auth
+
+While the streamer is running, it
 should periodically output "STATE" records. The next time the streamer is
 called, it will be called with whatever state value it produced last. The
 state is typically used to record offsets in the ordered stream of data,
-such as values of "last_updated_at" fields.
+such as values of "last updated at" fields.
 
 ```json
 {
@@ -66,9 +83,9 @@ When a streamer is invoked with a state argument, it must only produce
 data with positions in the stream equal to or after the position
 corresponding to that value. The state value must be valid JSON, but
 beyond that the structure and content of the state is determined entirely
-by the streamer. The file containing the last state value should
-contain *only* that value, and nothing else. A common use case for state is
-a timestamp corresponding to the latest modification date of the streamed
+by the streamer. The file containing the last state value should contain
+*only* that value, and nothing else. A common use case for state is a
+timestamp corresponding to the latest modification date of the streamed
 data.
 
 A streamer should interpret the absence of a `--state` argument or an
