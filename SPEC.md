@@ -27,7 +27,8 @@ CONFIG is a required argument that points to a JSON file containing any
 configuration parameters the streamer needs.
 
 STATE is an optional argument pointing to a JSON file that the streamer
-can use to remember where it left off in the previous invocation. ```
+can use to remember where it left off in the previous invocation. 
+```
 
 ### Command
 
