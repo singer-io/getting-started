@@ -16,19 +16,18 @@ pipeline.
 ### Synopsis
 
 ```
-streamer COMMAND --config CONFIG\_FILE [--state STATE\_FILE]
+streamer COMMAND --config CONFIG [--state STATE]
 
 COMMAND must be one of:
 
   sync - Stream data from the source and write it to stdout
   check - Quickly test whether we can access the source
 
-CONFIG_FILE is a required argument that will contain any configuration
-parameters the streamer needs.
+CONFIG is a required argument that points to a JSON file containing any
+configuration parameters the streamer needs.
 
-STATE_FILE is an optional argument that the streamer can use to remember
-where it left off in the previous invocation.
-```
+STATE is an optional argument pointing to a JSON file that the streamer
+can use to remember where it left off in the previous invocation. ```
 
 ### Command
 
@@ -44,6 +43,12 @@ The Configuration contains whatever parameters the streamer needs in order
 to pull data from the source. Typically this will include the credentials
 for the API or data source.
 
+#### Examples
+
+The format of the configuration will vary by streamer. For many sources,
+the configuration may just be a single value like an API key. This should
+still be encoded as JSON. For example:
+
 ```json
 {
   "api_key" : "ABC123ASDF5432"
@@ -56,43 +61,13 @@ The State is used mark the spot in the stream so that a streamer can start
 close to where it left off the last time it was run. The state must be
 encoded in JSON, but beyond that the structure of the state is determined
 wholely by the streamer. As a streamer runs, it should periodically write
-STATE records to stdout in order to mark the spot in the stream. 
+STATE values to stdout in order to mark the spot in the stream. If the
+streamer is invoked without a `--state STATE` argument, it should start at
+the beginning of the stream or at some appropriate default position. If it
+is invoked with a `--state STATE` argument it should read in the state
+file and start from the corresponding position in the stream.
 
-
-
-The auth
-
-While the streamer is running, it
-should periodically output "STATE" records. The next time the streamer is
-called, it will be called with whatever state value it produced last. The
-state is typically used to record offsets in the ordered stream of data,
-such as values of "last updated at" fields.
-
-```json
-{
-  "users" : {
-    "last_updated_at" : "2016-12-14T00:00:00"
-  },
-  "events" : {
-    "last_updated_at" : "2016-12-13T18:00:00"
-  }
-}
-```
-
-When a streamer is invoked with a state argument, it must only produce
-data with positions in the stream equal to or after the position
-corresponding to that value. The state value must be valid JSON, but
-beyond that the structure and content of the state is determined entirely
-by the streamer. The file containing the last state value should contain
-*only* that value, and nothing else. A common use case for state is a
-timestamp corresponding to the latest modification date of the streamed
-data.
-
-A streamer should interpret the absence of a `--state` argument or an
-empty state object (e.g. `{}`) as an indication that it should start from
-the beginning.
-
-### Examples invocations
+### Example invocations
 
 #### Check the connection information
 
