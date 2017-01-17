@@ -36,7 +36,9 @@ A streamer should support two modes of operation, `sync` and `check`. In
 sync mode, the streamer connects to a data source and writes a stream of
 records to stdout. In check mode, the streamer quickly attempts to
 determine whether it can access the data source with the configuration
-provided.
+provided. For example, for a streamer that sources from a web service, the
+`check` command might simply read an API key from the config and fetch a
+single record from the API to confirm that the API key is correct.
 
 ### Configuration
 
