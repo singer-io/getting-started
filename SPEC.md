@@ -1,11 +1,11 @@
 # Stitch Streamer Specification
 ### Version 0.1
 
-A *streamer* is an application that takes *configuration* file and an
-optional *state* file as input, and produces an ordered stream of
-*records* and *state* objects as output. A *record* is text-encoded data of
-any kind. A *state* object is a value that indicates an offset in the
-ordered stream. A streamer may be implemented in any programming language.
+A *streamer* is an application that takes a *configuration* file and an
+optional *state* file as input, and produces an ordered stream of *record*
+and *state* messages as output. A *record* is json-encoded data of any
+kind. A *state* object is a value that indicates an offset in the ordered
+stream. A streamer may be implemented in any programming language.
 
 Streamers are designed to produce a stream of data from sources like
 databases and web service APIs for use in a data integration or ETL
@@ -40,15 +40,16 @@ provided.
 
 ### Configuration
 
-The Configuration contains whatever parameters the streamer needs in order
+The configuration contains whatever parameters the streamer needs in order
 to pull data from the source. Typically this will include the credentials
 for the API or data source.
 
 #### Examples
 
-The format of the configuration will vary by streamer. For many sources,
-the configuration may just be a single value like an API key. This should
-still be encoded as JSON. For example:
+The format of the configuration will vary by streamer, but it must be
+JSON-encoded and the root of the configuration must be an object. For
+many sources, the configuration may just be a single value like an API
+key. This should still be encoded as JSON. For example:
 
 ```json
 {
@@ -58,15 +59,22 @@ still be encoded as JSON. For example:
 
 ### State
 
-The State is used mark the spot in the stream so that a streamer can start
-close to where it left off the last time it was run. The state must be
-encoded in JSON, but beyond that the structure of the state is determined
-wholely by the streamer. As a streamer runs, it should periodically write
-STATE values to stdout in order to mark the spot in the stream. If the
-streamer is invoked without a `--state STATE` argument, it should start at
-the beginning of the stream or at some appropriate default position. If it
-is invoked with a `--state STATE` argument it should read in the state
-file and start from the corresponding position in the stream.
+The state is used to persist information between invocations of a
+streamer. The state must be encoded in JSON, but beyond that the structure
+of the state is determined wholely by the streamer. A streamer that wishes
+to persist state should periodically write STATE messages to stdout as it
+processesses the stream, and should expect the file named by the `--state
+STATE` argument to have the same format as the value of the STATE messages
+it emits.
+
+A common use case of state is to record the spot in the stream where the
+last invocation left off. For this use case, the state will typically
+contain values that like timestamps that correspond to "last-updated-at"
+fields from the source. If the streamer is invoked without a `--state
+STATE` argument, it should start at the beginning of the stream or at some
+appropriate default position. If it is invoked with a `--state STATE`
+argument it should read in the state file and start from the corresponding
+position in the stream.
 
 ### Example invocations
 
