@@ -107,31 +107,17 @@ $ python streamer.py sync --config config.json --state state.json
 
 ## Output
 
-A streamer outputs a header followed by structured messages to `stdout` in
-JSON format, one message per line. Logs and other information can be
-emitted to `stderr` for aiding debugging. A streamer exits with a zero
-exit code on success, non-zero on failure.
-
-### Header
-
-A streamer must write a Header to `stdout` prior to any other
-output. The first line of the Header MUST define the protocol version.
-The last line of the Header MUST be `--`.  Lines in between define
-properties of the stream in a `Key: value` format.  Permitted keys
-are:
-
- - `Content-Type` **Required**. Defines the encoding of the
-   body. Permitted values are: `jsonline`.
-
-
-### Body
+A streamer outputs structured messages to `stdout` in JSON format, one
+message per line. Logs and other information can be emitted to `stderr`
+for aiding debugging. A streamer exits with a zero exit code on success,
+non-zero on failure.
 
 The body contains messages encoded as a JSON map, one message per
 line. Each message must contain a `type` attribute. Any message `type`
 is permitted, and `type`s are interpretted case-insensitively. The
 following `type`s have specific meaning:
 
-#### RECORD
+### RECORD
 
 RECORD messages contain the data from the data stream. They must have
 the following properties:
@@ -150,7 +136,7 @@ Example:
 {"type": "RECORD", "stream": "users", "record": {"id": 0, "name": "Chris"}}
 ```
 
-#### SCHEMA
+### SCHEMA
 
 SCHEMA messages describe the structure of data in the stream. They
 must have the following properties:
@@ -171,7 +157,7 @@ Example:
 {"type": "SCHEMA", "stream": "users", "schema": {"properties":{"id":{"type":"integer"}}}, "record": {"id": 0, "name": "Chris"}}
 ```
 
-#### STATE
+### STATE
 
 STATE messages contain a value that identifies the point in the
 stream corresponding to the point at which the STATE entry appears
@@ -186,7 +172,7 @@ messages have the following properties:
 The semantics of a STATE value are not part of the specification,
 and should be determined independently by each streamer.
 
-### Example output
+## Example output
 
 ```
 stitchstream/0.1
