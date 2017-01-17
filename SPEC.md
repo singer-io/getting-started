@@ -2,10 +2,12 @@
 ### Version 0.1
 
 A *streamer* is an application that takes a *configuration* file and an
-optional *state* file as input, and produces an ordered stream of *record*
-and *state* messages as output. A *record* is json-encoded data of any
-kind. A *state* object is a value that indicates an offset in the ordered
-stream. A streamer may be implemented in any programming language.
+optional *state* file as input, and produces an ordered stream of
+*record*, *state*, and *schema* messages as output. A *record* is
+json-encoded data of any kind. A *state* message is used to persist
+information between invocations of a streamer. A *schema* message
+describes the structure of the *record*s in the stream. A streamer may be
+implemented in any programming language.
 
 Streamers are designed to produce a stream of data from sources like
 databases and web service APIs for use in a data integration or ETL
@@ -27,18 +29,21 @@ CONFIG is a required argument that points to a JSON file containing any
 configuration parameters the streamer needs.
 
 STATE is an optional argument pointing to a JSON file that the streamer
-can use to remember where it left off in the previous invocation. 
+can use to remember information from the previous invocation, like, for
+example, the point where it left off
+
 ```
 
 ### Command
 
 A streamer should support two modes of operation, `sync` and `check`. In
 sync mode, the streamer connects to a data source and writes a stream of
-records to stdout. In check mode, the streamer quickly attempts to
+messages to stdout. In check mode, the streamer quickly attempts to
 determine whether it can access the data source with the configuration
 provided. For example, for a streamer that sources from a web service, the
 `check` command might simply read an API key from the config and fetch a
-single record from the API to confirm that the API key is correct.
+single record from the API to confirm that the API key is correct. A
+streamer in check mode should not write any messages to stdout.
 
 ### Configuration
 
@@ -65,13 +70,13 @@ The state is used to persist information between invocations of a
 streamer. The state must be encoded in JSON, but beyond that the structure
 of the state is determined wholely by the streamer. A streamer that wishes
 to persist state should periodically write STATE messages to stdout as it
-processesses the stream, and should expect the file named by the `--state
+processes the stream, and should expect the file named by the `--state
 STATE` argument to have the same format as the value of the STATE messages
 it emits.
 
 A common use case of state is to record the spot in the stream where the
 last invocation left off. For this use case, the state will typically
-contain values that like timestamps that correspond to "last-updated-at"
+contain values like timestamps that correspond to "last-updated-at"
 fields from the source. If the streamer is invoked without a `--state
 STATE` argument, it should start at the beginning of the stream or at some
 appropriate default position. If it is invoked with a `--state STATE`
@@ -161,13 +166,9 @@ Example:
 
 ### STATE
 
-STATE messages contain a value that identifies the point in the
-stream corresponding to the point at which the STATE entry appears
-in the stream.  All RECORD messages prior to a STATE entry come
-*before* or equal to the point in the stream described by the STATE
-value, and all subsequent RECORDS entries come after or equal to the
-point in the stream corresponding to the STATE value. STATE
-messages have the following properties:
+STATE messages contain the state that the streamer wishes to persist.
+STATE messages have the following properties:
+
 
  - `value` **Required**. The JSON formatted state value
 
