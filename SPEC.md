@@ -1,13 +1,15 @@
 # Stitch Streamer Specification
 ### Version 0.1
 
-A *streamer* is an application that takes a *configuration* file and an
-optional *state* file as input, and produces an ordered stream of
-*record*, *state*, and *schema* messages as output. A *record* is
-json-encoded data of any kind. A *state* message is used to persist
-information between invocations of a streamer. A *schema* message
-describes the structure of the *record*s in the stream. A streamer may be
-implemented in any programming language.
+A *streamer* is an application that takes a *configuration* file and
+optional *state* and *structure* files as input, and produces an
+ordered stream of *record*, *state*, *schema* and *structure* messages
+as output. A *record* is json-encoded data of any kind. A *structure*
+message describes the data available to the streamer. A *state*
+message is used to persist information between invocations of a
+streamer. A *schema* message describes the datatypes of the *record*s
+in the stream. A streamer may be implemented in any programming
+language.
 
 Streamers are designed to produce a stream of data from sources like
 databases and web service APIs for use in a data integration or ETL
@@ -18,32 +20,47 @@ pipeline.
 ### Synopsis
 
 ```
-streamer COMMAND --config CONFIG [--state STATE]
+streamer COMMAND --config CONFIG [--state STATE] [--structure STRUCTURE]
 
 COMMAND must be one of:
 
   sync - Stream data from the source and write it to stdout
-  check - Quickly test whether we can access the source
+  check - Quickly test whether we can access the source with the given config
+  discover - Write the structure of the available data
 
 CONFIG is a required argument that points to a JSON file containing any
 configuration parameters the streamer needs.
 
-STATE is an optional argument pointing to a JSON file that the streamer
-can use to remember information from the previous invocation, like, for
-example, the point where it left off
+STATE is an optional argument pointing to a JSON file that the
+streamer can use to remember information from the previous invocation,
+like, for example, the point where it left off. Only used with the
+*sync* command.
+
+STRUCTURE is an optional argument pointing to a JSON file containing
+extra configuration about the structures that the streamer should
+sync. Only used with the *sync* command.
 
 ```
 
 ### Command
 
-A streamer should support two modes of operation, `sync` and `check`. In
-sync mode, the streamer connects to a data source and writes a stream of
-messages to stdout. In check mode, the streamer quickly attempts to
-determine whether it can access the data source with the configuration
-provided. For example, for a streamer that sources from a web service, the
-`check` command might simply read an API key from the config and fetch a
+A streamer should support three modes of operation, `sync`, `check`
+and `discover`. In sync mode, the streamer connects to a data source
+and writes a stream of messages to stdout.
+
+In check mode, the streamer quickly attempts to determine whether it
+can access the data source with the configuration provided. For
+example, for a streamer that sources from a web service, the `check`
+command might simply read an API key from the config and fetch a
 single record from the API to confirm that the API key is correct. A
 streamer in check mode should not write any messages to stdout.
+
+In discover mode, the streamer outputs messages about the structure of
+the available data to stdout. For example, a streamer that sources
+data from a database, would output the available schemas, tables, and
+columns in discover mode. Support of the `discover` command is
+optional, and streamers should fail if discover is invoked but not
+supported.
 
 ### Configuration
 
@@ -67,12 +84,12 @@ key. This should still be encoded as JSON. For example:
 ### State
 
 The state is used to persist information between invocations of a
-streamer. The state must be encoded in JSON, but beyond that the structure
-of the state is determined wholely by the streamer. A streamer that wishes
-to persist state should periodically write STATE messages to stdout as it
-processes the stream, and should expect the file named by the `--state
-STATE` argument to have the same format as the value of the STATE messages
-it emits.
+streamer. The state must be encoded in JSON, but beyond that the
+format of the state is determined wholely by the streamer. A streamer
+that wishes to persist state should periodically write STATE messages
+to stdout as it processes the stream, and should expect the file named
+by the `--state STATE` argument to have the same format as the value
+of the STATE messages it emits.
 
 A common use case of state is to record the spot in the stream where the
 last invocation left off. For this use case, the state will typically
@@ -82,6 +99,19 @@ STATE` argument, it should start at the beginning of the stream or at some
 appropriate default position. If it is invoked with a `--state STATE`
 argument it should read in the state file and start from the corresponding
 position in the stream.
+
+### Structure
+
+The structure is an optional configuration file that can be used to
+configure which data structures the streamer captures in sync
+mode. The structure must be encoded as JSON following the same format
+as STRUCTURE messages, defined below, with an additional "is_synced"
+key on every node.  If the "is_synced" value of a node is true, the
+streamer should emit the data corresponding to that structure node
+during sync, and it should not emit the data otherwise.  A streamer
+that supports structure specification should fail if an invalid
+structure is supplied.
+
 
 ### Example invocations
 
@@ -94,7 +124,7 @@ $ java -cp your.jar check com.yours.Streamer --config config.json
 $ python streamer.py check --config config.json
 ```
 
-#### Sync from the beginning
+#### Sync from the beginning without structure selection
 
 ```bash
 $ ./streamer sync --config config.json
@@ -103,13 +133,31 @@ $ java -cp your.jar sync com.yours.Streamer --config config.json
 $ python streamer.py sync --config config.json
 ```
 
-#### Sync starting from a stored state
+#### Sync from the beginning with structure selection
+
+```bash
+$ ./streamer sync --config config.json --structure structure.json
+$ ruby streamer.rb sync --config config.json --structure structure.json
+$ java -cp your.jar sync com.yours.Streamer --config config.json --structure structure.json
+$ python streamer.py sync --config config.json --structure structure.json
+```
+
+#### Sync starting from a stored state without structure selection
 
 ```bash
 $ ./streamer sync --config config.json --state state.json
 $ ruby streamer.rb sync --config config.json --state state.json
 $ java -cp your.jar sync com.yours.Streamer --config config.json --state state.json
 $ python streamer.py sync --config config.json --state state.json
+```
+
+#### Sync starting from a stored state with structure selection
+
+```bash
+$ ./streamer sync --config config.json --state state.json --structure structure.json
+$ ruby streamer.rb sync --config config.json --state state.json --structure structure.json
+$ java -cp your.jar sync com.yours.Streamer --config config.json --state state.json --structure structure.json
+$ python streamer.py sync --config config.json --state state.json --structure structure.json
 ```
 
 ## Output
@@ -145,7 +193,7 @@ Example:
 
 ### SCHEMA
 
-SCHEMA messages describe the structure of data in the stream. They
+SCHEMA messages describe the datatypes of data in the stream. They
 must have the following properties:
  
  - `schema` **Required**. A [JSON Schema] describing the
@@ -175,7 +223,7 @@ STATE messages have the following properties:
 The semantics of a STATE value are not part of the specification,
 and should be determined independently by each streamer.
 
-## Example output
+## Example:
 
 ```
 stitchstream/0.1
@@ -188,6 +236,28 @@ Content-Type: jsonline
 {"type": "RECORD", "stream": "locations", "record": {"id": 1, "name": "Philadelphia"}}
 {"type": "STATE", "value": {"users": 2, "locations": 1}}
 ```
+
+### STRUCTURE
+
+STRUCTURE messages describe the data available to the streamer. They
+must have the following properties:
+ 
+ - `structure` **Required**. A JSON object with string keys naming the
+   top of the structure hierarchy, and values as objects with keys:
+   - type: a string containing one of "database", "table", "column" or "other"
+   - description: a string with descriptive information about the node
+   - supported: a boolean indicating whether or not the streamer can sync this node
+   - children: a map containing the next lower level of structure, formatted in the same way as the root
+
+A STRUCTURE message should describe the entirety of the structure
+available to the streamer.
+
+Example, for a database:
+
+```json
+{"type": "STRUCTURE", "structure": {"my_first_database": {"type": "database", "description": "", "supported": true, "children": {"my_first_databases_first_table": {"type": "table", "description": "", "supported": true, "children": {"id_column": {"type": "column", "description": "INT PRIMARY KEY", "supported": true}, "string_column": {"type": "column", "description": "VARCHAR(255)", "supported": true}}}}}}}
+```
+
 
 ## Versioning
 
