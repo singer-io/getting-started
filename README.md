@@ -43,7 +43,7 @@ are:
  - [Create a new Stitch Connection](#create-a-new-stitch-connection)
  - [Configure your environment](#configure-your-environment)
  - [Run the GitHub streamer with the Stitch persister](#run-the-github-streamer-with-the-stitch-persister)
- - [Save and Use Bookmarks](#save-and-use-bookmarks)
+ - [Save and Use State](#save-and-use-state)
 
 #### Setup a Python 3 environment
 
@@ -147,7 +147,7 @@ any user or global shell profiles.
 Run them together like this:
 
 ```bash
-› persist-stitch python stream_github.py
+› python stream_github.py | persist-stitch
 ```
 
 There are two parts to this command: running `persist-stitch`, and
@@ -155,7 +155,7 @@ passing it the command to run the streamer.  If successful,
 you'll see output like this:
 
 ```bash
-› persist-stitch python stream_github.py
+› python stream_github.py | persist-stitch
 INFO:root:Subprocess started 48434
 2016-12-08 16:41:55,969 - root - INFO - Replicating all commits from stitchstreams/getting-started
 2016-12-08 16:41:55,998 - requests.packages.urllib3.connectionpool - INFO - Starting new HTTPS connection (1): api.github.com
@@ -167,44 +167,34 @@ INFO:root:Persisted 15 records to Stitch
 {"issues": "2016-11-05T04:00:33Z", "commits": "2016-12-08T14:56:00Z"}
 ```
 
-#### Save and Use Bookmarks
+#### Save and Use State
 
-When `persist-stitch` is run as above, it writes log lines to `stderr`,
-but `stdout` is reserved for outputting *bookmarks*. The last line in the
-output above is an example of a bookmark - it contains the date of the
-latest issue and commit extracted by the streamer. A bookmark is a
-JSON-formatted string that is put into the data stream by the streamer
-with a value that describes its location in the stream. Read more about
-bookmarks in the [Stream format] documentation.
+When `persist-stitch` is run as above, it writes log lines to
+`stderr`, but `stdout` is reserved for outputting *state*. The last
+line in the output above is an example of a state message - it
+contains the date of the latest issue and commit extracted by the
+streamer, as a JSON-formatted map. This message is put into the data
+stream by the streamer with a value that describes its location in the
+stream. Read more about state in the [Stream format] documentation.
 
-The Stitch persister writes the bookmark message to `stdout` once it has
-persisted all data that appeared in the stream before the bookmark. Note
-that although the bookmark is sent into the Stitch persister, the
-persister process doesn't actually store it anywhere or send it to the
-Stitch API, it just repeats it back to *stdout*.
+The Stitch persister writes the state message to `stdout` once it has
+persisted all data that appeared in the stream before the state
+message. Note that although the state message is sent into the Stitch
+persister, the persister process doesn't actually store it anywhere or
+send it to the Stitch API, it just repeats it back to *stdout*.
 
-Streamers like the GitHub streamer can also accept a *FILE* argument
+Streamers like the GitHub streamer can also accept a *STATE* argument
 that, if present, points to a file containing the last persisted
-bookmark value.  This enables streamers to work incrementally - the
-bookmark checkpoints the last value that was persisted, and the next
+state value.  This enables streamers to work incrementally - the
+state checkpoints the last value that was persisted, and the next
 time the streamer is run it should pick up from that point.
 
-To run the GitHub streamer incrementally, point it to a bookmark file
+To run the GitHub streamer incrementally, point it to a state file
 and capture the persister's `stdout` like this:
 
 ```bash
-› persist-stitch python stream_github.py bookmark.out >> bookmark.out
+› python stream_github.py --state state.json | persist-stitch >> state.json
 ```
-
-Notice that we're appending the bookmark to the same bookmark file
-we're reading in, meaning the latest bookmark will be the *last* line
-in that file. The streamer is already configured to look only at the
-last line, so that's OK, and this means the bookmark file will serve
-as a log of the bookmarks that were used, which may be helpful for
-debugging. It also means that the bookmark file will grow without
-bounds, so you may occasionally want to archive or delete lines prior
-to the last line in it.
-
 
 ## Using Streams to get data into other destinations
 
@@ -233,7 +223,7 @@ data to *stdout* in the [Stream format]. In fact, your first streamer
 can be written from the command line, without any programming at all:
 
 ```bash
-› printf 'stitchstream/0.1\ncontent-type: jsonline\n--\n{"type":"RECORD","stream":"hello","record":{"value":"world"}}\n'
+› printf '{"type":"RECORD","stream":"hello","record":{"value":"world"}}\n'
 ```
 
 This streams the datapoint `{"value":"world"}` to the "hello"
@@ -243,7 +233,7 @@ the [Stitch persister]:
 ```bash
 › export STITCH_TOKEN=redacted
 › export STITCH_CLIENT_ID=redacted
-› persist-stitch printf 'stitchstream/0.1\ncontent-type: jsonline\n--\n{"type":"RECORD","stream":"hello","record":{"value":"world"}}\n'
+› printf '{"type":"RECORD","stream":"hello","record":{"value":"world"}}\n' | persist-stitch
 ...
 INFO:root:Persisted 1 records to Stitch
 ```
@@ -303,7 +293,7 @@ We can send this data to Stitch by running our new streamer with the
 [Stitch persister]:
 
 ```bash
-› persist-stitch python stream_ip.py
+› python stream_ip.py | persist-stitch
 ```
 
 ## Running your streamer from Stitch
@@ -311,7 +301,7 @@ We can send this data to Stitch by running our new streamer with the
 Soon, the Stitch Platform will be able to run *your* streamers.
 You'll submit your code, along with a manifest describing how to run
 it, and we'll do the rest - configuration, hardware provisioning,
-scheduling, monitoring, and bookmark handling.  If you'd like to
+scheduling, monitoring, and state handling.  If you'd like to
 participate in the closed beta of the Platform, contact us in our
 [Slack channel]
 
