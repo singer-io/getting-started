@@ -148,9 +148,7 @@ Run the streamer and pipe the output into the persister, like this:
 › python stream_github.py sync --config streamer-config.json | persist-stitch sync --config persister-config.json
 ```
 
-There are two parts to this command: running `persist-stitch`, and
-passing it the command to run the streamer.  If successful,
-you'll see output like this:
+If successful, you'll see output like this:
 
 ```bash
 > stream-github sync --config streamer-config.json | persist-stitch sync --config persister-config.json
