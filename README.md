@@ -91,14 +91,12 @@ This installs an executable called `persist-stitch`.
 
 #### Install the GitHub streamer
 
-Clone the [GitHub streamer] repository and install its pip
-dependencies:
+Clone the [GitHub streamer] repository and install it:
 
 ```bash
 › git clone git@github.com:stitchstreams/stream-github
-...
 › cd stream-github
-› pip install -r requirements.txt
+› python setup.py install
 ```
 
 #### Create a GitHub access token
@@ -118,36 +116,36 @@ somewhere secure. Stitch will put the data into a schema of the same
 name in your warehouse.  We recommend creating a new connection for
 each streamer, to avoid table name collisions.
 
-#### Configure your environment
+#### Configure the streamer
 
-To run the streamer and persister together you'll need the following
-values in your environment:
+To run the streamer you'll need to create a JSON file containing the
+access token you just created and the path to the repository to stream.
+The repo path is relative to `https://github.com/`. For example the path
+for this repository is `stitchstreams/stream-github`.
 
- - *Stitch Client ID* - This is the number in the URL when you login to Stitch
- - *Stitch API Token* - The token you saved temporarily when you created the Import API connection for this streamer. 
- - *GitHub Token* - The token you saved temporarily from GitHub
- - *GitHub Repo Path* - The relative path of the repository you want to pull activity data for. For example, to pull activity for this repository - http://github.com/stitchstreams/getting-started - the path would be `stitchstreams/getting-started`.
-
-The easiest way to add these to your environment is:
-
-```bash
-› export STITCH_CLIENT_ID=<stitch client id>
-› export STITCH_TOKEN=<stitch token>
-› export GITHUB_ACCESS_TOKEN=<github token>
-› export GITHUB_REPO_PATH=<github repo path>
+```json
+{"access_token": "your-access-token",
+ "repo_path": "path-to/repository"}
 ```
 
-which will keep the values in your environment for the duration of your
-shell session. We recommend using a different Stitch token for each
-streamer, so these environment variables should probably not be stored in
-any user or global shell profiles.
+Create this file and name it something like `github-streamer-config.json`.
+
+#### Configure the persister
+
+To run the persister you'll need to create a file contianing your Stitch
+client id and access token. For example:
+
+```json
+{"client_id": 1234,
+ "token": "asdfasdfasdfasdfasdfasdfasdfasdfadsf"}
+```
 
 #### Run the GitHub streamer with the Stitch persister
 
-Run them together like this:
+Run the streamer and pipe the output into the persister, like this:
 
 ```bash
-› python stream_github.py | persist-stitch
+› python stream_github.py sync --config streamer-config.json | persist-stitch sync --config persister-config.json
 ```
 
 There are two parts to this command: running `persist-stitch`, and
@@ -155,16 +153,10 @@ passing it the command to run the streamer.  If successful,
 you'll see output like this:
 
 ```bash
-› python stream_github.py | persist-stitch
-INFO:root:Subprocess started 48434
-2016-12-08 16:41:55,969 - root - INFO - Replicating all commits from stitchstreams/getting-started
-2016-12-08 16:41:55,998 - requests.packages.urllib3.connectionpool - INFO - Starting new HTTPS connection (1): api.github.com
-2016-12-08 16:41:56,558 - requests.packages.urllib3.connectionpool - DEBUG - "GET /repos/stitchstreams/getting-started/commits HTTP/1.1" 200 None
-2016-12-08 16:41:56,613 - requests.packages.urllib3.connectionpool - DEBUG - "GET /repos/stitchstreams/getting-started/issues?sort=updated&direction=asc HTTP/1.1" 200 None
-INFO:root:Waiting for process 48434 to complete
-INFO:root:Subprocess 48434 returned code 0
-INFO:root:Persisted 15 records to Stitch
-{"issues": "2016-11-05T04:00:33Z", "commits": "2016-12-08T14:56:00Z"}
+> stream-github sync --config streamer-config.json | persist-stitch sync --config persister-config.json
+  INFO Replicating all commits from StitchStreams/getting-started
+  INFO Persisted batch of 41 records to Stitch
+{"commits": "2017-01-17T20:32:05Z", "issues": null}
 ```
 
 #### Save and Use State
@@ -183,7 +175,7 @@ message. Note that although the state message is sent into the Stitch
 persister, the persister process doesn't actually store it anywhere or
 send it to the Stitch API, it just repeats it back to *stdout*.
 
-Streamers like the GitHub streamer can also accept a *STATE* argument
+Streamers like the GitHub streamer can also accept a `--state` argument
 that, if present, points to a file containing the last persisted
 state value.  This enables streamers to work incrementally - the
 state checkpoints the last value that was persisted, and the next
@@ -193,7 +185,7 @@ To run the GitHub streamer incrementally, point it to a state file
 and capture the persister's `stdout` like this:
 
 ```bash
-› python stream_github.py --state state.json | persist-stitch >> state.json
+› stream-github sync --config streamer-config.json --state state.json | persist-stitch >> state.json
 ```
 
 ## Using Streams to get data into other destinations
