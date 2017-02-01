@@ -145,13 +145,13 @@ client id and access token. For example:
 Run the streamer and pipe the output into the persister, like this:
 
 ```bash
-› python stream_github.py sync --config streamer-config.json | persist-stitch sync --config persister-config.json
+› python stream_github.py --config streamer-config.json | persist-stitch --config persister-config.json
 ```
 
 If successful, you'll see output like this:
 
 ```bash
-> stream-github sync --config streamer-config.json | persist-stitch sync --config persister-config.json
+> stream-github --config streamer-config.json | persist-stitch --config persister-config.json
   INFO Replicating all commits from StitchStreams/getting-started
   INFO Persisted batch of 41 records to Stitch
 {"commits": "2017-01-17T20:32:05Z", "issues": null}
@@ -183,7 +183,7 @@ To run the GitHub streamer incrementally, point it to a state file
 and capture the persister's `stdout` like this:
 
 ```bash
-› stream-github sync --config streamer-config.json --state state.json | persist-stitch >> state.json
+› stream-github --config streamer-config.json --state state.json | persist-stitch >> state.json
 ```
 
 ## Using Streams to get data into other destinations
