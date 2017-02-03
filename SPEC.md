@@ -20,25 +20,18 @@ pipeline.
 ### Synopsis
 
 ```
-streamer COMMAND --config CONFIG [--state STATE] [--structure STRUCTURE]
-
-COMMAND must be one of:
-
-  sync - Stream data from the source and write it to stdout
-  check - Quickly test whether we can access the source with the given config
-  discover - Write the structure of the available data
+streamer --config CONFIG [--state STATE] [--structure STRUCTURE]
 
 CONFIG is a required argument that points to a JSON file containing any
 configuration parameters the streamer needs.
 
 STATE is an optional argument pointing to a JSON file that the
 streamer can use to remember information from the previous invocation,
-like, for example, the point where it left off. Only used with the
-*sync* command.
+like, for example, the point where it left off.
 
 STRUCTURE is an optional argument pointing to a JSON file containing
 extra configuration about the structures that the streamer should
-sync. Only used with the *sync* command.
+sync.
 
 ```
 
@@ -115,49 +108,40 @@ structure is supplied.
 
 ### Example invocations
 
-#### Check the connection information
-
-```bash
-$ ./streamer check --config config.json
-$ ruby streamer.rb check --config config.json
-$ java -cp your.jar check com.yours.Streamer --config config.json
-$ python streamer.py check --config config.json
-```
-
 #### Sync from the beginning without structure selection
 
 ```bash
-$ ./streamer sync --config config.json
-$ ruby streamer.rb sync --config config.json
-$ java -cp your.jar sync com.yours.Streamer --config config.json
-$ python streamer.py sync --config config.json
+$ ./streamer --config config.json
+$ ruby streamer.rb --config config.json
+$ java -cp your.jar com.yours.Streamer --config config.json
+$ python streamer.py --config config.json
 ```
 
 #### Sync from the beginning with structure selection
 
 ```bash
-$ ./streamer sync --config config.json --structure structure.json
-$ ruby streamer.rb sync --config config.json --structure structure.json
-$ java -cp your.jar sync com.yours.Streamer --config config.json --structure structure.json
-$ python streamer.py sync --config config.json --structure structure.json
+$ ./streamer --config config.json --structure structure.json
+$ ruby streamer.rb --config config.json --structure structure.json
+$ java -cp your.jar com.yours.Streamer --config config.json --structure structure.json
+$ python streamer.py --config config.json --structure structure.json
 ```
 
 #### Sync starting from a stored state without structure selection
 
 ```bash
-$ ./streamer sync --config config.json --state state.json
-$ ruby streamer.rb sync --config config.json --state state.json
-$ java -cp your.jar sync com.yours.Streamer --config config.json --state state.json
-$ python streamer.py sync --config config.json --state state.json
+$ ./streamer --config config.json --state state.json
+$ ruby streamer.rb --config config.json --state state.json
+$ java -cp your.jar com.yours.Streamer --config config.json --state state.json
+$ python streamer.py --config config.json --state state.json
 ```
 
 #### Sync starting from a stored state with structure selection
 
 ```bash
-$ ./streamer sync --config config.json --state state.json --structure structure.json
-$ ruby streamer.rb sync --config config.json --state state.json --structure structure.json
-$ java -cp your.jar sync com.yours.Streamer --config config.json --state state.json --structure structure.json
-$ python streamer.py sync --config config.json --state state.json --structure structure.json
+$ ./streamer --config config.json --state state.json --structure structure.json
+$ ruby streamer.rb --config config.json --state state.json --structure structure.json
+$ java -cp your.jar com.yours.Streamer --config config.json --state state.json --structure structure.json
+$ python streamer.py --config config.json --state state.json --structure structure.json
 ```
 
 ## Output
