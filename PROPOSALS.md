@@ -1,17 +1,22 @@
 # Add structure detection and selection
 
-STRUCTURE is an optional argument pointing to a JSON file containing
-extra configuration about the structures that the streamer should
-sync.
+## Use case
 
-In discover mode, the streamer outputs messages about the structure of
-the available data to stdout. For example, a streamer that sources
-data from a database, would output the available schemas, tables, and
-columns in discover mode. Support of the `discover` command is
-optional, and streamers should fail if discover is invoked but not
-supported.
+For some data sources, it would be desirable to provide a more where the
+tap can detect what tables or fields are available, and to allow a user to
+select which fields to retrieve.
 
-### Structure
+## Solution
+
+Add an optional `--discover` flag that causes the tap to print out a
+"STRUCTURE" message describing the data structures that are available to
+the tap. Add a `--structure STRUCTURE` option that indicates that the tap
+should read the STRUCTURE file in and use that to determine which data structures to sync.
+
+Support for these two options should be optional, and a tap should fail if
+it is invoked with options it doesn't support.
+
+### Structure File
 
 The structure is an optional configuration file that can be used to
 configure which data structures the streamer captures in sync
@@ -23,8 +28,7 @@ during sync, and it should not emit the data otherwise.  A streamer
 that supports structure specification should fail if an invalid
 structure is supplied.
 
-
-### STRUCTURE
+### Structure Message
 
 STRUCTURE messages describe the data available to the streamer. They
 must have the following properties:
@@ -42,18 +46,47 @@ available to the streamer.
 Example, for a database:
 
 ```json
-{"type": "STRUCTURE", "structure": {"my_first_database": {"type": "database", "description": "", "supported": true, "children": {"my_first_databases_first_table": {"type": "table", "description": "", "supported": true, "children": {"id_column": {"type": "column", "description": "INT PRIMARY KEY", "supported": true}, "string_column": {"type": "column", "description": "VARCHAR(255)", "supported": true}}}}}}}
+{"type": "STRUCTURE",
+ "structure": {
+   "my_first_database": {
+     "type": "database",
+     "description": "",
+     "supported": true,
+     "children": {
+       "my_first_databases_first_table": {
+         "type": "table",
+         "description": "",
+         "supported": true,
+         "children": {
+           "id_column": {
+             "type": "column",
+             "description": "INT PRIMARY KEY",
+             "supported": true
+           },
+           "string_column": {
+             "type": "column",
+             "description": "VARCHAR(255)",
+             "supported": true
+           }
+         }
+       }
+     }
+   }
+ }
+}
 ```
 
+# Add connection check support
 
+## Use case
 
+For some sources it might be good to provide an option to quickly test
+whether the authentication details provided in the config file are valid.
+This would allow a user to determine whether they can authenticate without
+actually initiating a sync.
 
-# Add "check" mode
+## Solution
 
-In check mode, the streamer quickly attempts to determine whether it
-can access the data source with the configuration provided. For
-example, for a streamer that sources from a web service, the `check`
-command might simply read an API key from the config and fetch a
-single record from the API to confirm that the API key is correct. A
-streamer in check mode should not write any messages to stdout.
-
+Add an optional `--check` flag. If the `--check` flag is provided, the tap
+should attempt to authenticate, then print the details of the
+authentication attempt to stderr and exit 0 on success or 1 on failure.
