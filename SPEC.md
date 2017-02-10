@@ -14,9 +14,7 @@ Streamers are designed to produce a stream of data from sources like
 databases and web service APIs for use in a data integration or ETL
 pipeline.
 
-## Input
-
-### Synopsis
+## Synopsis
 
 ```
 streamer --config CONFIG [--state STATE]
@@ -30,7 +28,7 @@ like, for example, the point where it left off.
 
 ```
 
-### Configuration
+## Configuration
 
 The configuration contains whatever parameters the streamer needs in order
 to pull data from the source. Typically this will include the credentials
@@ -49,7 +47,7 @@ key. This should still be encoded as JSON. For example:
 }
 ```
 
-### State
+## State
 
 The state is used to persist information between invocations of a
 streamer. The state must be encoded in JSON, but beyond that the
@@ -70,13 +68,13 @@ position in the stream.
 
 ### Example invocations
 
-#### Sync from the beginning
+Sync from the beginning
 
 ```bash
 $ ./streamer --config config.json
 ```
 
-#### Sync starting from a stored state
+Sync starting from a stored state
 
 ```bash
 $ ./streamer --config config.json --state state.json
