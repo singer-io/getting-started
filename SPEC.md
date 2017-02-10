@@ -28,7 +28,9 @@ like, for example, the point where it left off.
 
 ```
 
-## Configuration
+## Input
+
+### Configuration
 
 The configuration contains whatever parameters the streamer needs in order
 to pull data from the source. Typically this will include the credentials
@@ -47,7 +49,7 @@ key. This should still be encoded as JSON. For example:
 }
 ```
 
-## State
+### State
 
 The state is used to persist information between invocations of a
 streamer. The state must be encoded in JSON, but beyond that the
