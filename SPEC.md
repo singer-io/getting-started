@@ -1,15 +1,14 @@
 # Stitch Streamer Specification
+
 ### Version 0.1
 
-A *streamer* is an application that takes a *configuration* file and
-optional *state* and *structure* files as input, and produces an
-ordered stream of *record*, *state*, *schema* and *structure* messages
-as output. A *record* is json-encoded data of any kind. A *structure*
-message describes the data available to the streamer. A *state*
-message is used to persist information between invocations of a
-streamer. A *schema* message describes the datatypes of the *record*s
-in the stream. A streamer may be implemented in any programming
-language.
+A *streamer* is an application that takes a *configuration* file and an
+optional *state* file as input and produces an ordered stream of *record*,
+*state* and *schema* messages as output. A *record* is json-encoded data
+of any kind. A *state* message is used to persist information between
+invocations of a streamer. A *schema* message describes the datatypes of
+the *record*s in the stream. A streamer may be implemented in any
+programming language.
 
 Streamers are designed to produce a stream of data from sources like
 databases and web service APIs for use in a data integration or ETL
@@ -20,7 +19,7 @@ pipeline.
 ### Synopsis
 
 ```
-streamer --config CONFIG [--state STATE] [--structure STRUCTURE]
+streamer --config CONFIG [--state STATE]
 
 CONFIG is a required argument that points to a JSON file containing any
 configuration parameters the streamer needs.
@@ -29,31 +28,7 @@ STATE is an optional argument pointing to a JSON file that the
 streamer can use to remember information from the previous invocation,
 like, for example, the point where it left off.
 
-STRUCTURE is an optional argument pointing to a JSON file containing
-extra configuration about the structures that the streamer should
-sync.
-
 ```
-
-### Command
-
-A streamer should support three modes of operation, `sync`, `check`
-and `discover`. In sync mode, the streamer connects to a data source
-and writes a stream of messages to stdout.
-
-In check mode, the streamer quickly attempts to determine whether it
-can access the data source with the configuration provided. For
-example, for a streamer that sources from a web service, the `check`
-command might simply read an API key from the config and fetch a
-single record from the API to confirm that the API key is correct. A
-streamer in check mode should not write any messages to stdout.
-
-In discover mode, the streamer outputs messages about the structure of
-the available data to stdout. For example, a streamer that sources
-data from a database, would output the available schemas, tables, and
-columns in discover mode. Support of the `discover` command is
-optional, and streamers should fail if discover is invoked but not
-supported.
 
 ### Configuration
 
@@ -93,55 +68,18 @@ appropriate default position. If it is invoked with a `--state STATE`
 argument it should read in the state file and start from the corresponding
 position in the stream.
 
-### Structure
-
-The structure is an optional configuration file that can be used to
-configure which data structures the streamer captures in sync
-mode. The structure must be encoded as JSON following the same format
-as STRUCTURE messages, defined below, with an additional "is_synced"
-key on every node.  If the "is_synced" value of a node is true, the
-streamer should emit the data corresponding to that structure node
-during sync, and it should not emit the data otherwise.  A streamer
-that supports structure specification should fail if an invalid
-structure is supplied.
-
-
 ### Example invocations
 
-#### Sync from the beginning without structure selection
+#### Sync from the beginning
 
 ```bash
 $ ./streamer --config config.json
-$ ruby streamer.rb --config config.json
-$ java -cp your.jar com.yours.Streamer --config config.json
-$ python streamer.py --config config.json
 ```
 
-#### Sync from the beginning with structure selection
-
-```bash
-$ ./streamer --config config.json --structure structure.json
-$ ruby streamer.rb --config config.json --structure structure.json
-$ java -cp your.jar com.yours.Streamer --config config.json --structure structure.json
-$ python streamer.py --config config.json --structure structure.json
-```
-
-#### Sync starting from a stored state without structure selection
+#### Sync starting from a stored state
 
 ```bash
 $ ./streamer --config config.json --state state.json
-$ ruby streamer.rb --config config.json --state state.json
-$ java -cp your.jar com.yours.Streamer --config config.json --state state.json
-$ python streamer.py --config config.json --state state.json
-```
-
-#### Sync starting from a stored state with structure selection
-
-```bash
-$ ./streamer --config config.json --state state.json --structure structure.json
-$ ruby streamer.rb --config config.json --state state.json --structure structure.json
-$ java -cp your.jar com.yours.Streamer --config config.json --state state.json --structure structure.json
-$ python streamer.py --config config.json --state state.json --structure structure.json
 ```
 
 ## Output
@@ -229,28 +167,6 @@ Content-Type: jsonline
 {"type": "RECORD", "stream": "locations", "record": {"id": 1, "name": "Philadelphia"}}
 {"type": "STATE", "value": {"users": 2, "locations": 1}}
 ```
-
-### STRUCTURE
-
-STRUCTURE messages describe the data available to the streamer. They
-must have the following properties:
- 
- - `structure` **Required**. A JSON object with string keys naming the
-   top of the structure hierarchy, and values as objects with keys:
-   - type: a string containing one of "database", "table", "column" or "other"
-   - description: a string with descriptive information about the node
-   - supported: a boolean indicating whether or not the streamer can sync this node
-   - children: a map containing the next lower level of structure, formatted in the same way as the root
-
-A STRUCTURE message should describe the entirety of the structure
-available to the streamer.
-
-Example, for a database:
-
-```json
-{"type": "STRUCTURE", "structure": {"my_first_database": {"type": "database", "description": "", "supported": true, "children": {"my_first_databases_first_table": {"type": "table", "description": "", "supported": true, "children": {"id_column": {"type": "column", "description": "INT PRIMARY KEY", "supported": true}, "string_column": {"type": "column", "description": "VARCHAR(255)", "supported": true}}}}}}}
-```
-
 
 ## Versioning
 
