@@ -1,12 +1,16 @@
-# Add structure detection and selection
+# Proposals
 
-## Use case
+These are changes to the spec that may be added in the future.
+
+## Add structure detection and selection
+
+### Use case
 
 For some data sources, it would be desirable to provide a more where the
 tap can detect what tables or fields are available, and to allow a user to
 select which fields to retrieve.
 
-## Solution
+### Solution
 
 Add an optional `--discover` flag that causes the tap to print out a
 "STRUCTURE" message describing the data structures that are available to
@@ -16,7 +20,7 @@ should read the STRUCTURE file in and use that to determine which data structure
 Support for these two options should be optional, and a tap should fail if
 it is invoked with options it doesn't support.
 
-### Structure File
+#### Structure File
 
 The structure is an optional configuration file that can be used to
 configure which data structures the streamer captures in sync
@@ -28,7 +32,7 @@ during sync, and it should not emit the data otherwise.  A streamer
 that supports structure specification should fail if an invalid
 structure is supplied.
 
-### Structure Message
+#### Structure Message
 
 STRUCTURE messages describe the data available to the streamer. They
 must have the following properties:
@@ -76,16 +80,16 @@ Example, for a database:
 }
 ```
 
-# Add connection check support
+## Add connection check support
 
-## Use case
+### Use case
 
 For some sources it might be good to provide an option to quickly test
 whether the authentication details provided in the config file are valid.
 This would allow a user to determine whether they can authenticate without
 actually initiating a sync.
 
-## Solution
+### Solution
 
 Add an optional `--check` flag. If the `--check` flag is provided, the tap
 should attempt to authenticate, then print the details of the
