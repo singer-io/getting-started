@@ -271,7 +271,7 @@ Schema].
 ```python
 with urllib.request.urlopen('http://icanhazip.com') as response:
     ip = response.read().decode('utf-8').strip()
-    stitchstream.write_schema('my_ip', schema)
+    stitchstream.write_schema('my_ip', schema, key_properties=['ip'])
     stitchstream.write_records('my_ip', [{'timestamp': now,'ip': ip}])
 ```
 

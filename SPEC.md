@@ -186,6 +186,12 @@ must have the following properties:
  - `stream` **Required**. The string name of the stream that this
    schema describes
 
+ - `key_properties` **Required**. A list of strings indicating which
+   properties make up the primary key for this stream. Each item in the
+   list must be the name of a top-level property defined in the schema. A
+   value for `key_properties` must be provided, but it may be an empty
+   list to indicate that there is no primary key.
+
 A single streamer may output SCHEMA messages with different stream
 names.  If a RECORD message from a stream is not preceded by a
 `SCHEMA` message for that stream, it is assumed to be schema-less.
@@ -193,7 +199,10 @@ names.  If a RECORD message from a stream is not preceded by a
 Example:
 
 ```json
-{"type": "SCHEMA", "stream": "users", "schema": {"properties":{"id":{"type":"integer"}}}, "record": {"id": 0, "name": "Chris"}}
+{"type": "SCHEMA",
+ "stream": "users",
+  "schema": {"properties":{"id":{"type":"integer"}}}, "record": {"id": 0, "name": "Chris"},
+  "key_properties": ["id"]}
 ```
 
 ### STATE
@@ -213,10 +222,10 @@ and should be determined independently by each streamer.
 stitchstream/0.1
 Content-Type: jsonline
 --
-{"type": "SCHEMA", "stream": "users", "schema": {"required": ["id"], "type": "object", "properties": {"id": {"key": true, "type": "integer"}}}}
+{"type": "SCHEMA", "stream": "users", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
 {"type": "RECORD", "stream": "users", "record": {"id": 1, "name": "Chris"}}
 {"type": "RECORD", "stream": "stream": "users", "record": {"id": 2, "name": "Mike"}}
-{"type": "SCHEMA", "stream": "locations", "schema": {"required": ["id"], "type": "object", "properties": {"id": {"key": true, "type": "integer"}}}}
+{"type": "SCHEMA", "stream": "locations", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
 {"type": "RECORD", "stream": "locations", "record": {"id": 1, "name": "Philadelphia"}}
 {"type": "STATE", "value": {"users": 2, "locations": 1}}
 ```
