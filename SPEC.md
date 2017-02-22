@@ -1,29 +1,29 @@
-# Stitch Streamer Specification
+# Singer Specification
 
 ### Version 0.1
 
-A *streamer* is an application that takes a *configuration* file and an
+A *Tap* is an application that takes a *configuration* file and an
 optional *state* file as input and produces an ordered stream of *record*,
 *state* and *schema* messages as output. A *record* is json-encoded data
 of any kind. A *state* message is used to persist information between
-invocations of a streamer. A *schema* message describes the datatypes of
-the *record*s in the stream. A streamer may be implemented in any
+invocations of a Tap. A *schema* message describes the datatypes of
+the *record*s in the stream. A Tap may be implemented in any
 programming language.
 
-Streamers are designed to produce a stream of data from sources like
+Taps are designed to produce a stream of data from sources like
 databases and web service APIs for use in a data integration or ETL
 pipeline.
 
 ## Synopsis
 
 ```
-streamer --config CONFIG [--state STATE]
+tap --config CONFIG [--state STATE]
 
 CONFIG is a required argument that points to a JSON file containing any
-configuration parameters the streamer needs.
+configuration parameters the Tap needs.
 
 STATE is an optional argument pointing to a JSON file that the
-streamer can use to remember information from the previous invocation,
+Tap can use to remember information from the previous invocation,
 like, for example, the point where it left off.
 
 ```
@@ -32,13 +32,13 @@ like, for example, the point where it left off.
 
 ### Configuration
 
-The configuration contains whatever parameters the streamer needs in order
+The configuration contains whatever parameters the Tap needs in order
 to pull data from the source. Typically this will include the credentials
 for the API or data source.
 
 #### Examples
 
-The format of the configuration will vary by streamer, but it must be
+The format of the configuration will vary by Tap, but it must be
 JSON-encoded and the root of the configuration must be an object. For
 many sources, the configuration may just be a single value like an API
 key. This should still be encoded as JSON. For example:
@@ -52,8 +52,8 @@ key. This should still be encoded as JSON. For example:
 ### State
 
 The state is used to persist information between invocations of a
-streamer. The state must be encoded in JSON, but beyond that the
-format of the state is determined wholely by the streamer. A streamer
+Tap. The state must be encoded in JSON, but beyond that the
+format of the state is determined wholely by the Tap. A Tap
 that wishes to persist state should periodically write STATE messages
 to stdout as it processes the stream, and should expect the file named
 by the `--state STATE` argument to have the same format as the value
@@ -62,7 +62,7 @@ of the STATE messages it emits.
 A common use case of state is to record the spot in the stream where the
 last invocation left off. For this use case, the state will typically
 contain values like timestamps that correspond to "last-updated-at"
-fields from the source. If the streamer is invoked without a `--state
+fields from the source. If the Tap is invoked without a `--state
 STATE` argument, it should start at the beginning of the stream or at some
 appropriate default position. If it is invoked with a `--state STATE`
 argument it should read in the state file and start from the corresponding
@@ -73,25 +73,25 @@ position in the stream.
 Sync from the beginning
 
 ```bash
-$ ./streamer --config config.json
+$ ./tap --config config.json
 ```
 
 Sync starting from a stored state
 
 ```bash
-$ ./streamer --config config.json --state state.json
+$ ./tap --config config.json --state state.json
 ```
 
 ## Output
 
-A streamer outputs structured messages to `stdout` in JSON format, one
+A Tap outputs structured messages to `stdout` in JSON format, one
 message per line. Logs and other information can be emitted to `stderr`
 for aiding debugging. A streamer exits with a zero exit code on success,
 non-zero on failure.
 
 The body contains messages encoded as a JSON map, one message per
 line. Each message must contain a `type` attribute. Any message `type`
-is permitted, and `type`s are interpretted case-insensitively. The
+is permitted, and `type`s are interpreted case-insensitively. The
 following `type`s have specific meaning:
 
 ### RECORD
@@ -103,7 +103,7 @@ the following properties:
 
  - `stream` **Required**. The string name of the stream
 
-A single streamer may output RECORDS messages with different stream
+A single Tap may output RECORDS messages with different stream
 names.  A single RECORDS entry may only contain records for a single
 stream.
 
@@ -117,7 +117,7 @@ Example:
 
 SCHEMA messages describe the datatypes of data in the stream. They
 must have the following properties:
- 
+
  - `schema` **Required**. A [JSON Schema] describing the
    `data` property of RECORDs from the same `stream`
 
@@ -130,7 +130,7 @@ must have the following properties:
    value for `key_properties` must be provided, but it may be an empty
    list to indicate that there is no primary key.
 
-A single streamer may output SCHEMA messages with different stream
+A single Tap may output SCHEMA messages with different stream
 names.  If a RECORD message from a stream is not preceded by a
 `SCHEMA` message for that stream, it is assumed to be schema-less.
 
@@ -145,21 +145,18 @@ Example:
 
 ### STATE
 
-STATE messages contain the state that the streamer wishes to persist.
+STATE messages contain the state that the Tap wishes to persist.
 STATE messages have the following properties:
 
 
  - `value` **Required**. The JSON formatted state value
 
 The semantics of a STATE value are not part of the specification,
-and should be determined independently by each streamer.
+and should be determined independently by each Tap.
 
 ## Example:
 
 ```
-stitchstream/0.1
-Content-Type: jsonline
---
 {"type": "SCHEMA", "stream": "users", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
 {"type": "RECORD", "stream": "users", "record": {"id": 1, "name": "Chris"}}
 {"type": "RECORD", "stream": "stream": "users", "record": {"id": 2, "name": "Mike"}}
@@ -170,24 +167,12 @@ Content-Type: jsonline
 
 ## Versioning
 
-A streamer's API encompasses its input and output - including its
+A Tap's API encompasses its input and output - including its
 configuration, how it interprets state, and how the data it
-produces is structured and interpretted. Streamers should follow
+produces is structured and interpreted. Taps should follow
 [Semantic Versioning], meaning that breaking changes to any of
 these should be a new MAJOR version, and backwards-compatible changes
 should be a new MINOR version.
-
-## Packaging
-
-TODO
-
-## Resource Restrictions
-
-TODO
-
-## Security Restrictions
-
-TODO
 
 [JSON Schema]: http://json-schema.org/ "JSON Schema"
 [Semantic Versioning]: http://semver.org/ "Semantic Versioning"
