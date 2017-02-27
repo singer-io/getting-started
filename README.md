@@ -1,260 +1,203 @@
-# Getting Started with Streams
+# Getting Started with Singer
 
-Streams are the best way to get new data sources into Stitch.  A
-Stream is produced by a *streamer* application, and consumed by a
-*persister* application.
-
-Persisters typically save data somewhere - anywhere - like S3, your
-local filesystem, a queue or a database. We built the [Stitch
-persister] to send data to the Stitch Import API.
+Singer is an open source standard for moving data between databases,
+web APIs, files, queues, and just about anything else you can think
+of. The [Singer spec] describes how data extraction scripts — called
+“Taps” — and data loading scripts — called “Targets” — should
+communicate using a standard JSON-based data format over
+**stdout**. By conforming to this spec, Taps and Targets can be used
+in any combination to move data from any source to any destination.
 
 **Topics**
 
- - [Using Streams to get data into Stitch](#using-streams-to-get-data-into-stitch)
- - [Using Streams to get data into other destinations](#using-streams-to-get-data-into-other-destinations)
- - [Developing a streamer](#developing-a-streamer)
- - [Running your streamer from Stitch](#running-your-streamer-from-stitch)
+ - [Using Singer to populate Google Sheets](#using-singer-to-populate-google-sheets)
+ - [Developing a Tap](#developing-a-tap)
+ - [Additional Resources](#additional-resources)
+ 
+## Using Singer to populate Google Sheets
 
-## Using Streams to get data into Stitch
+The [Google Sheets Target] can be combined with any Singer Tap to
+populate a Google Sheet with data. This example will use currency
+exchange rate data from the [Fixer.io Tap]. Fixer.io is a free API for
+current and historical foreign exchange rates published by the
+European Central Bank.
 
-Stitch is built on top of the Streams framework, and soon you'll be
-able to run your own custom streamers from within the Stitch Platform,
-which will take care of provisioning hardware, scheduling,
-configuration and monitoring.  Until then, you can run a streamer on
-your own hardware, and connect it to the [Stitch persister] to send data
-to Stitch.
-[Drift](https://github.com/stitchstreams/stream-drift),
-[Chargebee](https://github.com/stitchstreams/stream-chargebee),
-[PagerDuty](https://github.com/stitchstreams/stream-pagerduty) and
-[GitHub](GitHub streamer) are a few
-examples of the data sources that have already been built with
-Streams.
+The steps are:
+ 1. Activate the Google Sheets API
+ 1. Configure the Target
+ 1. Install
+ 1. Run
 
-### Example - Sending GitHub data to Stitch with the GitHub streamer
+### Step 1: Activate the Google Sheets API
 
-You can run the [GitHub streamer] with the [Stitch persister] to send
-data about a GitHub repository activity to Stitch. The steps required
-are:
+ (originally found in the [Google API
+ docs](https://developers.google.com/sheets/api/quickstart/python))
+ 
+ 1. Use [this
+ wizard](https://console.developers.google.com/start/api?id=sheets.googleapis.com)
+ to create or select a project in the Google Developers Console and
+ activate the Sheets API. Click Continue, then Go to credentials.
 
- - [Setup a Python 3 environment](#setup-a-python-3-environment)
- - [Install the Stitch persister](#install-the-stitch-persister)
- - [Install the GitHub streamer](#install-the-github-streamer)
- - [Create a GitHub access token](#create-a-github-access-token)
- - [Create a new Stitch Connection](#create-a-new-stitch-connection)
- - [Configure your environment](#configure-your-environment)
- - [Run the GitHub streamer with the Stitch persister](#run-the-github-streamer-with-the-stitch-persister)
- - [Save and Use State](#save-and-use-state)
+ 1. On the **Add credentials to your project** page, click the
+ **Cancel** button.
 
-#### Setup a Python 3 environment
+ 1. At the top of the page, select the **OAuth consent screen**
+ tab. Select an **Email address**, enter a **Product name** if not
+ already set, and click the **Save** button.
 
-The [Stitch persister] requires Python 3.5.0 or greater. You can check
-your Python version with:
+ 1. Select the **Credentials** tab, click the **Create credentials**
+ button and select **OAuth client ID**.
+
+ 1. Select the application type **Other**, enter the name "Singer
+ Sheets Target", and click the **Create** button.
+
+ 1. Click **OK** to dismiss the resulting dialog.
+
+ 1. Click the Download button to the right of the client ID.
+
+ 1. Move this file to your working directory and rename it
+ *client_secret.json*.
+
+### Step 2: Configure the Target
+
+Created a file called `config.json` in your working directory,
+following [config.sample.json](config.sample.json). The required
+`spreadsheet_id` parameter is the value between the "/d/" and the
+"/edit" in the URL of your spreadsheet. For example, consider the
+following URL that references a Google Sheets spreadsheet:
+
+```
+https://docs.google.com/spreadsheets/d/1qpyC0XzvTcKT6EISywvqESX3A0MwQoFDE8p-Bll4hps/edit#gid=0
+```
+
+The ID of this spreadsheet is
+`1qpyC0XzvTcKT6EISywvqESX3A0MwQoFDE8p-Bll4hps`.
+
+
+### Step 3: Install
+
+First, make sure Python 3 is installed on your system or follow these
+installation instructions for [Mac](python-mac) or
+[Ubuntu](python-ubuntu).
+
+`target-gsheet` can be run with any [Singer Tap] to move data from
+sources like [Braintree], [Freshdesk] and [Hubspot] to Google
+Sheets. We'll use the [Fixer.io Tap] - which pulls currency exchange
+rate data from a public data set - as an example.
+
+These commands will install `tap-fixerio` and `target-gsheet` with
+pip:
 
 ```bash
-› python --version
-Python 3.5.2
+› pip install target-gsheet tap-fixerio
 ```
 
-If you aren't on a compatible version, install the latest version of
-Python 3.  If you're on macOS, we recommend using [homebrew] to `brew
-install python3`.  Installation instructions for other platforms can
-be found
-[here](http://www.diveintopython3.net/installing-python.html).
+### Step 4: Run
 
-Depending on how you perform the install, you might end up with Python
-3 aliased as `python3` in your PATH.  Be sure to confirm your `python
---version`, and swap `python3` for `python` in the commands below if
-necessary.
-
-pip - the python package manager - should have been installed along
-with python.  You can check for pip with:
+This command will pipe the output of `tap-fixerio` to `target-gsheet`:
 
 ```bash
-› pip --version
-pip 9.0.1 from /Users/cmerrick/.virtualenvs/stitchstream/lib/python3.5/site-packages (python 3.5)
+› tap-fixerio | target-gsheet -c config.json
+    INFO Replicating the latest exchange rate data from fixer.io
+    INFO Tap exiting normally
 ```
 
-Confirm that `pip` is linked to your Python 3 installation, and if not,
-check to see if it's aliased to `pip3`.  Installation instructions can
-be found in the [pip docs](https://pip.readthedocs.io/en/stable/) if
-yours is missing.
+`target-gsheet` will attempt to open a new window or tab in your
+default browser to perform authentication. If this fails, copy the URL
+from the console and manually open it in your browser.
 
-#### Install the Stitch persister
+If you are not already logged into your Google account, you will be
+prompted to log in. If you are logged into multiple Google accounts,
+you will be asked to select one account to use for the
+authorization. Click the **Accept** button to allow `target-gsheet` to
+access your Google Sheet.  You can close the tab after the signup flow
+is complete.
 
-The [Stitch persister] is available as a pip package.  Install it with:
+Each stream generated by the Tap will be written to a different sheet
+in your Google Sheet. For the [Fixer.io Tap] you'll see a single sheet
+named `exchange_rate`.
+
+### Step 5: Saving State (optional)
+
+When `target-gsheet` is run as above it writes log lines to `stderr`,
+but `stdout` is reserved for outputting *state* messages. A state
+message is a JSON-formatted line with data that the Tap wants
+persisted between runs - often "high water mark" information that the
+Tap can use to pick up where it left off on the next run. Read more
+about state messages in the [Singer spec].
+
+Targets write state messages to `stdout` once all data that appeared
+in the stream before the state message has been processed by the
+Target. Note that although the state message is sent into the target,
+the target's process doesn't actually store it anywhere or do anything
+with it, it just repeats it back to *stdout*.
+
+Taps like the [Fixer.io Tap] can also accept a `--state` argument
+that, if present, points to a file containing the last persisted state
+value.  This enables Taps to work incrementally - the state
+checkpoints the last value that was handled by the Target, and the
+next time the Tap is run it should pick up from that point.
+
+To run the [Fixer.io Tap] incrementally, point it to a state file and
+capture the persister's `stdout` like this:
 
 ```bash
-› pip install persist-stitch
+› tap-fixerio --state state.json | target-gsheet -c config.json >> state.json
 ```
 
-This installs an executable called `persist-stitch`.
+## Developing a Tap
 
-#### Install the GitHub streamer
-
-Clone the [GitHub streamer] repository and install it:
-
-```bash
-› git clone git@github.com:stitchstreams/stream-github
-› cd stream-github
-› python setup.py install
-```
-
-#### Create a GitHub access token
-
-Login to your GitHub account, go to the [Personal Access
-Tokens](https://github.com/settings/tokens) settings page, and
-generate a new token with at least the `repo` scope.  Temporarily
-record this token somewhere secure, you'll need it later.
-
-#### Create a new Stitch Connection
-
-Login to your [Stitch] account and [generate an Stitch Import API
-token](https://docs.stitchdata.com/hc/en-us/articles/223759228-Getting-Started-with-the-Import-API#accesstoken).
-You'll need to provide a name for the connection - something like
-'github' is probably appropriate - and temporarily record the token
-somewhere secure. Stitch will put the data into a schema of the same
-name in your warehouse.  We recommend creating a new connection for
-each streamer, to avoid table name collisions.
-
-#### Configure the streamer
-
-To run the streamer you'll need to create a JSON file containing the
-access token you just created and the path to the repository to stream.
-The repo path is relative to `https://github.com/`. For example the path
-for this repository is `stitchstreams/stream-github`.
-
-```json
-{"access_token": "your-access-token",
- "repo_path": "path-to/repository"}
-```
-
-Create this file and name it something like `github-streamer-config.json`.
-
-#### Configure the persister
-
-To run the persister you'll need to create a file contianing your Stitch
-client id and access token. For example:
-
-```json
-{"client_id": 1234,
- "token": "asdfasdfasdfasdfasdfasdfasdfasdfadsf"}
-```
-
-#### Run the GitHub streamer with the Stitch persister
-
-Run the streamer and pipe the output into the persister, like this:
-
-```bash
-› python stream_github.py --config streamer-config.json | persist-stitch --config persister-config.json
-```
-
-If successful, you'll see output like this:
-
-```bash
-> stream-github --config streamer-config.json | persist-stitch --config persister-config.json
-  INFO Replicating all commits from StitchStreams/getting-started
-  INFO Persisted batch of 41 records to Stitch
-{"commits": "2017-01-17T20:32:05Z", "issues": null}
-```
-
-#### Save and Use State
-
-When `persist-stitch` is run as above, it writes log lines to
-`stderr`, but `stdout` is reserved for outputting *state*. The last
-line in the output above is an example of a state message - it
-contains the date of the latest issue and commit extracted by the
-streamer, as a JSON-formatted map. This message is put into the data
-stream by the streamer with a value that describes its location in the
-stream. Read more about state in the [Stream format] documentation.
-
-The Stitch persister writes the state message to `stdout` once it has
-persisted all data that appeared in the stream before the state
-message. Note that although the state message is sent into the Stitch
-persister, the persister process doesn't actually store it anywhere or
-send it to the Stitch API, it just repeats it back to *stdout*.
-
-Streamers like the GitHub streamer can also accept a `--state` argument
-that, if present, points to a file containing the last persisted
-state value.  This enables streamers to work incrementally - the
-state checkpoints the last value that was persisted, and the next
-time the streamer is run it should pick up from that point.
-
-To run the GitHub streamer incrementally, point it to a state file
-and capture the persister's `stdout` like this:
-
-```bash
-› stream-github --config streamer-config.json --state state.json | persist-stitch >> state.json
-```
-
-## Using Streams to get data into other destinations
-
-[Stitch] provides a hosted pipeline for loading data into multiple
-data warehouse platforms. We wrote the Stitch persister to send data
-to the Stitch API, so that Stitch can handle processing and loading
-the data.  But, different persisters can be used to send streams to
-different destinations - like files, S3 buckets, databases, queues,
-and APIs. If you'd like to build a different persister, check out the
-[Stitch persister] for guidance, and join our [Slack channel] to get
-help from our team.
-
-## Developing a streamer
-
-If you can't find an existing streamer for your data source, then it's
-time to build your own.
+If you can't find an existing Tap for your data source, then it's time
+to build your own.
 
 **Topics**:
  - [Hello, world](#hello-world)
- - [A Python streamer](#a-python-streamer)
+ - [A Python Tap](#a-python-tap)
  
 ### Hello, world
 
-A streamer is just a program, written in any language, that outputs
-data to *stdout* in the [Stream format]. In fact, your first streamer
-can be written from the command line, without any programming at all:
+A Tap is just a program, written in any language, that outputs data to
+*stdout* according to the [Singer spec]. In fact, your first Tap can
+be written from the command line, without any programming at all:
 
 ```bash
 › printf '{"type":"RECORD","stream":"hello","record":{"value":"world"}}\n'
 ```
 
-This streams the datapoint `{"value":"world"}` to the "hello"
-stream. That data can be sent to Stitch by running the command from
-the [Stitch persister]:
+This writes the datapoint `{"value":"world"}` to the "hello"
+stream. That data can be piped into any Target, like the [Google Sheets
+Target], over stdin:
 
 ```bash
-› export STITCH_TOKEN=redacted
-› export STITCH_CLIENT_ID=redacted
-› printf '{"type":"RECORD","stream":"hello","record":{"value":"world"}}\n' | persist-stitch
-...
-INFO:root:Persisted 1 records to Stitch
+› printf '{"type":"RECORD","stream":"hello","record":{"value":"world"}}\n' | target-gsheet -c config.json
 ```
 
-### A Python streamer
+### A Python Tap
 
 To move beyond *Hello, world* you'll need a real programming language.
 Although any language will do, we have built a Python library to help
 you get up and running quickly.
 
-Let's write a streamer called `stream_ip.py` that retrieves the
-current public IP using icanhazip.com, and writes that data with a
-timestamp.
+Let's write a Tap called `tap_ip.py` that retrieves the current
+ IP using icanhazip.com, and writes that data with a timestamp.
 
-First, install the `stitchstreams` helper library with `pip`:
+First, install the [Singer helper library] with `pip`:
 
 ```bash
-› pip install stitchstreams
+› pip install singer-python
 ```
 
-Then, open up a new file called `stream_ip.py` in your favorite editor.
+Then, open up a new file called `tap_ip.py` in your favorite editor.
 
 ```python
-import stitchstream
+import singer
 import urllib.request
 from datetime import datetime, timezone
 ```
 
 We'll use the `datetime` module to get the current timestamp, the
-`stitchstream` module to write data to `stdout` in the correct format,
-and the `urllib.request` module to make a request to icanhazip.com.
+`singer` module to write data to `stdout` in the correct format, and
+the `urllib.request` module to make a request to icanhazip.com.
 
 ```python
 now = datetime.now(timezone.utc).isoformat()
@@ -271,34 +214,40 @@ Schema].
 ```python
 with urllib.request.urlopen('http://icanhazip.com') as response:
     ip = response.read().decode('utf-8').strip()
-    stitchstream.write_schema('my_ip', schema, key_properties=['ip'])
-    stitchstream.write_records('my_ip', [{'timestamp': now,'ip': ip}])
+    singer.write_schema('my_ip', schema, 'timestamp')
+    singer.write_records('my_ip', [{'timestamp': now,'ip': ip}])
 ```
 
 Finally, we make the HTTP request, parse the response, and then make
-two calls to the `stitchstream` library: first, to write the schema of
+two calls to the `singer` library: first, to write the schema of
 the `'my_ip'` stream, and then to write a record to that stream.
 
-We can send this data to Stitch by running our new streamer with the
-[Stitch persister]:
+We can send this data to Google Sheets by running our new Tap
+with the [Google Sheets Target]:
 
 ```bash
-› python stream_ip.py | persist-stitch
+› python tap_ip.py | target-gsheet -c config.json
 ```
 
-## Running your streamer from Stitch
+## Additional Resources
 
-Soon, the Stitch Platform will be able to run *your* streamers.
-You'll submit your code, along with a manifest describing how to run
-it, and we'll do the rest - configuration, hardware provisioning,
-scheduling, monitoring, and state handling.  If you'd like to
-participate in the closed beta of the Platform, contact us in our
-[Slack channel]
+Join the [Singer Slack channel] to get help from members of the Singer
+community.
 
-[Slack channel]: https://stitch-streams-slack.herokuapp.com/
-[Stitch persister]: https://github.com/stitchstreams/persist-stitch
-[GitHub streamer]: https://github.com/stitchstreams/stream-github
+---
+
+Copyright &copy; 2017 Stitch
+
+[Singer spec]: SPEC.md
+[Singer Tap]: https://singer.io
+[Braintree]: https://github.com/singer-io/tap-braintree
+[Freshdesk]: https://github.com/singer-io/tap-freshdesk
+[Hubspot]: https://github.com/singer-io/tap-hubspot
+[Fixer.io Tap]: https://github.com/singer-io/tap-fixerio
+[python-mac]: http://docs.python-guide.org/en/latest/starting/install3/osx/
+[python-ubuntu]: https://www.digitalocean.com/community/tutorials/how-to-install-python-3-and-set-up-a-local-programming-environment-on-ubuntu-16-04
+[Google Sheets Target]: https://github.com/singer-io/target-gsheet
+[Singer helper library]: https://github.com/singer-io/singer-python
 [JSON Schema]: http://json-schema.org/
-[Stream format]: https://github.com/StitchStreams/getting-started/blob/master/SPEC.md
-[homebrew]: http://brew.sh
-[Stitch]: https://app.stitchdata.com
+[Singer Slack channel]: https://singer-slackin.herokuapp.com/
+
