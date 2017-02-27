@@ -23,11 +23,11 @@ current and historical foreign exchange rates published by the
 European Central Bank.
 
 The steps are:
- 1. [Activate the Google Sheets API](#step-1-activate-the-google-sheets-api)
- 1. [Configure the Target](#step-2-configure-the-target)
- 1. [Install](#step-3-install)
- 1. [Run](#step-4-run)
- 1. [Save State (optional)](#step-5-save-state-optional)
+ 1. [Activate the Google Sheets API](#step-1---activate-the-google-sheets-api)
+ 1. [Configure the Target](#step-2---configure-the-target)
+ 1. [Install](#step-3---install)
+ 1. [Run](#step-4---run)
+ 1. [Save State (optional)](#step-5---save-state-optional)
 
 ### Step 1 - Activate the Google Sheets API
 
