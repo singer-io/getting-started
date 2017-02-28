@@ -223,9 +223,8 @@ with urllib.request.urlopen('http://icanhazip.com') as response:
 Finally, we make the HTTP request, parse the response, and then make
 two calls to the `singer` library:
 
-'singer.write_schema' which writes the schema of the 'my_ip' stream and defines its primary key
-
-'singer.write_records' to write a record to that stream
+ - `singer.write_schema` which writes the schema of the `my_ip` stream and defines its primary key
+ - `singer.write_records` to write a record to that stream
 
 We can send this data to Google Sheets by running our new Tap
 with the [Google Sheets Target]:
