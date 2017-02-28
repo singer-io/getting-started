@@ -62,7 +62,7 @@ The steps are:
 ### Step 2 - Configure the Target
 
 Created a file called `config.json` in your working directory,
-following [config.sample.json](config.sample.json). The required
+following [config.sample.json](https://github.com/singer-io/target-gsheet/blob/master/config.sample.json). The required
 `spreadsheet_id` parameter is the value between the "/d/" and the
 "/edit" in the URL of your spreadsheet. For example, consider the
 following URL that references a Google Sheets spreadsheet:
