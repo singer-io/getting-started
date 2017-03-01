@@ -131,8 +131,8 @@ about State messages in the [Singer spec].
 Targets write State messages to `stdout` once all data that appeared
 in the stream before the State message has been processed by the
 Target. Note that although the State message is sent into the target,
-the target's process doesn't actually store it anywhere or do anything
-with it, it just repeats it back to `stdout`.
+in most cases the target's process won't actually store it anywhere or
+do anything with it other than repeat it back to `stdout`.
 
 Taps like the [Fixer.io Tap] can also accept a `--state` argument
 that, if present, points to a file containing the last persisted State
@@ -145,6 +145,8 @@ capture the persister's `stdout` like this:
 
 ```bash
 › tap-fixerio --state state.json | target-gsheet -c config.json >> state.json
+› tail -1 state.json > state.json.tmp && mv state.json.tmp state.json
+(rinse and repeat)
 ```
 
 ## Developing a Tap
