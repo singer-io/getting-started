@@ -12,6 +12,12 @@ limits, the entire quota can be used up and the tap should sleep when rate limit
 
 The singer-python library's utils namespace has a rate limiting decorator for use.
 
+User Agents
+===========
+
+You should support an optional `user_agent` field in config that will be passed along in request
+headers to the API. The `user_agent` should include an email address to allow the API provider to
+contact you if there's an issue with the tap or your usage of their API.
 
 Memory Constraints
 ==================
@@ -32,6 +38,13 @@ Good:
 
 Bad:
  - 2017-01-01 00:00:00
+
+
+Start Date
+==========
+
+Taps should support an optional `start_date` param that indicates how far back an integration
+should sync data in the absence of a state entry.
 
 
 State

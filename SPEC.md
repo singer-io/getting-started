@@ -36,6 +36,16 @@ The configuration contains whatever parameters the Tap needs in order
 to pull data from the source. Typically this will include the credentials
 for the API or data source.
 
+#### Special Fields
+
+`start_date` should be used on first sync to indicate how far back to grab
+records. Start dates should conform to the
+[RFC3339](https://www.ietf.org/rfc/rfc3339.txt) specification.
+
+`user_agent` should be set to something that includes a contact email
+address should the API provider need to contact you for any reason.
+(e.g. "Stitch (+support@stitchdata.com)")
+
 #### Examples
 
 The format of the configuration will vary by Tap, but it must be
@@ -45,7 +55,9 @@ key. This should still be encoded as JSON. For example:
 
 ```json
 {
-  "api_key" : "ABC123ASDF5432"
+  "api_key" : "ABC123ASDF5432",
+  "start_date" : "2017-01-01T00:00:00Z",
+  "user_agent" : "Stitch (+support@stitchdata.com)"
 }
 ```
 
