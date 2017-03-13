@@ -1,5 +1,36 @@
-Best Practices
-==============
+Best Practices for Submitting Taps to Stitch
+============================================
+
+Here are some best practices for writing Taps that will be run in Stitch's platform.
+
+Language
+--------
+
+Currently all Stitch Taps are written in Python. This Best Practices guide
+contains some python-specific recommendations. If you want to write a Tap
+in another language and submit it to be run in Stitch's platform, please
+contact us.
+
+Recommended Config Fields
+-------------------------
+
+The Singer Specification does not define any standard fields in the
+configuration, but in order to run a Tap in Stitch's platform, we
+recommend supporting these two fields:
+
+* `start_date` - A tap should take a `start_date` field in the config that
+  Indicates how far back an integration should sync data in the absence of
+  a state entry.
+
+* `user_agent` - A tap should accept a `user_agent` field in the config and pass it along in request headers to the API.
+
+TODO: John's version included:
+
+> The `user_agent` should include an email address to allow the API
+> provider to contact you if there's an issue with the tap or your usage
+> of their API.
+
+Is that something a Tap author needs to be concerned with? Won't that just be provided by the platform?
 
 Rate Limiting
 -------------
