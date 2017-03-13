@@ -43,13 +43,6 @@ limits, the entire quota can be used up and the tap should sleep when rate limit
 
 The singer-python library's utils namespace has a rate limiting decorator for use.
 
-User Agents
------------
-
-You should support an optional `user_agent` field in config that will be passed along in request
-headers to the API. The `user_agent` should include an email address to allow the API provider to
-contact you if there's an issue with the tap or your usage of their API.
-
 Memory Constraints
 ------------------
 
@@ -69,13 +62,6 @@ Good:
 
 Bad:
  - 2017-01-01 00:00:00
-
-
-Start Date
-----------
-
-Taps should support an optional `start_date` param that indicates how far back an integration
-should sync data in the absence of a state entry.
 
 
 State
@@ -133,19 +119,21 @@ file).
 Schemas
 -------
 
-Schemas should be stored in a `schemas` folder under the module directory as JSON files rather than
-as native dicts in the source code.
+Schemas should be stored in a `schemas` folder under the module directory
+as JSON files rather than as native dicts in the source code.
 
-Always stream the entity's schema before streaming any records for that entity.
+Always stream the entity's schema before streaming any records for that
+entity.
 
-Use `singer-tools`'s `singer-infer-schema` to generate a base schema to start from.
+If the API you're using does not publish a schema, you can use the
+`singer-infer-schema` program in [singer-tools] to generate a base schema
+to start from.
 
 
 Testing
 -------
 
-Use `singer-tools`'s `singer-check-tap` command to validate that a tap's output matches the expected
-format.
+Use `singer-tools`'s `singer-check-tap` command to validate that a tap's
+output matches the expected format and validate the output against its
+schema.
 
-Use the `target-stitch` module in dry-run mode (`tap-mytap -c myconf.json | target-stitch -n`) to
-validate records against their schemas.
