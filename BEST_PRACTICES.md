@@ -137,3 +137,37 @@ Use `singer-tools`'s `singer-check-tap` command to validate that a tap's
 output matches the expected format and validate the output against its
 schema.
 
+Code Quality
+------------
+
+We recommend running pylint on your Tap and making sure that you
+understand any issues it reports. You should get your code to the point
+where pylint does not report any error-level messages.
+
+When we import your Tap, we'll run it in CircleCI, and we'll include
+Pylint in the test phase. The CircleCI buld will fail if Pylint finds any
+issues, so we will need to account for all issues by either fixing them or
+disabling the message in Pylint. We are flexible about which Pylint issues
+are acceptable, but we generally run Pylint with some of the more pedantic
+messages disabled. For example, we typically use the following circle.yml
+config:
+
+```yaml
+machine:
+  python:
+    version: 3.4.4
+
+dependencies:
+  pre:
+    - pip install pylint
+
+test:
+  post:
+    - pylint tap_outbrain -d missing-docstring -d logging-format-interpolation -d too-many-locals -d too-many-arguments
+```
+
+
+
+
+
+
