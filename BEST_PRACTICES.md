@@ -1,8 +1,8 @@
 Best Practices
---------------
+==============
 
 Rate Limiting
-=============
+-------------
 
 Most APIs enforce rate limits. Taps should be written in a way that respects these rate limits.
 
@@ -13,21 +13,21 @@ limits, the entire quota can be used up and the tap should sleep when rate limit
 The singer-python library's utils namespace has a rate limiting decorator for use.
 
 User Agents
-===========
+-----------
 
 You should support an optional `user_agent` field in config that will be passed along in request
 headers to the API. The `user_agent` should include an email address to allow the API provider to
 contact you if there's an issue with the tap or your usage of their API.
 
 Memory Constraints
-==================
+------------------
 
 Taps should not rely on large volumes of RAM being available during run and should strive to keep
 as little data in memory as required. Use iterators/generators when available.
 
 
 Dates
-=====
+-----
 
 All dates should use the RFC3339 format (which includes timezone offsets). UTC is the preferred
 timezone for all data and should be used when possible.
@@ -41,14 +41,14 @@ Bad:
 
 
 Start Date
-==========
+----------
 
 Taps should support an optional `start_date` param that indicates how far back an integration
 should sync data in the absence of a state entry.
 
 
 State
-=====
+-----
 
 States that are datetimes will all be in RFC3339 format. Using ids or other identifiers for state
 is possible but could cause issues if the entities are not immutable and change out of order. If
@@ -77,7 +77,7 @@ The tap's config file must ALWAYS have a `start_date` field indicating the defau
 
 
 Logging and Exception Handling
-==============================
+------------------------------
 
 Log every URL + params that will be requested, but be sure to exclude any sensitive information
 such as api keys and client secrets. Log the progress of the sync (e.g. Starting entity 1,
@@ -93,14 +93,14 @@ non-zero error code (raise an exception or use `sys.exit(1)`)
 
 
 Module Structure
-================
+----------------
 
 Source code should be in a module (folder with `__init__.py` file) and not just a script (`module.py`
 file).
 
 
 Schemas
-=======
+-------
 
 Schemas should be stored in a `schemas` folder under the module directory as JSON files rather than
 as native dicts in the source code.
@@ -111,7 +111,7 @@ Use `singer-tools`'s `singer-infer-schema` to generate a base schema to start fr
 
 
 Testing
-=======
+-------
 
 Use `singer-tools`'s `singer-check-tap` command to validate that a tap's output matches the expected
 format.
