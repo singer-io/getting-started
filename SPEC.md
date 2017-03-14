@@ -171,7 +171,7 @@ and should be determined independently by each Tap.
 ```
 {"type": "SCHEMA", "stream": "users", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
 {"type": "RECORD", "stream": "users", "record": {"id": 1, "name": "Chris"}}
-{"type": "RECORD", "stream": "stream": "users", "record": {"id": 2, "name": "Mike"}}
+{"type": "RECORD", "stream": "users", "record": {"id": 2, "name": "Mike"}}
 {"type": "SCHEMA", "stream": "locations", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
 {"type": "RECORD", "stream": "locations", "record": {"id": 1, "name": "Philadelphia"}}
 {"type": "STATE", "value": {"users": 2, "locations": 1}}
