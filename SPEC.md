@@ -115,8 +115,8 @@ the following properties:
 
  - `stream` **Required**. The string name of the stream
 
-A single Tap may output RECORDS messages with different stream
-names.  A single RECORDS entry may only contain records for a single
+A single Tap may output RECORDs messages with different stream
+names.  A single RECORD entry may only contain records for a single
 stream.
 
 Example:
