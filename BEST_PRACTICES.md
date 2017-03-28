@@ -166,11 +166,11 @@ Schema Discovery and Property Selection
 For some data sources, it won't make sense to pull every property
 available. For example, suppose we had a Tap for a Postgres database, and
 a user only wanted to pull a subset of columns from a subset of tables. It
-would be too inconvenient if the Tap emitted all columns for all tables.
+would be inconvenient if the Tap emitted all columns for all tables.
 
 To address this, we recommend allowing a Tap to produce a document
 containing the "discovered" schemas for its data source, and allowing it
-to also accept an "annotated" schema that indicates which streams and
+to also accept "annotated schemas" that indicate which streams and
 properties to sync.
 
 ### Schema Discovery
@@ -187,8 +187,8 @@ The format of the discovery output is as follows. The top level is an
 object, with a single key called "streams", that points to an array. Each
 item of the array is an object with two keys:
 
-    * name - the name of the stream
-    * schema - the discovered schema for the stream
+* name - the name of the stream
+* schema - the discovered schema for the stream
     
 The discovered schema is in JSON schema format, with one extension.
 Properties may optionally contain a `selectable` attribute, which means
