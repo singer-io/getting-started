@@ -244,7 +244,7 @@ Here's an example of a discovered schema:
 }
 ```
 
-2. Add `--properties PROPERTIES` option.
+### Property Selection
 
 A tap that supports property selection should accept an optional
 `--properties PROPERTIES` option. `PROPERTIES` should point to a file
