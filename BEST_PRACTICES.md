@@ -208,10 +208,12 @@ Here's an example of a discovered schema:
         "id": {"type": "integer"},
         "name": {
           "type": "object",
+          "selectable": true,
           "properties": {
             "first_name": {"type": "string", "selectable": true},
             "last_name": {"type": "string", "selectable": true}
           },
+        },
         "addresses": {
           "type": "array",
           "selectable": true,
@@ -246,8 +248,7 @@ Here's an example of a discovered schema:
 
 A tap that supports property selection should accept an optional
 `--properties PROPERTIES` option. `PROPERTIES` should point to a file
-containing the desired schemas. The Tap should limit its output to the
-streams and properties present in the `PROPERTIES` file.
+containing the desired schemas.
 
 The format of PROPERTIES file is similar to the output from discovery.
 The top level is an object, with a single key called "streams", that
@@ -255,25 +256,73 @@ points to a map where each key is a stream name and each value is the
 desired schema for that stream.
 
 The Tap should attempt to sync every stream that is listed in the
-PROPERTIES file. For each of those streams, it should include all the
+PROPERTIES file. For each of those streams, it SHOULD include all the
 properties that are present for that stream in the desired schema. If the
 desired schema contains a property that does not exist in the data source,
-the tap should fail and exit with a non-zero status. The Tap may include
+the tap SHOULD fail and exit with a non-zero status. The Tap MAY include
 additional properties that are not included in the desired schema, if
-those properties are always provided by the data source.
+those properties are always provided by the data source. The tap MUST NOT
+include in its output any streams that are not present in desired schemas
+file.
 
 Note that the Tap should not validate the data against the desired schema.
 The purpose of the desired schema is _only_ to communicate which streams
 and properties are desired.
 
+For example, suppose we wanted to sync only the users table, and only the
+last name and state of each user. Our desired schemas file would look like
+this:
+
 ```javascript
 {
   "streams": {
-    "orders": {
+    "users": {
       "type": "object",
       "properties": {
-        "user_id": {"type": "integer"},
-        "amount": {"type": "number"},
+        "id": {"type": "integer"},
+        "name": {
+          "type": "object",
+          "properties": {
+            "last_name": {"type": "string"}
+          },
+        },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "state": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Since the Tap will ignore the type information on the desired schema, we
+can prune out the "type" fields. The following is sufficient for a Tap to
+know that it should sync the "users.last_name" and "addresses.state"
+properties of the "users" stream:
+
+```javascript
+{
+  "streams": {
+    "users": {
+      "properties": {
+        "name": {
+          "properties": {
+            "last_name": {}
+          },
+        },
+        "addresses": {
+          "items": {
+            "properties": {
+              "state": {}
+            }
+          }
+        }
       }
     }
   }
