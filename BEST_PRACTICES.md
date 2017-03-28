@@ -259,11 +259,11 @@ The Tap should attempt to sync every stream that is listed in the
 PROPERTIES file. For each of those streams, it SHOULD include all the
 properties that are present for that stream in the desired schema. If the
 desired schema contains a property that does not exist in the data source,
-the tap SHOULD fail and exit with a non-zero status. The Tap MAY include
-additional properties that are not included in the desired schema, if
-those properties are always provided by the data source. The tap MUST NOT
-include in its output any streams that are not present in desired schemas
-file.
+a Tap MAY fail and exit with a non-zero status or it MAY omit the
+requested field from the output. The Tap MAY include additional properties
+that are not included in the desired schema, if those properties are
+always provided by the data source. The tap MUST NOT include in its output
+any streams that are not present in desired schemas file.
 
 Note that the Tap should not validate the data against the desired schema.
 The purpose of the desired schema is _only_ to communicate which streams
