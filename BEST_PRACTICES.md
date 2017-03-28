@@ -184,11 +184,9 @@ written to STDOUT. If the `--discovered` flag is supplied, a tap should
 not emit any RECORD, SCHEMA, or STATE messages.
 
 The format of the discovery output is as follows. The top level is an
-object, with a single key called "streams", that points to an array. Each
-item of the array is an object with two keys:
-
-* name - the name of the stream
-* schema - the discovered schema for the stream
+object, with a single key called "streams", that points to a map where
+each key is a stream name and each value is the discovered schema for that
+stream.
     
 The discovered schema is in JSON schema format, with one extension.
 Properties may optionally contain a `selectable` attribute, which means
@@ -201,29 +199,26 @@ might always emit some fields, while allowing other fields to be selected.
 Here's an example of a discovered schema:
 
 ```javascript
-{"streams": [
-  {"name": "users",
-   "schema": {
-     "type": "object",
-     "properties": {
-       "id": {"type": "integer"},
-       "first_name": {"type": "string", "selectable": true},
-       "last_name": {"type": "string", "selectable": true},
-     }
-   }
-  },
-  {"name": "orders",
-   "schema": {
-     "type": "object",
-     "properties": {
-       "id": {"type": "integer"},
-       "user_id": {"type": "integer", "selectable": true},
-       "amount": {"type": "number", "selectable": true},
-       "credit_card_number": {"type": "string", "selectable": true},
-     }
-   }
+{
+  "streams": {
+    "users": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "integer"},
+        "first_name": {"type": "string", "selectable": true},
+        "last_name": {"type": "string", "selectable": true},
+      }
+    },
+    "orders": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "integer"},
+        "user_id": {"type": "integer", "selectable": true},
+        "amount": {"type": "number", "selectable": true},
+        "credit_card_number": {"type": "string", "selectable": true},
+      }
+    }
   }
- ]
 }
 ```
 
