@@ -180,8 +180,8 @@ A Tap that wants to support property selection should add an optional
 connect to its data source, find the list of streams available, and print
 out a document listing each stream along with the discovered schema. The
 discovery output should go to STDOUT, and it should be the only thing
-written to STDOUT. If the `--discovered` flag is supplied, a tap should
-not emit any RECORD, SCHEMA, or STATE messages.
+written to STDOUT. If the `--discover` flag is supplied, a tap should not
+emit any RECORD, SCHEMA, or STATE messages.
 
 The format of the discovery output is as follows. The top level is an
 object, with a single key called "streams", that points to a map where
