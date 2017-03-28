@@ -163,14 +163,15 @@ test:
 Schema Discovery and Property Selection
 ---------------------------------------
 
-For some data sources, it won't make sense to pull every property
-available. For example, suppose we had a Tap for a Postgres database, and
-a user only wanted to pull a subset of columns from a subset of tables. It
-would be inconvenient if the Tap emitted all columns for all tables.
+For some data sources, it won't make sense to pull every stream and
+property available. For example, suppose we had a Tap for a Postgres
+database, and a user only wanted to pull a subset of columns from a subset
+of tables. It would be inconvenient if the Tap emitted all columns for all
+tables.
 
 To address this, we recommend allowing a Tap to produce a document
 containing the "discovered" schemas for its data source, and allowing it
-to also accept "annotated schemas" that indicate which streams and
+to also accept "desired schemas" that indicate which streams and
 properties to sync.
 
 ### Schema Discovery
@@ -205,8 +206,27 @@ Here's an example of a discovered schema:
       "type": "object",
       "properties": {
         "id": {"type": "integer"},
-        "first_name": {"type": "string", "selectable": true},
-        "last_name": {"type": "string", "selectable": true},
+        "name": {
+          "type": "object",
+          "properties": {
+            "first_name": {"type": "string", "selectable": true},
+            "last_name": {"type": "string", "selectable": true}
+          },
+        "addresses": {
+          "type": "array",
+          "selectable": true,
+          "items": {
+            "type": "object",
+            "selectable": true,
+            "properties": {
+              "addr1": {"type": "string", "selectable": true},
+              "addr2": {"type": "string", "selectable": true},
+              "city": {"type": "string", "selectable": true},
+              "state": {"type": "string", "selectable": true},
+              "zip": {"type": "string", "selectable": true},
+            }
+          }
+        }
       }
     },
     "orders": {
@@ -224,29 +244,38 @@ Here's an example of a discovered schema:
 
 2. Add `--properties PROPERTIES` option.
 
-    A tap that supports property selection should accept an optional
-    `--properties PROPERTIES` option. `PROPERTIES` should point to a file.
-    The Tap should limit its output to the streams present in the
-    `PROPERTIES` file, and further limit the fields in each stream to the
-    ones marked as "selected" in the PROPERTIES file.
+A tap that supports property selection should accept an optional
+`--properties PROPERTIES` option. `PROPERTIES` should point to a file
+containing the desired schemas. The Tap should limit its output to the
+streams and properties present in the `PROPERTIES` file.
 
-### Discovered Schema and Annotated Schema Format
+The format of PROPERTIES file is similar to the output from discovery.
+The top level is an object, with a single key called "streams", that
+points to a map where each key is a stream name and each value is the
+desired schema for that stream.
 
+The Tap should attempt to sync every stream that is listed in the
+PROPERTIES file. For each of those streams, it should include all the
+properties that are present for that stream in the desired schema. If the
+desired schema contains a property that does not exist in the data source,
+the tap should fail and exit with a non-zero status. The Tap may include
+additional properties that are not included in the desired schema, if
+those properties are always provided by the data source.
+
+Note that the Tap should not validate the data against the desired schema.
+The purpose of the desired schema is _only_ to communicate which streams
+and properties are desired.
 
 ```javascript
-{"streams": [
-  {"name": "orders",
-   "schema": {
-     "type": "object",
-     "properties": {
-       "user_id": {"type": "integer", "selected": true},
-       "amount": {"type": "number", "selected": true},
-     }
-   }
+{
+  "streams": {
+    "orders": {
+      "type": "object",
+      "properties": {
+        "user_id": {"type": "integer"},
+        "amount": {"type": "number"},
+      }
+    }
   }
- ]
 }
 ```
-
-
-
