@@ -22,15 +22,11 @@ recommend supporting these two fields:
   Indicates how far back an integration should sync data in the absence of
   a state entry.
 
-* `user_agent` - A tap should accept a `user_agent` field in the config and pass it along in request headers to the API.
-
-TODO: John's version included:
-
-> The `user_agent` should include an email address to allow the API
-> provider to contact you if there's an issue with the tap or your usage
-> of their API.
-
-Is that something a Tap author needs to be concerned with? Won't that just be provided by the platform?
+* `user_agent` - A tap should accept a `user_agent` field in the config
+  and pass it along in request headers to the API. The caller of a Tap
+  should include an email address in the `user_agent` field to allow the
+  API provider to contact you if there's an issue with the tap or your
+  usage of their API.
 
 Rate Limiting
 -------------
@@ -63,7 +59,6 @@ Good:
 Bad:
  - 2017-01-01 00:00:00
 
-
 State
 -----
 
@@ -91,7 +86,6 @@ state. Interrupted jobs that save state too early will have data missing. Interr
 save state too late will cause an increase in duplicate rows being replicated.
 
 The tap's config file must ALWAYS have a `start_date` field indicating the default state.
-
 
 Logging and Exception Handling
 ------------------------------
@@ -166,8 +160,98 @@ test:
     - pylint tap_outbrain -d missing-docstring -d logging-format-interpolation -d too-many-locals -d too-many-arguments
 ```
 
+Schema Discovery and Property Selection
+---------------------------------------
+
+For some data sources, it won't make sense to pull every property
+available. For example, suppose we had a Tap for a Postgres database, and
+a user only wanted to pull a subset of columns from a subset of tables. It
+would be too inconvenient if the Tap emitted all columns for all tables.
+
+To address this, we recommend allowing a Tap to produce a document
+containing the "discovered" schemas for its data source, and allowing it
+to also accept an "annotated" schema that indicates which streams and
+properties to sync.
+
+### Schema Discovery
+
+A Tap that wants to support property selection should add an optional
+`--discover` flag. When the `--discover` flag is supplied, the Tap should
+connect to its data source, find the list of streams available, and print
+out a document listing each stream along with the discovered schema. The
+discovery output should go to STDOUT, and it should be the only thing
+written to STDOUT. If the `--discovered` flag is supplied, a tap should
+not emit any RECORD, SCHEMA, or STATE messages.
+
+The format of the discovery output is as follows. The top level is an
+object, with a single key called "streams", that points to an array. Each
+item of the array is an object with two keys:
+
+    * name - the name of the stream
+    * schema - the discovered schema for the stream
+    
+The discovered schema is in JSON schema format, with one extension.
+Properties may optionally contain a `selectable` attribute, which means
+that a user can decide whether to include those properties in the output.
+Certain fields may not be selectable and will always be included if their
+parent object is included. For example, for a database source the primary
+key of each table must be included if the table is selected. An HTTP API
+might always emit some fields, while allowing other fields to be selected.
+
+Here's an example of a discovered schema:
+
+```javascript
+{"streams": [
+  {"name": "users",
+   "schema": {
+     "type": "object",
+     "properties": {
+       "id": {"type": "integer"},
+       "first_name": {"type": "string", "selectable": true},
+       "last_name": {"type": "string", "selectable": true},
+     }
+   }
+  },
+  {"name": "orders",
+   "schema": {
+     "type": "object",
+     "properties": {
+       "id": {"type": "integer"},
+       "user_id": {"type": "integer", "selectable": true},
+       "amount": {"type": "number", "selectable": true},
+       "credit_card_number": {"type": "string", "selectable": true},
+     }
+   }
+  }
+ ]
+}
+```
+
+2. Add `--properties PROPERTIES` option.
+
+    A tap that supports property selection should accept an optional
+    `--properties PROPERTIES` option. `PROPERTIES` should point to a file.
+    The Tap should limit its output to the streams present in the
+    `PROPERTIES` file, and further limit the fields in each stream to the
+    ones marked as "selected" in the PROPERTIES file.
+
+### Discovered Schema and Annotated Schema Format
 
 
+```javascript
+{"streams": [
+  {"name": "orders",
+   "schema": {
+     "type": "object",
+     "properties": {
+       "user_id": {"type": "integer", "selected": true},
+       "amount": {"type": "number", "selected": true},
+     }
+   }
+  }
+ ]
+}
+```
 
 
 
