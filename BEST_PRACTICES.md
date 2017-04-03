@@ -1,22 +1,17 @@
-Best Practices for Submitting Taps to Stitch
+Best Practices for Building a Singer Tap
 ============================================
-
-Here are some best practices for writing Taps that will be run in Stitch's platform.
 
 Language
 --------
 
-Currently all Stitch Taps are written in Python. This Best Practices guide
-contains some python-specific recommendations. If you want to write a Tap
-in another language and submit it to be run in Stitch's platform, please
-contact us.
+Currently all Singer Taps are written in Python. This Best Practices guide
+contains some python-specific recommendations.
 
 Recommended Config Fields
 -------------------------
 
 The Singer Specification does not define any standard fields in the
-configuration, but in order to run a Tap in Stitch's platform, we
-recommend supporting these two fields:
+configuration. We recommend supporting the following fields:
 
 * `start_date` - A tap should take a `start_date` field in the config that
   Indicates how far back an integration should sync data in the absence of
