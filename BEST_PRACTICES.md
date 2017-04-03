@@ -190,12 +190,12 @@ each key is a stream name and each value is the discovered schema for that
 stream.
     
 The discovered schema is in JSON schema format, with one extension.
-Properties may optionally contain a `selectable` attribute, which means
-that a user can decide whether to include those properties in the output.
-Certain fields may not be selectable and will always be included if their
-parent object is included. For example, for a database source the primary
-key of each table must be included if the table is selected. An HTTP API
-might always emit some fields, while allowing other fields to be selected.
+Properties may optionally contain an `inclusion` attribute, which can have
+one of three values:
+
+* automatic - the user cannot select the attribute, it will be automatically included.
+* available - the user can select the attribute for inclusion.
+* unsupported - the Tap does not support this attribute, and is just reporting it in the schema to indicate that the attribute exists in the source but will not be included.
 
 Here's an example of a discovered schema:
 
@@ -205,27 +205,30 @@ Here's an example of a discovered schema:
     "users": {
       "type": "object",
       "properties": {
-        "id": {"type": "integer"},
+        "id": {
+          "type": "integer",
+          "inclusion": "automatic"
+        },
         "name": {
           "type": "object",
-          "selectable": true,
+          "inclusion": "available",
           "properties": {
-            "first_name": {"type": "string", "selectable": true},
-            "last_name": {"type": "string", "selectable": true}
+            "first_name": {"type": "string", "inclusion": "available"},
+            "last_name": {"type": "string", "inclusion": "available"}
           },
         },
         "addresses": {
           "type": "array",
-          "selectable": true,
+          "inclusion": "available",
           "items": {
             "type": "object",
-            "selectable": true,
+            "inclusion": "available",
             "properties": {
-              "addr1": {"type": "string", "selectable": true},
-              "addr2": {"type": "string", "selectable": true},
-              "city": {"type": "string", "selectable": true},
-              "state": {"type": "string", "selectable": true},
-              "zip": {"type": "string", "selectable": true},
+              "addr1": {"type": "string", "inclusion": "available"},
+              "addr2": {"type": "string", "inclusion": "available"},
+              "city": {"type": "string", "inclusion": "available"},
+              "state": {"type": "string", "inclusion": "available"},
+              "zip": {"type": "string", "inclusion": "available"},
             }
           }
         }
@@ -235,9 +238,9 @@ Here's an example of a discovered schema:
       "type": "object",
       "properties": {
         "id": {"type": "integer"},
-        "user_id": {"type": "integer", "selectable": true},
-        "amount": {"type": "number", "selectable": true},
-        "credit_card_number": {"type": "string", "selectable": true},
+        "user_id": {"type": "integer", "inclusion": "available"},
+        "amount": {"type": "number", "inclusion": "available"},
+        "credit_card_number": {"type": "string", "inclusion": "available"},
       }
     }
   }
@@ -250,20 +253,21 @@ A tap that supports property selection should accept an optional
 `--properties PROPERTIES` option. `PROPERTIES` should point to a file
 containing the desired schemas.
 
-The format of PROPERTIES file is similar to the output from discovery.
-The top level is an object, with a single key called "streams", that
-points to a map where each key is a stream name and each value is the
-desired schema for that stream.
+The format of PROPERTIES file is similar to the output from discovery. The
+top level is an object, with a single key called "streams", that points to
+a map where each key is a stream name and each value is the requested
+schema for that stream. The caller requests properties by decorating those
+properties with a `"selected": true` attribute in the schema.
 
 The Tap should attempt to sync every stream that is listed in the
 PROPERTIES file. For each of those streams, it SHOULD include all the
-properties that are present for that stream in the desired schema. If the
-desired schema contains a property that does not exist in the data source,
-a Tap MAY fail and exit with a non-zero status or it MAY omit the
-requested field from the output. The Tap MAY include additional properties
-that are not included in the desired schema, if those properties are
-always provided by the data source. The tap MUST NOT include in its output
-any streams that are not present in desired schemas file.
+properties that are marked as selected for that stream. If the requested
+schema contains a property that does not exist in the data source, a Tap
+MAY fail and exit with a non-zero status or it MAY omit the requested
+field from the output. The Tap MAY include additional properties that are
+not included in the desired schema, if those properties are always
+provided by the data source. The tap MUST NOT include in its output any
+streams that are not present in desired schemas file.
 
 Note that the Tap should not validate the data against the desired schema.
 The purpose of the desired schema is _only_ to communicate which streams
@@ -278,20 +282,26 @@ this:
   "streams": {
     "users": {
       "type": "object",
+      "selected": true,
       "properties": {
         "id": {"type": "integer"},
         "name": {
           "type": "object",
+          "selected": true,
           "properties": {
             "last_name": {"type": "string"}
           },
         },
         "addresses": {
           "type": "array",
+          "selected": true,
           "items": {
             "type": "object",
             "properties": {
-              "state": {"type": "string"}
+              "state": {
+                "type": "string",
+                "selected": true
+              }
             }
           }
         }
@@ -310,16 +320,22 @@ properties of the "users" stream:
 {
   "streams": {
     "users": {
+      "selected": true
       "properties": {
         "name": {
+          "selected": true,
           "properties": {
-            "last_name": {}
-          },
+            "last_name": {"selected": true},
+            "first_name": {"selected": true}
+          }
         },
         "addresses": {
+          "selected": true,
           "items": {
             "properties": {
-              "state": {}
+              "state": {
+                "selected": true
+              }
             }
           }
         }
