@@ -165,15 +165,16 @@ A Tap is just a program, written in any language, that outputs data to
 be written from the command line, without any programming at all:
 
 ```bash
-› printf '{"type":"RECORD","stream":"hello","record":{"value":"world"}}\n'
+› printf '{"type":"SCHEMA", "stream":"hello","key_properties":[],"schema":{"type":"object", "properties":{"value":{"type":"string"}}}}\n{"type":"RECORD","stream":"hello","schema":"hello","record":{"value":"world"}}\n'
 ```
 
 This writes the datapoint `{"value":"world"}` to the *hello*
-stream. That data can be piped into any Target, like the [Google Sheets
+stream along with a schema indicating that `value` is a string. 
+That data can be piped into any Target, like the [Google Sheets
 Target], over `stdin`:
 
 ```bash
-› printf '{"type":"RECORD","stream":"hello","record":{"value":"world"}}\n' | target-gsheet -c config.json
+› printf '{"type":"SCHEMA", "stream":"hello","key_properties":[],"schema":{"type":"object", "properties":{"value":{"type":"string"}}}}\n{"type":"RECORD","stream":"hello","schema":"hello","record":{"value":"world"}}\n' | target-gsheet -c config.json
 ```
 
 ### A Python Tap
