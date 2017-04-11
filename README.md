@@ -86,11 +86,21 @@ sources like [Braintree], [Freshdesk] and [Hubspot] to Google
 Sheets. We'll use the [Fixer.io Tap] - which pulls currency exchange
 rate data from a public data set - as an example.
 
-These commands will install `tap-fixerio` and `target-gsheet` with
-pip:
+We recommend installing each Tap and Target in a separate Python virtual
+environment. This will insure that you won't have conflicting dependencies
+between any Taps and Targets.
+
+These commands will install `tap-fixerio` and `target-gsheet` with pip in
+their own virtual environments:
 
 ```bash
-› pip install target-gsheet tap-fixerio
+# Install tap-fixerio in its own virtualenv
+virtualenv -p python3 tap-fixerio
+target-gsheet/bin/pip install target-gsheet
+
+# Install target-gsheet in its own virtualenv
+virtualenv -p python3 target-gsheet
+tap-fixerio/bin/pip install tap-fixerio
 ```
 
 ### Step 4 - Run
@@ -99,7 +109,7 @@ This command will pipe the output of `tap-fixerio` to `target-gsheet`,
 using the configuration file created in Step 2:
 
 ```bash
-› tap-fixerio | target-gsheet -c config.json
+› tap-fixerio/bin/tap-fixerio | target-gsheet/bin/target-gsheet -c config.json
     INFO Replicating the latest exchange rate data from fixer.io
     INFO Tap exiting normally
 ```
