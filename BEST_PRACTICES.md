@@ -183,7 +183,7 @@ The format of the discovery output is as follows. The top level is an
 object, with a single key called "streams", that points to a map where
 each key is a stream name and each value is the discovered schema for that
 stream.
-    
+
 The discovered schema is in JSON schema format, with one extension.
 Properties may optionally contain an `inclusion` attribute, which can have
 one of three values:
@@ -352,17 +352,65 @@ INFO STATS: <metrics-json>
 
 `<metrics-json>` should be a JSON object where the keys are limited to the following:
 
-* `source` Source of the data, as a string
-* `status` Either 'running', 'succeeded', or 'failed'
-* `http_status_code` The HTTP status code of the response, for HTTP requests
-* `duration` Duration of the operation in seconds
-* `record_count` Number of records fetched
-* `byte_count` Number of bytes fetched
+* source
+* status
+* http_status_code
+* duration
+* record_count
+* byte_count
 
+All fields are optional. A Tap SHOULD report whatever fields are
+meaningful for the kinds of operations it performs. A Tap SHOULD NOT
+include a field that it cannot reliably compute.
+
+### Fields
+
+#### source
+
+`source` is a short name describing the source of the data within the
+context of this Tap. You should choose a source naming structure that
+allows easy grouping.  For an HTTP service, you should not use a full
+URL. For example, for a Tap thatpaginates through orders by making GET
+requests to
+`http://myapi.com/customers/{cust-id}/orders?offset={offset}&limit={limit}`,
+"orders" would be a good source name.
+
+#### status
+
+A string describing the status of the operation, either "running",
+"succeeded", or "failed".
+
+#### http_status_code
+
+A Tap that pulls data directly from an HTTP service SHOULD indicate
+the HTTP status code of each request in this field.
+
+#### duration
+
+The time duration covered by this metric, in seconds. Floating point
+numbers are allowed in order to provide sub-second precision. For a
+synchronous fetch operation like an HTTP GET, this would be the
+duration of the request. For a stream of records, this should be the
+number of seconds since the previous metric was reported, NOT the
+cumulative number of seconds for the entire operation.
+
+#### record_count
+
+Number of records read. For a batch operation this should be the
+number of records in the batch. For a streaming operation this should
+be the number of records since the last metric was reported, NOT the
+cumulative record count for the whole operation.
+
+#### byte_count
+
+Bytes read. Like record_count, this should NOT be cumulative.
 
 ### Examples
 
-#### Example 1
+Here are some examples of metrics and how those metrics should be
+interpreted.
+
+#### Example 1: Successful HTTP GET
 
 ```
 INFO STATS: {"source": "orders", "status": "succeeded", "http_status_code": 200, "duration": 1.23, "record_count": 100, "byte_count": 12345}
@@ -372,7 +420,7 @@ INFO STATS: {"source": "orders", "status": "succeeded", "http_status_code": 200,
 > succeeded with a status code of 200, and returned a body with 12345
 > bytes containing 100 records.
 
-#### Example 2
+#### Example 2: Failed HTTP GET
 
 ```
 INFO STATS: {"source": "orders", "status": "failed", "http_status_code": 400, "duration": 1.23}
@@ -381,7 +429,7 @@ INFO STATS: {"source": "orders", "status": "failed", "http_status_code": 400, "d
 > We made an HTTP request to an "orders" endpoint that took 1.23 seconds
 > and failed with a status code of 400.
 
-#### Example 3
+#### Example 3: Successful streaming operation
 
 ```
 INFO STATS: {"source": "orders", "status": "running", "duration": 1.2, "record_count": 100}
@@ -392,7 +440,7 @@ INFO STATS: {"source": "orders", "status": "succeeded", "duration": 0.1, "record
 
 We fetched a total of 314 records from an "orders" endpoint in 4.5 seconds.
 
-#### Example 4:
+#### Example 4: Successful HTTP GET
 
 ```
 INFO STATS: {"source": "orders", "status": "succeeded", "http_status_code": 200, "duration": 1.23}
@@ -400,3 +448,7 @@ INFO STATS: {"source": "orders", "status": "succeeded", "http_status_code": 200,
 
 > We made an HTTP request that succeeded and returned an unspecified
 > number of records.
+
+If a Tap hits a lot of different HTTP endpoints with different
+response structures, and it would be too cumbersome to discern and
+report accurate record counts, a Tap can simply omit that field.
