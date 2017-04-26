@@ -370,7 +370,7 @@ include a field that it cannot reliably compute.
 `source` is a short name describing the source of the data within the
 context of this Tap. You should choose a source naming structure that
 allows easy grouping.  For an HTTP service, you should not use a full
-URL. For example, for a Tap thatpaginates through orders by making GET
+URL. For example, for a Tap that paginates through orders by making GET
 requests to
 `http://myapi.com/customers/{cust-id}/orders?offset={offset}&limit={limit}`,
 "orders" would be a good source name.
@@ -389,10 +389,9 @@ the HTTP status code of each request in this field.
 
 The time duration covered by this metric, in seconds. Floating point
 numbers are allowed in order to provide sub-second precision. For a
-synchronous fetch operation like an HTTP GET, this would be the
-duration of the request. For a stream of records, this should be the
-number of seconds since the previous metric was reported, NOT the
-cumulative number of seconds for the entire operation.
+synchronous fetch operation like an HTTP GET, this would be the duration
+of the request. For a stream of records, this should be the time since the
+previous metric was reported, NOT the time for the entire operation.
 
 #### record_count
 
