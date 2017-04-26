@@ -339,3 +339,64 @@ properties of the "users" stream:
   }
 }
 ```
+
+Metrics
+-------
+
+A Tap should periodically emit structured log messages containing metrics
+about read operations.
+
+```
+INFO STATS: <metrics-json>
+```
+
+`<metrics-json>` should be a JSON object where the keys are limited to the following:
+
+* `source` Source of the data, as a string
+* `status` Either 'running', 'succeeded', or 'failed'
+* `http_status_code` The HTTP status code of the response, for HTTP requests
+* `duration` Duration of the operation in seconds
+* `record_count` Number of records fetched
+* `byte_count` Number of bytes fetched
+
+
+### Examples
+
+#### Example 1
+
+```
+INFO STATS: {"source": "orders", "status": "succeeded", "http_status_code": 200, "duration": 1.23, "record_count": 100, "byte_count": 12345}
+```
+
+> We made an HTTP request to an "orders" endpoint that took 1.23,
+> succeeded with a status code of 200, and returned a body with 12345
+> bytes containing 100 records.
+
+#### Example 2
+
+```
+INFO STATS: {"source": "orders", "status": "failed", "http_status_code": 400, "duration": 1.23}
+```
+
+> We made an HTTP request to an "orders" endpoint that took 1.23 seconds
+> and failed with a status code of 400.
+
+#### Example 3
+
+```
+INFO STATS: {"source": "orders", "status": "running", "duration": 1.2, "record_count": 100}
+INFO STATS: {"source": "orders", "status": "running", "duration": 0.9, "record_count": 100}
+INFO STATS: {"source": "orders", "status": "running", "duration": 2.3, "record_count": 100}
+INFO STATS: {"source": "orders", "status": "succeeded", "duration": 0.1, "record_count": 14}
+```
+
+We fetched a total of 314 records from an "orders" endpoint in 4.5 seconds.
+
+#### Example 4:
+
+```
+INFO STATS: {"source": "orders", "status": "succeeded", "http_status_code": 200, "duration": 1.23}
+```
+
+> We made an HTTP request that succeeded and returned an unspecified
+> number of records.
