@@ -96,11 +96,11 @@ their own virtual environments:
 ```bash
 # Install tap-fixerio in its own virtualenv
 virtualenv -p python3 tap-fixerio
-target-gsheet/bin/pip install tap-fixerio
+target-fixerio/bin/pip install tap-fixerio
 
 # Install target-gsheet in its own virtualenv
 virtualenv -p python3 target-gsheet
-tap-fixerio/bin/pip install target-gsheet
+tap-gsheet/bin/pip install target-gsheet
 ```
 
 ### Step 4 - Run
