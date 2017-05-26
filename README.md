@@ -216,10 +216,13 @@ the `urllib.request` module to make a request to icanhazip.com.
 
 ```python
 now = datetime.now(timezone.utc).isoformat()
-schema = {'properties':	
-	  {'ip': {'type': 'string'},
-           'timestamp': {'type': 'string',
-           	         'format': 'date-time'}}}
+schema = {
+    'properties':   {
+        'ip': {'type': 'string'},
+        'timestamp': {'type': 'string', 'format': 'date-time'},
+    },
+}
+
 ```
 
 This sets up some of the data we'll need - the current time, and the
@@ -230,7 +233,7 @@ Schema].
 with urllib.request.urlopen('http://icanhazip.com') as response:
     ip = response.read().decode('utf-8').strip()
     singer.write_schema('my_ip', schema, 'timestamp')
-    singer.write_records('my_ip', [{'timestamp': now,'ip': ip}])
+    singer.write_records('my_ip', [{'timestamp': now, 'ip': ip}])
 ```
 
 Finally, we make the HTTP request, parse the response, and then make
