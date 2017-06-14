@@ -361,70 +361,60 @@ INFO METRIC: <metrics-json>
 
 #### source
 
-* type - The type of the metric. Indicates how consumers of the data
-  should interpret the "value" field. Stitch currently recognizes two
-  metric types, "counter" and "timer":
+* `type` - The type of the metric. Indicates how consumers of the data
+  should interpret the "value" field. There are two types of metrics,
+  "counter" and "timer":
   
-    * counter - the value should be interpreted as a number that is added
+    * `counter` - the value should be interpreted as a number that is added
       to a cumulative or running total.
       
-    * timer - the value is the duration in seconds of some operation.
+    * `timer` - the value is the duration in seconds of some operation.
   
-* metric - The name of the metric. This should consist only of letters,
-  numbers, underscore, and dash characters.
+* `metric` - The name of the metric. This should consist only of letters,
+  numbers, underscore, and dash characters. For example,
+  `"http_request_duration"`.
 
-* value - The value of the datapoint, either an integer or a float.
+* `value` - The value of the datapoint, either an integer or a float. For
+  example, `1234` or `1.234`.
 
-* tags - Mapping of tags describing the data. 
+* `tags` - Mapping of tags describing the data. The keys can be any
+  strings consisting solely of letters, numbers, underscores, and dashes.
+  For consistency's sake, we recommend using the following tags when they
+  are relevant.
+  
+    * `endpoint` - For a Tap that pulls data from an HTTP API, this should
+      be a descriptive name for the endpoint, such as `"users"` or `"deals"`
+      or `"orders"`.
 
+    * `http_status_code` - The HTTP status code. For example, `200` or
+      `500`.
+
+    * `job_type` - For a process that we are timing, some description of
+      the type of the job. For example, if we have a Tap that does a POST
+      to an HTTP API to generate a report and then polls with a GET until
+      the report is done, we could use a job type of `"run_report"`.
     
+    * `status` - Either `"succeeded"` or `"failed"`.
 
-`source` is a short name describing the source of the data within the
-context of this Tap. You should choose a source naming structure that
-allows easy grouping.  For an HTTP service, you should not use a full
-URL. For example, for a Tap that paginates through orders by making GET
-requests to
-`http://myapi.com/customers/{cust-id}/orders?offset={offset}&limit={limit}`,
-"orders" would be a good source name.
-
-#### status
-
-A string describing the status of the operation, either "running",
-"succeeded", or "failed".
-
-#### http_status_code
-
-A Tap that pulls data directly from an HTTP service SHOULD indicate
-the HTTP status code of each request in this field.
-
-#### duration
-
-The time duration covered by this metric, in seconds. Floating point
-numbers are allowed in order to provide sub-second precision. For a
-synchronous fetch operation like an HTTP GET, this would be the duration
-of the request. For a stream of records, this should be the time since the
-previous metric was reported, NOT the time for the entire operation.
-
-#### record_count
-
-Number of records read. For a batch operation this should be the
-number of records in the batch. For a streaming operation this should
-be the number of records since the last metric was reported, NOT the
-cumulative record count for the whole operation.
-
-#### byte_count
-
-Bytes read. Like record_count, this should NOT be cumulative.
-
+  Note that for many metrics, many of those tags will _not_ be relevant.
+  
 ### Examples
 
 Here are some examples of metrics and how those metrics should be
 interpreted.
 
-#### Example 1: Successful HTTP GET
+#### Example 1: Timer for Successful HTTP GET
 
 ```
-INFO STATS: {"source": "orders", "status": "succeeded", "http_status_code": 200, "duration": 1.23, "record_count": 100, "byte_count": 12345}
+INFO STATS: {"type": "timer",\
+             "metric": "http_request_duration",\
+             "value": 1.23,\
+             "tags": {\
+               "endpoint": "orders",\
+               "http_status_code": 200,\
+               "status": "succeeded"\
+             }\
+            }
 ```
 
 > We made an HTTP request to an "orders" endpoint that took 1.23,
