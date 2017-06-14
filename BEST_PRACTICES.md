@@ -183,7 +183,7 @@ The format of the discovery output is as follows. The top level is an
 object, with a single key called "streams", that points to a map where
 each key is a stream name and each value is the discovered schema for that
 stream.
-    
+
 The discovered schema is in JSON schema format, with one extension.
 Properties may optionally contain an `inclusion` attribute, which can have
 one of three values:
@@ -339,3 +339,88 @@ properties of the "users" stream:
   }
 }
 ```
+
+Metrics
+-------
+
+A Tap should periodically emit structured log messages containing metrics
+about read operations. Consumers of the Tap logs can parse these metrics
+out of the logs for monitoring or analysis.
+
+```
+INFO METRIC: <metrics-json>
+```
+
+`<metrics-json>` should be a JSON object with the following keys;
+
+* `type` - The type of the metric. Indicates how consumers of the data
+  should interpret the `value` field. There are two types of metrics:
+  
+    * `counter` - The value should be interpreted as a number that is added
+      to a cumulative or running total.
+      
+    * `timer` - The value is the duration in seconds of some operation.
+  
+* `metric` - The name of the metric. This should consist only of letters,
+  numbers, underscore, and dash characters. For example,
+  `"http_request_duration"`.
+
+* `value` - The value of the datapoint, either an integer or a float. For
+  example, `1234` or `1.234`.
+
+* `tags` - Mapping of tags describing the data. The keys can be any
+  strings consisting solely of letters, numbers, underscores, and dashes.
+  For consistency's sake, we recommend using the following tags when they
+  are relevant.
+  
+    * `endpoint` - For a Tap that pulls data from an HTTP API, this should
+      be a descriptive name for the endpoint, such as `"users"` or `"deals"`
+      or `"orders"`.
+
+    * `http_status_code` - The HTTP status code. For example, `200` or
+      `500`.
+
+    * `job_type` - For a process that we are timing, some description of
+      the type of the job. For example, if we have a Tap that does a POST
+      to an HTTP API to generate a report and then polls with a GET until
+      the report is done, we could use a job type of `"run_report"`.
+    
+    * `status` - Either `"succeeded"` or `"failed"`.
+
+  Note that for many metrics, many of those tags will _not_ be relevant.
+  
+### Examples
+
+Here are some examples of metrics and how those metrics should be
+interpreted.
+
+#### Example 1: Timer for Successful HTTP GET
+
+```
+INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 1.23, "tags": {"endpoint": "orders", "http_status_code": 200, "status": "succeeded"}}
+```
+
+> We made an HTTP request to an "orders" endpoint that took 1.23 seconds
+> and succeeded with a status code of 200.
+
+#### Example 2: Timer for Failed HTTP GET
+
+```
+INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 30.01, "tags": {"endpoint": "orders", "http_status_code": 500, "status": "failed"}}
+```
+
+> We made an HTTP request to an "orders" endpoint that took 30.01 seconds
+> and failed with a status code of 500.
+
+#### Example 3: Counter for Records
+
+```
+INFO METRIC: {"type": "counter", "metric": "record_count", "value": 100, "tags": {"endpoint: "orders"}}
+INFO METRIC: {"type": "counter", "metric": "record_count", "value": 100, "tags": {"endpoint: "orders"}}
+INFO METRIC: {"type": "counter", "metric": "record_count", "value": 100, "tags": {"endpoint: "orders"}}
+INFO METRIC: {"type": "counter", "metric": "record_count", "value": 14, "tags": {"endpoint: "orders"}}
+
+```
+
+> We fetched a total of 314 records from an "orders" endpoint.
+
