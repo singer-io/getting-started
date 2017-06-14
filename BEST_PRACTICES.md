@@ -347,25 +347,37 @@ A Tap should periodically emit structured log messages containing metrics
 about read operations.
 
 ```
-INFO STATS: <metrics-json>
+INFO METRIC: <metrics-json>
 ```
 
 `<metrics-json>` should be a JSON object where the keys are limited to the following:
 
-* source
-* status
-* http_status_code
-* duration
-* record_count
-* byte_count
-
-All fields are optional. A Tap SHOULD report whatever fields are
-meaningful for the kinds of operations it performs. A Tap SHOULD NOT
-include a field that it cannot reliably compute.
+* type
+* metric
+* value
+* tags
 
 ### Fields
 
 #### source
+
+* type - The type of the metric. Indicates how consumers of the data
+  should interpret the "value" field. Stitch currently recognizes two
+  metric types, "counter" and "timer":
+  
+    * counter - the value should be interpreted as a number that is added
+      to a cumulative or running total.
+      
+    * timer - the value is the duration in seconds of some operation.
+  
+* metric - The name of the metric. This should consist only of letters,
+  numbers, underscore, and dash characters.
+
+* value - The value of the datapoint, either an integer or a float.
+
+* tags - Mapping of tags describing the data. 
+
+    
 
 `source` is a short name describing the source of the data within the
 context of this Tap. You should choose a source naming structure that
