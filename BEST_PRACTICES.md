@@ -344,22 +344,22 @@ Metrics
 -------
 
 A Tap should periodically emit structured log messages containing metrics
-about read operations.
+about read operations. Consumers of the Tap logs can parse these metrics
+out of the logs for monitoring or analysis.
 
 ```
 INFO METRIC: <metrics-json>
 ```
 
-`<metrics-json>` should be a JSON object where the keys are limited to the following:
+`<metrics-json>` should be a JSON object with the following keys;
 
 * `type` - The type of the metric. Indicates how consumers of the data
-  should interpret the "value" field. There are two types of metrics,
-  "counter" and "timer":
+  should interpret the `value` field. There are two types of metrics:
   
-    * `counter` - the value should be interpreted as a number that is added
+    * `counter` - The value should be interpreted as a number that is added
       to a cumulative or running total.
       
-    * `timer` - the value is the duration in seconds of some operation.
+    * `timer` - The value is the duration in seconds of some operation.
   
 * `metric` - The name of the metric. This should consist only of letters,
   numbers, underscore, and dash characters. For example,
@@ -422,5 +422,5 @@ INFO METRIC: {"type": "counter", "metric": "record_count", "value": 14, "tags": 
 
 ```
 
-We fetched a total of 314 records from an "orders" endpoint.
+> We fetched a total of 314 records from an "orders" endpoint.
 
