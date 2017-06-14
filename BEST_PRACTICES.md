@@ -352,15 +352,6 @@ INFO METRIC: <metrics-json>
 
 `<metrics-json>` should be a JSON object where the keys are limited to the following:
 
-* type
-* metric
-* value
-* tags
-
-### Fields
-
-#### source
-
 * `type` - The type of the metric. Indicates how consumers of the data
   should interpret the "value" field. There are two types of metrics,
   "counter" and "timer":
@@ -406,50 +397,30 @@ interpreted.
 #### Example 1: Timer for Successful HTTP GET
 
 ```
-INFO STATS: {"type": "timer",\
-             "metric": "http_request_duration",\
-             "value": 1.23,\
-             "tags": {\
-               "endpoint": "orders",\
-               "http_status_code": 200,\
-               "status": "succeeded"\
-             }\
-            }
-```
-
-> We made an HTTP request to an "orders" endpoint that took 1.23,
-> succeeded with a status code of 200, and returned a body with 12345
-> bytes containing 100 records.
-
-#### Example 2: Failed HTTP GET
-
-```
-INFO STATS: {"source": "orders", "status": "failed", "http_status_code": 400, "duration": 1.23}
+INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 1.23, "tags": {"endpoint": "orders", "http_status_code": 200, "status": "succeeded"}}
 ```
 
 > We made an HTTP request to an "orders" endpoint that took 1.23 seconds
-> and failed with a status code of 400.
+> and succeeded with a status code of 200.
 
-#### Example 3: Successful streaming operation
-
-```
-INFO STATS: {"source": "orders", "status": "running", "duration": 1.2, "record_count": 100}
-INFO STATS: {"source": "orders", "status": "running", "duration": 0.9, "record_count": 100}
-INFO STATS: {"source": "orders", "status": "running", "duration": 2.3, "record_count": 100}
-INFO STATS: {"source": "orders", "status": "succeeded", "duration": 0.1, "record_count": 14}
-```
-
-We fetched a total of 314 records from an "orders" endpoint in 4.5 seconds.
-
-#### Example 4: Successful HTTP GET
+#### Example 2: Timer for Failed HTTP GET
 
 ```
-INFO STATS: {"source": "orders", "status": "succeeded", "http_status_code": 200, "duration": 1.23}
+INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 30.01, "tags": {"endpoint": "orders", "http_status_code": 500, "status": "failed"}}
 ```
 
-> We made an HTTP request that succeeded and returned an unspecified
-> number of records.
+> We made an HTTP request to an "orders" endpoint that took 30.01 seconds
+> and failed with a status code of 500.
 
-If a Tap hits a lot of different HTTP endpoints with different
-response structures, and it would be too cumbersome to discern and
-report accurate record counts, a Tap can simply omit that field.
+#### Example 3: Counter for Records
+
+```
+INFO METRIC: {"type": "counter", "metric": "record_count", "value": 100, "tags": {"endpoint: "orders"}}
+INFO METRIC: {"type": "counter", "metric": "record_count", "value": 100, "tags": {"endpoint: "orders"}}
+INFO METRIC: {"type": "counter", "metric": "record_count", "value": 100, "tags": {"endpoint: "orders"}}
+INFO METRIC: {"type": "counter", "metric": "record_count", "value": 14, "tags": {"endpoint: "orders"}}
+
+```
+
+We fetched a total of 314 records from an "orders" endpoint.
+
