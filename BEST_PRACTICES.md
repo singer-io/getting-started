@@ -212,6 +212,7 @@ the only thing written to STDOUT. If the `--discover` flag is supplied, a
 tap MOST NOT emit any RECORD, SCHEMA, or STATE messages.
 
 The format of the discovery output is as follows. The top level is an
+<<<<<<< HEAD
 object, with a single key called "streams", that points to an array of
 objects, each having the following fields:
 

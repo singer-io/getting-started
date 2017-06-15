@@ -46,7 +46,7 @@ The Stitch persister and Stitch API use schemas as follows:
  - schemas must be an 'object' at the top level
  - Stitch supports schemas with objects nested to any depth, and arrays of
    objects nested to any depth - more info in the
-   [Stitch docs](https://docs.stitchdata.com/hc/en-us/articles/222587567-Redshift-Handling-of-Nested-Data-Structures-Row-Count-Impact-v2-)
+   [Stitch docs](https://www.stitchdata.com/docs/data-structure/nested-data-structures-row-count-impact)
  - properties of type `string` and format `date-time` are converted to
    the appropriate timestamp or datetime type in the destination database
  - properties of type `integer` are converted to integer in the destination
@@ -59,7 +59,7 @@ The Stitch persister and Stitch API use schemas as follows:
  - when Stitch encounters a schema for a stream that is incompatible with
    the table that stream is to be loaded into in the destination database,
    it adds the data to the
-   [reject pile](https://docs.stitchdata.com/hc/en-us/articles/235828367-Identifying-Resolving-Record-Rejections)
+   [reject pile](https://www.stitchdata.com/docs/data-structure/identifying-rejected-records)
  
 
 [JSON Schema]: http://json-schema.org/
