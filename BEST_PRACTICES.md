@@ -155,7 +155,7 @@ test:
     - pylint tap_outbrain -d missing-docstring -d logging-format-interpolation -d too-many-locals -d too-many-arguments
 ```
 
-Schema Discovery and Property Selection
+Stream Discovery and Property Selection
 ---------------------------------------
 
 For some data sources, it won't make sense to pull every stream and
@@ -165,80 +165,129 @@ of tables. It would be inconvenient if the Tap emitted all columns for all
 tables.
 
 To address this, we recommend allowing a Tap to produce a document
-containing the "discovered" schemas for its data source, and allowing it
-to also accept "desired schemas" that indicate which streams and
-properties to sync.
+containing the _discovered streams_ for its data source, and allowing it
+to also accept _annotated streams_ that indicate which streams and
+properties to sync. The general process is:
 
-### Schema Discovery
+1. Run the Tap in discovery mode and save the _discovered streams_ to a JSON file.
+2. Edit the discovered streams JSON file to do things like:
+    * Mark certain streams and properties as _selected_
+    * Change the names of some streams if necessary
+   The resulting document is called the _annotated streams_.
+3. Run the Tap in sync mode, providing the _annotated streams_.
+
+
+### Singer JSON Schema
+
+For the purposes of stream and property selection, we extend JSON schema
+as follows.
+
+A Singer JSON Schema may have the following additional properties:
+
+* `inclusion`: Either "available", "automatic", or "unsupported".
+  "available" means that the field is available for selection, and that
+  the Tap will only emit values for that field if it is marked with
+  `"selected": true`. "automatic" means that the Tap may emit values for
+  the field, but it is not up to the user to select it. "unsupported"
+  means that the field exists in the source data but the Tap is unable to
+  provide it.
+* `selected`: Either true or false. true indicates that the field should
+  be included, false indicates it should not. In most cases the discovery
+  output will
+
+Note that JSON Schema has a recursive structure, and that the `inclusion`
+and `selected` properties may appear on any Schema node. For the top-level
+schema, the value of `selected` determines whether the stream is emitted
+at all. For non-top-level schemas, `selected` determines whether that
+property is included.
+
+### Stream Discovery
 
 A Tap that wants to support property selection should add an optional
 `--discover` flag. When the `--discover` flag is supplied, the Tap should
 connect to its data source, find the list of streams available, and print
-out a document listing each stream along with the discovered schema. The
-discovery output should go to STDOUT, and it should be the only thing
-written to STDOUT. If the `--discover` flag is supplied, a tap should not
-emit any RECORD, SCHEMA, or STATE messages.
+out a document listing each stream along with some metadata including the
+discovered schema. The discovery output MUST go to STDOUT, and it MUST be
+the only thing written to STDOUT. If the `--discover` flag is supplied, a
+tap MOST NOT emit any RECORD, SCHEMA, or STATE messages.
 
 The format of the discovery output is as follows. The top level is an
-object, with a single key called "streams", that points to a map where
-each key is a stream name and each value is the discovered schema for that
-stream.
+object, with a single key called "streams", that points to an array of
+objects, each having the following fields:
 
-The discovered schema is in JSON schema format, with one extension.
-Properties may optionally contain an `inclusion` attribute, which can have
-one of three values:
+* `tap_stream_id` (string, required): Unique identifier for the stream.
+* `key_properties` (array of strings, optional): List of key properties.
+* `schema` (object, required): The JSON schema for the stream. This value is
+  expected to be valid Singer JSON schema (see above).
+* `replication\_key` (string, optional): The name of a property in the source to
+  use as a "bookmark". For example, this will often be an "updated-at"
+  field or an auto-incrementing primary key.
+* `is_view` (boolean, optional): For a database source, indicates that the
+  source is a view.
+* `database` (string, optional): For a database source, the name of the
+  database.
+* `table` (string, optional): For a database source, the name of the
+  table.
+* `stream` (string, optional): The name that will be used for the stream
+  in the data produced by this Tap.
+* `row_count` (integer, optional): The number of rows in the source data,
+  for taps that have access to that information.
 
-* automatic - the user cannot select the attribute, it will be automatically included.
-* available - the user can select the attribute for inclusion.
-* unsupported - the Tap does not support this attribute, and is just reporting it in the schema to indicate that the attribute exists in the source but will not be included.
-
-Here's an example of a discovered schema:
+Here's an example of a discovered streams document:
 
 ```javascript
 {
-  "streams": {
-    "users": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer",
-          "inclusion": "automatic"
-        },
-        "name": {
-          "type": "object",
-          "inclusion": "available",
-          "properties": {
-            "first_name": {"type": "string", "inclusion": "available"},
-            "last_name": {"type": "string", "inclusion": "available"}
+  "streams": [
+    {
+      "stream": "users",
+      "tap_stream_id": "users",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "inclusion": "automatic"
           },
-        },
-        "addresses": {
-          "type": "array",
-          "inclusion": "available",
-          "items": {
+          "name": {
             "type": "object",
             "inclusion": "available",
             "properties": {
-              "addr1": {"type": "string", "inclusion": "available"},
-              "addr2": {"type": "string", "inclusion": "available"},
-              "city": {"type": "string", "inclusion": "available"},
-              "state": {"type": "string", "inclusion": "available"},
-              "zip": {"type": "string", "inclusion": "available"},
+              "first_name": {"type": "string", "inclusion": "available"},
+              "last_name": {"type": "string", "inclusion": "available"}
+            },
+          },
+          "addresses": {
+            "type": "array",
+            "inclusion": "available",
+            "items": {
+              "type": "object",
+              "inclusion": "available",
+              "properties": {
+                "addr1": {"type": "string", "inclusion": "available"},
+                "addr2": {"type": "string", "inclusion": "available"},
+                "city": {"type": "string", "inclusion": "available"},
+                "state": {"type": "string", "inclusion": "available"},
+                "zip": {"type": "string", "inclusion": "available"},
+              }
             }
           }
         }
       }
     },
-    "orders": {
-      "type": "object",
-      "properties": {
-        "id": {"type": "integer"},
-        "user_id": {"type": "integer", "inclusion": "available"},
-        "amount": {"type": "number", "inclusion": "available"},
-        "credit_card_number": {"type": "string", "inclusion": "available"},
+    {
+      "stream": "orders",
+      "tap_stream_id": "orders",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "user_id": {"type": "integer", "inclusion": "available"},
+          "amount": {"type": "number", "inclusion": "available"},
+          "credit_card_number": {"type": "string", "inclusion": "available"},
+        }
       }
     }
-  }
+  ]
 }
 ```
 
@@ -246,36 +295,34 @@ Here's an example of a discovered schema:
 
 A tap that supports property selection should accept an optional
 `--properties PROPERTIES` option. `PROPERTIES` should point to a file
-containing the desired schemas.
+containing the desired streams. The format of PROPERTIES file is identical
+to the output from discovery.
 
-The format of PROPERTIES file is similar to the output from discovery. The
-top level is an object, with a single key called "streams", that points to
-a map where each key is a stream name and each value is the requested
-schema for that stream. The caller requests properties by decorating those
-properties with a `"selected": true` attribute in the schema.
-
-The Tap should attempt to sync every stream that is listed in the
-PROPERTIES file. For each of those streams, it SHOULD include all the
-properties that are marked as selected for that stream. If the requested
-schema contains a property that does not exist in the data source, a Tap
-MAY fail and exit with a non-zero status or it MAY omit the requested
-field from the output. The Tap MAY include additional properties that are
-not included in the desired schema, if those properties are always
-provided by the data source. The tap MUST NOT include in its output any
-streams that are not present in desired schemas file.
+The Tap SHOULD attempt to sync every stream that is listed in the
+PROPERTIES file where the "selected" property of the stream's schema is
+`true`. For each of those streams, it SHOULD include all the properties
+that are marked as selected for that stream. If the requested schema
+contains a property that does not exist in the data source, a Tap MAY fail
+and exit with a non-zero status or it MAY omit the requested field from
+the output. The Tap MAY include additional properties that are not
+included in the desired schema, if those properties are always provided by
+the data source. The tap MUST NOT include in its output any streams that
+are not present in desired schemas file.
 
 Note that the Tap should not validate the data against the desired schema.
 The purpose of the desired schema is _only_ to communicate which streams
 and properties are desired.
 
 For example, suppose we wanted to sync only the users table, and only the
-last name and state of each user. Our desired schemas file would look like
+last name and state of each user. Our annotated streams file would look like
 this:
 
 ```javascript
 {
-  "streams": {
-    "users": {
+  "streams": [{
+    "stream": "users",
+    "tap_stream_id": "users",
+    "schema": {
       "type": "object",
       "selected": true,
       "properties": {
@@ -303,6 +350,7 @@ this:
       }
     }
   }
+  ]
 }
 ```
 
