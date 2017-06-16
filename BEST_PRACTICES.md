@@ -184,14 +184,17 @@ by adding two additional properties:
 
 * `inclusion`: Either `available`, `automatic`, or `unsupported`.
   
-    * `available` means that the field is available for selection, and that
+    * `"available"` means that the field is available for selection, and that
       the Tap will only emit values for that field if it is marked with
       `"selected": true`. 
-    * `automatic` means that the Tap may emit values for the field, but it
-      is not up to the user to select it. "unsupported" means that the
-      field exists in the source data but the Tap is unable to provide it.
-    * `selected`: Either true or false. true indicates that the field
-      should be included, false indicates it should not.
+    * `"automatic"` means that the Tap may emit values for the field, but it
+      is not up to the user to select it.
+    * `"unsupported"` means that the field exists in the source data but the
+      Tap is unable to provide it.
+* `selected`: Either `true` or `false`. For a top-level schema, `true`
+   indicates that the stream should be synced, and `false` indicates it
+   should be omitted entirely. For a property within a stream, `true`
+   means include the property, `false` means leave it out.
 
 Note that JSON Schema has a recursive structure, and that the `inclusion`
 and `selected` properties may appear on any Schema node. For the top-level
