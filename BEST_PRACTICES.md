@@ -155,8 +155,8 @@ test:
     - pylint tap_outbrain -d missing-docstring -d logging-format-interpolation -d too-many-locals -d too-many-arguments
 ```
 
-Stream Discovery and Property Selection
----------------------------------------
+Allowing Users to Select Streams to Sync
+----------------------------------------
 
 For some data sources, it won't make sense to pull every stream and
 property available. For example, suppose we had a Tap for a Postgres
@@ -164,36 +164,34 @@ database, and a user only wanted to pull a subset of columns from a subset
 of tables. It would be inconvenient if the Tap emitted all columns for all
 tables.
 
-To address this, we recommend allowing a Tap to produce a document
-containing the _discovered streams_ for its data source, and allowing it
-to also accept _annotated streams_ that indicate which streams and
-properties to sync. The general process is:
+To address this, we recommend extending the Tap to use a document called a
+_catalog_. A _catalog_ is a mechanism for a Tap to indicate what streams
+it makes available, and for the user to select certain streams and
+properties within those streams.
 
-1. Run the Tap in discovery mode and save the _discovered streams_ to a JSON file.
-2. Edit the discovered streams JSON file to do things like:
-    * Mark certain streams and properties as _selected_
-    * Change the names of some streams if necessary
-   The resulting document is called the _annotated streams_.
-3. Run the Tap in sync mode, providing the _annotated streams_.
+A Tap that supports a catalog should provide two additional options:
 
+* `--discover` - indicates that the Tap should not sync data, but should
+  just write its catalog to stdout.
+  
+* `--catalog CATALOG` - the Tap should sync data, based on the selections
+  made in the provided CATALOG file.
 
-### Singer JSON Schema
+### JSON Schema Extensions
 
 For the purposes of stream and property selection, we extend JSON schema
-as follows.
-
-A Singer JSON Schema may have the following additional properties:
+by adding two additional properties:
 
 * `inclusion`: Either "available", "automatic", or "unsupported".
-  "available" means that the field is available for selection, and that
-  the Tap will only emit values for that field if it is marked with
-  `"selected": true`. "automatic" means that the Tap may emit values for
-  the field, but it is not up to the user to select it. "unsupported"
-  means that the field exists in the source data but the Tap is unable to
-  provide it.
-* `selected`: Either true or false. true indicates that the field should
-  be included, false indicates it should not. In most cases the discovery
-  output will
+  
+    * "available" means that the field is available for selection, and that
+      the Tap will only emit values for that field if it is marked with
+      `"selected": true`. 
+    * "automatic" means that the Tap may emit values for the field, but it
+      is not up to the user to select it. "unsupported" means that the
+      field exists in the source data but the Tap is unable to provide it.
+    * `selected`: Either true or false. true indicates that the field
+      should be included, false indicates it should not.
 
 Note that JSON Schema has a recursive structure, and that the `inclusion`
 and `selected` properties may appear on any Schema node. For the top-level
@@ -201,7 +199,9 @@ schema, the value of `selected` determines whether the stream is emitted
 at all. For non-top-level schemas, `selected` determines whether that
 property is included.
 
-### Stream Discovery
+
+
+### Discovery
 
 A Tap that wants to support property selection should add an optional
 `--discover` flag. When the `--discover` flag is supplied, the Tap should
@@ -211,28 +211,24 @@ discovered schema. The discovery output MUST go to STDOUT, and it MUST be
 the only thing written to STDOUT. If the `--discover` flag is supplied, a
 tap MOST NOT emit any RECORD, SCHEMA, or STATE messages.
 
-The format of the discovery output is as follows. The top level is an
-<<<<<<< HEAD
+### Catalog Format
+
+The format of the catalog is as follows. The top level is an
 object, with a single key called "streams", that points to an array of
 objects, each having the following fields:
 
-* `tap_stream_id` (string, required): Unique identifier for the stream.
-* `key_properties` (array of strings, optional): List of key properties.
-* `schema` (object, required): The JSON schema for the stream. This value is
-  expected to be valid Singer JSON schema (see above).
-* `replication\_key` (string, optional): The name of a property in the source to
-  use as a "bookmark". For example, this will often be an "updated-at"
-  field or an auto-incrementing primary key.
-* `is_view` (boolean, optional): For a database source, indicates that the
-  source is a view.
-* `database` (string, optional): For a database source, the name of the
-  database.
-* `table` (string, optional): For a database source, the name of the
-  table.
-* `stream` (string, optional): The name that will be used for the stream
-  in the data produced by this Tap.
-* `row_count` (integer, optional): The number of rows in the source data,
-  for taps that have access to that information.
+
+| Property          | type               | required? | Description                    |
+| ----------------- |--------------------|-----------|--------------------------------|
+| `tap_stream_id`   | string             | required  | Unique identifier for the stream. |
+| `key_properties`  | array of strings   | optional|  List of key properties. |
+| `schema`          | object             | required | The JSON schema for the stream. This value is expected to be valid Singer JSON schema (see above). |
+| `replication_key` | string             | optional | The name of a property in the source to use as a "bookmark". For example, this will often be an "updated-at" field or an auto-incrementing primary key. |
+| `is_view`         | boolean            | optional | For a database source, indicates that the source is a view. |
+| `database`        | string             | optional | For a database source, the name of the database. |
+| `table`           | string             | optional | For a database source, the name of the table. |
+| `stream`          | string             | optional | The name that will be used for the stream in the data produced by this Tap. |
+| `row_count`       | integer            | optional | The number of rows in the source data, for taps that have access to that information. |
 
 Here's an example of a discovered streams document:
 
