@@ -199,18 +199,6 @@ schema, the value of `selected` determines whether the stream is emitted
 at all. For non-top-level schemas, `selected` determines whether that
 property is included.
 
-
-
-### Discovery
-
-A Tap that wants to support property selection should add an optional
-`--discover` flag. When the `--discover` flag is supplied, the Tap should
-connect to its data source, find the list of streams available, and print
-out a document listing each stream along with some metadata including the
-discovered schema. The discovery output MUST go to STDOUT, and it MUST be
-the only thing written to STDOUT. If the `--discover` flag is supplied, a
-tap MOST NOT emit any RECORD, SCHEMA, or STATE messages.
-
 ### Catalog Format
 
 The format of the catalog is as follows. The top level is an
@@ -220,17 +208,17 @@ objects, each having the following fields:
 
 | Property          | type               | required? | Description                    |
 | ----------------- |--------------------|-----------|--------------------------------|
-| `tap_stream_id`   | string             | required  | Unique identifier for the stream. |
-| `key_properties`  | array of strings   | optional|  List of key properties. |
-| `schema`          | object             | required | The JSON schema for the stream. This value is expected to be valid Singer JSON schema (see above). |
-| `replication_key` | string             | optional | The name of a property in the source to use as a "bookmark". For example, this will often be an "updated-at" field or an auto-incrementing primary key. |
-| `is_view`         | boolean            | optional | For a database source, indicates that the source is a view. |
-| `database`        | string             | optional | For a database source, the name of the database. |
-| `table`           | string             | optional | For a database source, the name of the table. |
-| `stream`          | string             | optional | The name that will be used for the stream in the data produced by this Tap. |
-| `row_count`       | integer            | optional | The number of rows in the source data, for taps that have access to that information. |
+| `tap_stream_id`   | string             | required  | The unique identifier for the stream. |
+| `stream`          | string             | required  | The name that will be used for the stream in the data produced by this Tap. |
+| `key_properties`  | array of strings   | optional  |  List of key properties. |
+| `schema`          | object             | required  | The JSON schema for the stream.  |
+| `replication_key` | string             | optional  | The name of a property in the source to use as a "bookmark". For example, this will often be an "updated-at" field or an auto-incrementing primary key. |
+| `is_view`         | boolean            | optional  | For a database source, indicates that the source is a view. |
+| `database`        | string             | optional  | For a database source, the name of the database. |
+| `table`           | string             | optional  | For a database source, the name of the table. |
+| `row_count`       | integer            | optional  | The number of rows in the source data, for taps that have access to that information. |
 
-Here's an example of a discovered streams document:
+Here's an example of a discovered catalog
 
 ```javascript
 {
@@ -288,12 +276,22 @@ Here's an example of a discovered streams document:
 }
 ```
 
-### Property Selection
+
+
+### Discovery Mode
+
+A Tap that wants to support property selection should add an optional
+`--discover` flag. When the `--discover` flag is supplied, the Tap should
+connect to its data source, find the list of streams available, and print
+out the catalog to stdout. The discovery output MUST go to STDOUT, and it
+MUST be the only thing written to STDOUT. If the `--discover` flag is
+supplied, a tap MOST NOT emit any RECORD, SCHEMA, or STATE messages.
+
+### Sync Mode
 
 A tap that supports property selection should accept an optional
-`--properties PROPERTIES` option. `PROPERTIES` should point to a file
-containing the desired streams. The format of PROPERTIES file is identical
-to the output from discovery.
+`--catalog CATALOG` option. `CATALOG` should point to a file containing
+the catalog, annotated with the user's "selected" shources.
 
 The Tap SHOULD attempt to sync every stream that is listed in the
 PROPERTIES file where the "selected" property of the stream's schema is
@@ -302,88 +300,9 @@ that are marked as selected for that stream. If the requested schema
 contains a property that does not exist in the data source, a Tap MAY fail
 and exit with a non-zero status or it MAY omit the requested field from
 the output. The Tap MAY include additional properties that are not
-included in the desired schema, if those properties are always provided by
-the data source. The tap MUST NOT include in its output any streams that
-are not present in desired schemas file.
-
-Note that the Tap should not validate the data against the desired schema.
-The purpose of the desired schema is _only_ to communicate which streams
-and properties are desired.
-
-For example, suppose we wanted to sync only the users table, and only the
-last name and state of each user. Our annotated streams file would look like
-this:
-
-```javascript
-{
-  "streams": [{
-    "stream": "users",
-    "tap_stream_id": "users",
-    "schema": {
-      "type": "object",
-      "selected": true,
-      "properties": {
-        "id": {"type": "integer"},
-        "name": {
-          "type": "object",
-          "selected": true,
-          "properties": {
-            "last_name": {"type": "string"}
-          },
-        },
-        "addresses": {
-          "type": "array",
-          "selected": true,
-          "items": {
-            "type": "object",
-            "properties": {
-              "state": {
-                "type": "string",
-                "selected": true
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  ]
-}
-```
-
-Since the Tap will ignore the type information on the desired schema, we
-can prune out the "type" fields. The following is sufficient for a Tap to
-know that it should sync the "users.last_name" and "addresses.state"
-properties of the "users" stream:
-
-```javascript
-{
-  "streams": {
-    "users": {
-      "selected": true
-      "properties": {
-        "name": {
-          "selected": true,
-          "properties": {
-            "last_name": {"selected": true},
-            "first_name": {"selected": true}
-          }
-        },
-        "addresses": {
-          "selected": true,
-          "items": {
-            "properties": {
-              "state": {
-                "selected": true
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-```
+included in the catalog, if those properties are always provided by the
+data source. The tap MUST NOT include in its output any streams that are
+not present in the catalog.
 
 Metrics
 -------
