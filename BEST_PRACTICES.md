@@ -173,20 +173,19 @@ A Tap that supports a catalog should provide two additional options:
 
 * `--discover` - indicates that the Tap should not sync data, but should
   just write its catalog to stdout.
-  
+
 * `--catalog CATALOG` - the Tap should sync data, based on the selections
   made in the provided CATALOG file.
 
 ### Catalog Format
 
-The format of the catalog is as follows. The top level is an
-object, with a single key called "streams", that points to an array of
+The format of the catalog is as follows. The top level is an object,
+with a single key called `"streams"` that points to an array of
 objects, each having the following fields:
-
 
 | Property          | type               | required? | Description                    |
 | ----------------- |--------------------|-----------|--------------------------------|
-| `tap_stream_id`   | string             | required  | The unique identifier for the stream. |
+| `tap_stream_id`   | string             | required  | The unique identifier for the stream. This is allowed to be different from the name of the stream on order to allow users to rename streams or allow for sources that have duplicate stream names. |
 | `stream`          | string             | required  | The name that will be used for the stream in the data produced by this Tap. |
 | `key_properties`  | array of strings   | optional  |  List of key properties. |
 | `schema`          | object             | required  | The JSON schema for the stream.  |
@@ -205,10 +204,10 @@ properties may appear on the top-level schema or on properties within the
 schema:
 
 * `inclusion`: Either `available`, `automatic`, or `unsupported`.
-  
+
     * `"available"` means that the field is available for selection, and that
       the Tap will only emit values for that field if it is marked with
-      `"selected": true`. 
+      `"selected": true`.
     * `"automatic"` means that the Tap may emit values for the field, but it
       is not up to the user to select it.
     * `"unsupported"` means that the field exists in the source data but the
@@ -279,11 +278,12 @@ Here's an example of a discovered catalog
 ### Discovery Mode
 
 A Tap that wants to support property selection should add an optional
-`--discover` flag. When the `--discover` flag is supplied, the Tap should
-connect to its data source, find the list of streams available, and print
-out the catalog to stdout. The discovery output MUST go to STDOUT, and it
-MUST be the only thing written to STDOUT. If the `--discover` flag is
-supplied, a tap MUST NOT emit any RECORD, SCHEMA, or STATE messages.
+`--discover` flag. When the `--discover` flag is supplied, the Tap
+should connect to its data source, find the list of streams available,
+and print out the catalog to stdout. The discovery output should go to
+STDOUT, and it should be the only thing written to STDOUT. If the
+`--discover` flag is supplied, a tap should not emit any RECORD,
+SCHEMA, or STATE messages.
 
 ### Sync Mode
 
@@ -291,15 +291,15 @@ A tap that supports property selection should accept an optional
 `--catalog CATALOG` option. `CATALOG` should point to a file containing
 the catalog, annotated with the user's "selected" choices.
 
-The Tap SHOULD attempt to sync every stream that is listed in the
+The Tap should attempt to sync every stream that is listed in the
 PROPERTIES file where the "selected" property of the stream's schema is
-`true`. For each of those streams, it SHOULD include all the properties
+`true`. For each of those streams, it should include all the properties
 that are marked as selected for that stream. If the requested schema
-contains a property that does not exist in the data source, a Tap MAY fail
-and exit with a non-zero status or it MAY omit the requested field from
-the output. The Tap MAY include additional properties that are not
+contains a property that does not exist in the data source, a Tap may fail
+and exit with a non-zero status or it may omit the requested field from
+the output. The Tap may include additional properties that are not
 included in the catalog, if those properties are always provided by the
-data source. The tap MUST NOT include in its output any streams that are
+data source. The tap should not include in its output any streams that are
 not present in the catalog.
 
 Metrics
@@ -317,12 +317,12 @@ INFO METRIC: <metrics-json>
 
 * `type` - The type of the metric. Indicates how consumers of the data
   should interpret the `value` field. There are two types of metrics:
-  
+
     * `counter` - The value should be interpreted as a number that is added
       to a cumulative or running total.
-      
+
     * `timer` - The value is the duration in seconds of some operation.
-  
+
 * `metric` - The name of the metric. This should consist only of letters,
   numbers, underscore, and dash characters. For example,
   `"http_request_duration"`.
@@ -334,7 +334,7 @@ INFO METRIC: <metrics-json>
   strings consisting solely of letters, numbers, underscores, and dashes.
   For consistency's sake, we recommend using the following tags when they
   are relevant.
-  
+
     * `endpoint` - For a Tap that pulls data from an HTTP API, this should
       be a descriptive name for the endpoint, such as `"users"` or `"deals"`
       or `"orders"`.
@@ -346,11 +346,11 @@ INFO METRIC: <metrics-json>
       the type of the job. For example, if we have a Tap that does a POST
       to an HTTP API to generate a report and then polls with a GET until
       the report is done, we could use a job type of `"run_report"`.
-    
+
     * `status` - Either `"succeeded"` or `"failed"`.
 
   Note that for many metrics, many of those tags will _not_ be relevant.
-  
+
 ### Examples
 
 Here are some examples of metrics and how those metrics should be
@@ -385,4 +385,3 @@ INFO METRIC: {"type": "counter", "metric": "record_count", "value": 14, "tags": 
 ```
 
 > We fetched a total of 314 records from an "orders" endpoint.
-
