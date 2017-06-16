@@ -182,12 +182,12 @@ A Tap that supports a catalog should provide two additional options:
 For the purposes of stream and property selection, we extend JSON schema
 by adding two additional properties:
 
-* `inclusion`: Either "available", "automatic", or "unsupported".
+* `inclusion`: Either `available`, `automatic`, or `unsupported`.
   
-    * "available" means that the field is available for selection, and that
+    * `available` means that the field is available for selection, and that
       the Tap will only emit values for that field if it is marked with
       `"selected": true`. 
-    * "automatic" means that the Tap may emit values for the field, but it
+    * `automatic` means that the Tap may emit values for the field, but it
       is not up to the user to select it. "unsupported" means that the
       field exists in the source data but the Tap is unable to provide it.
     * `selected`: Either true or false. true indicates that the field
