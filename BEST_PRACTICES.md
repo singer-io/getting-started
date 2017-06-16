@@ -160,9 +160,9 @@ Allowing Users to Select Streams to Sync
 
 For some data sources, it won't make sense to pull every stream and
 property available. For example, suppose we had a Tap for a Postgres
-database, and a user only wanted to pull a subset of columns from a subset
-of tables. It would be inconvenient if the Tap emitted all columns for all
-tables.
+database, and a user only wanted to pull a subset of columns from a
+subset of tables. It would be inconvenient if the Tap emitted data
+from all tables and columns.
 
 To address this, we recommend extending the Tap to use a document called a
 _catalog_. A _catalog_ is a mechanism for a Tap to indicate what streams
@@ -185,7 +185,7 @@ objects, each having the following fields:
 
 | Property          | type               | required? | Description                    |
 | ----------------- |--------------------|-----------|--------------------------------|
-| `tap_stream_id`   | string             | required  | The unique identifier for the stream. This is allowed to be different from the name of the stream on order to allow users to rename streams or allow for sources that have duplicate stream names. |
+| `tap_stream_id`   | string             | required  | The unique identifier for the stream. This is allowed to be different from the name of the stream in order to allow for sources that have duplicate stream names. |
 | `stream`          | string             | required  | The name that will be used for the stream in the data produced by this Tap. |
 | `key_properties`  | array of strings   | optional  |  List of key properties. |
 | `schema`          | object             | required  | The JSON schema for the stream.  |
