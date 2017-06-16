@@ -155,8 +155,8 @@ test:
     - pylint tap_outbrain -d missing-docstring -d logging-format-interpolation -d too-many-locals -d too-many-arguments
 ```
 
-Schema Discovery and Property Selection
----------------------------------------
+Allowing Users to Select Streams to Sync
+----------------------------------------
 
 For some data sources, it won't make sense to pull every stream and
 property available. For example, suppose we had a Tap for a Postgres
@@ -164,181 +164,143 @@ database, and a user only wanted to pull a subset of columns from a subset
 of tables. It would be inconvenient if the Tap emitted all columns for all
 tables.
 
-To address this, we recommend allowing a Tap to produce a document
-containing the "discovered" schemas for its data source, and allowing it
-to also accept "desired schemas" that indicate which streams and
-properties to sync.
+To address this, we recommend extending the Tap to use a document called a
+_catalog_. A _catalog_ is a mechanism for a Tap to indicate what streams
+it makes available, and for the user to select certain streams and
+properties within those streams.
 
-### Schema Discovery
+A Tap that supports a catalog should provide two additional options:
 
-A Tap that wants to support property selection should add an optional
-`--discover` flag. When the `--discover` flag is supplied, the Tap should
-connect to its data source, find the list of streams available, and print
-out a document listing each stream along with the discovered schema. The
-discovery output should go to STDOUT, and it should be the only thing
-written to STDOUT. If the `--discover` flag is supplied, a tap should not
-emit any RECORD, SCHEMA, or STATE messages.
+* `--discover` - indicates that the Tap should not sync data, but should
+  just write its catalog to stdout.
 
-The format of the discovery output is as follows. The top level is an
-object, with a single key called "streams", that points to a map where
-each key is a stream name and each value is the discovered schema for that
-stream.
+* `--catalog CATALOG` - the Tap should sync data, based on the selections
+  made in the provided CATALOG file.
 
-The discovered schema is in JSON schema format, with one extension.
-Properties may optionally contain an `inclusion` attribute, which can have
-one of three values:
+### Catalog Format
 
-* automatic - the user cannot select the attribute, it will be automatically included.
-* available - the user can select the attribute for inclusion.
-* unsupported - the Tap does not support this attribute, and is just reporting it in the schema to indicate that the attribute exists in the source but will not be included.
+The format of the catalog is as follows. The top level is an object,
+with a single key called `"streams"` that points to an array of
+objects, each having the following fields:
 
-Here's an example of a discovered schema:
+| Property          | type               | required? | Description                    |
+| ----------------- |--------------------|-----------|--------------------------------|
+| `tap_stream_id`   | string             | required  | The unique identifier for the stream. This is allowed to be different from the name of the stream on order to allow users to rename streams or allow for sources that have duplicate stream names. |
+| `stream`          | string             | required  | The name that will be used for the stream in the data produced by this Tap. |
+| `key_properties`  | array of strings   | optional  |  List of key properties. |
+| `schema`          | object             | required  | The JSON schema for the stream.  |
+| `replication_key` | string             | optional  | The name of a property in the source to use as a "bookmark". For example, this will often be an "updated-at" field or an auto-incrementing primary key. |
+| `is_view`         | boolean            | optional  | For a database source, indicates that the source is a view. |
+| `database_name`   | string             | optional  | For a database source, the name of the database. |
+| `table_name`      | string             | optional  | For a database source, the name of the table. |
+| `row_count`       | integer            | optional  | The number of rows in the source data, for taps that have access to that information. |
+
+### JSON Schema Extensions
+
+In order to allow a Tap to indicate which fields are selectable and to
+allow the user to make their selections, we extend JSON Schema by adding
+two additional properties. Note that since JSON Schema is recursive, these
+properties may appear on the top-level schema or on properties within the
+schema:
+
+* `inclusion`: Either `available`, `automatic`, or `unsupported`.
+
+    * `"available"` means that the field is available for selection, and that
+      the Tap will only emit values for that field if it is marked with
+      `"selected": true`.
+    * `"automatic"` means that the Tap may emit values for the field, but it
+      is not up to the user to select it.
+    * `"unsupported"` means that the field exists in the source data but the
+      Tap is unable to provide it.
+* `selected`: Either `true` or `false`. For a top-level schema, `true`
+   indicates that the stream should be synced, and `false` indicates it
+   should be omitted entirely. For a property within a stream, `true`
+   means include the property, `false` means leave it out.
+
+Here's an example of a discovered catalog
 
 ```javascript
 {
-  "streams": {
-    "users": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer",
-          "inclusion": "automatic"
-        },
-        "name": {
-          "type": "object",
-          "inclusion": "available",
-          "properties": {
-            "first_name": {"type": "string", "inclusion": "available"},
-            "last_name": {"type": "string", "inclusion": "available"}
+  "streams": [
+    {
+      "stream": "users",
+      "tap_stream_id": "users",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "inclusion": "automatic"
           },
-        },
-        "addresses": {
-          "type": "array",
-          "inclusion": "available",
-          "items": {
+          "name": {
             "type": "object",
             "inclusion": "available",
             "properties": {
-              "addr1": {"type": "string", "inclusion": "available"},
-              "addr2": {"type": "string", "inclusion": "available"},
-              "city": {"type": "string", "inclusion": "available"},
-              "state": {"type": "string", "inclusion": "available"},
-              "zip": {"type": "string", "inclusion": "available"},
+              "first_name": {"type": "string", "inclusion": "available"},
+              "last_name": {"type": "string", "inclusion": "available"}
+            },
+          },
+          "addresses": {
+            "type": "array",
+            "inclusion": "available",
+            "items": {
+              "type": "object",
+              "inclusion": "available",
+              "properties": {
+                "addr1": {"type": "string", "inclusion": "available"},
+                "addr2": {"type": "string", "inclusion": "available"},
+                "city": {"type": "string", "inclusion": "available"},
+                "state": {"type": "string", "inclusion": "available"},
+                "zip": {"type": "string", "inclusion": "available"},
+              }
             }
           }
         }
       }
     },
-    "orders": {
-      "type": "object",
-      "properties": {
-        "id": {"type": "integer"},
-        "user_id": {"type": "integer", "inclusion": "available"},
-        "amount": {"type": "number", "inclusion": "available"},
-        "credit_card_number": {"type": "string", "inclusion": "available"},
+    {
+      "stream": "orders",
+      "tap_stream_id": "orders",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "user_id": {"type": "integer", "inclusion": "available"},
+          "amount": {"type": "number", "inclusion": "available"},
+          "credit_card_number": {"type": "string", "inclusion": "available"},
+        }
       }
     }
-  }
+  ]
 }
 ```
 
-### Property Selection
+### Discovery Mode
+
+A Tap that wants to support property selection should add an optional
+`--discover` flag. When the `--discover` flag is supplied, the Tap
+should connect to its data source, find the list of streams available,
+and print out the catalog to stdout. The discovery output should go to
+STDOUT, and it should be the only thing written to STDOUT. If the
+`--discover` flag is supplied, a tap should not emit any RECORD,
+SCHEMA, or STATE messages.
+
+### Sync Mode
 
 A tap that supports property selection should accept an optional
-`--properties PROPERTIES` option. `PROPERTIES` should point to a file
-containing the desired schemas.
-
-The format of PROPERTIES file is similar to the output from discovery. The
-top level is an object, with a single key called "streams", that points to
-a map where each key is a stream name and each value is the requested
-schema for that stream. The caller requests properties by decorating those
-properties with a `"selected": true` attribute in the schema.
+`--catalog CATALOG` option. `CATALOG` should point to a file containing
+the catalog, annotated with the user's "selected" choices.
 
 The Tap should attempt to sync every stream that is listed in the
-PROPERTIES file. For each of those streams, it SHOULD include all the
-properties that are marked as selected for that stream. If the requested
-schema contains a property that does not exist in the data source, a Tap
-MAY fail and exit with a non-zero status or it MAY omit the requested
-field from the output. The Tap MAY include additional properties that are
-not included in the desired schema, if those properties are always
-provided by the data source. The tap MUST NOT include in its output any
-streams that are not present in desired schemas file.
-
-Note that the Tap should not validate the data against the desired schema.
-The purpose of the desired schema is _only_ to communicate which streams
-and properties are desired.
-
-For example, suppose we wanted to sync only the users table, and only the
-last name and state of each user. Our desired schemas file would look like
-this:
-
-```javascript
-{
-  "streams": {
-    "users": {
-      "type": "object",
-      "selected": true,
-      "properties": {
-        "id": {"type": "integer"},
-        "name": {
-          "type": "object",
-          "selected": true,
-          "properties": {
-            "last_name": {"type": "string"}
-          },
-        },
-        "addresses": {
-          "type": "array",
-          "selected": true,
-          "items": {
-            "type": "object",
-            "properties": {
-              "state": {
-                "type": "string",
-                "selected": true
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-Since the Tap will ignore the type information on the desired schema, we
-can prune out the "type" fields. The following is sufficient for a Tap to
-know that it should sync the "users.last_name" and "addresses.state"
-properties of the "users" stream:
-
-```javascript
-{
-  "streams": {
-    "users": {
-      "selected": true
-      "properties": {
-        "name": {
-          "selected": true,
-          "properties": {
-            "last_name": {"selected": true},
-            "first_name": {"selected": true}
-          }
-        },
-        "addresses": {
-          "selected": true,
-          "items": {
-            "properties": {
-              "state": {
-                "selected": true
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-```
+PROPERTIES file where the "selected" property of the stream's schema is
+`true`. For each of those streams, it should include all the properties
+that are marked as selected for that stream. If the requested schema
+contains a property that does not exist in the data source, a Tap may fail
+and exit with a non-zero status or it may omit the requested field from
+the output. The Tap may include additional properties that are not
+included in the catalog, if those properties are always provided by the
+data source. The tap should not include in its output any streams that are
+not present in the catalog.
 
 Metrics
 -------
@@ -355,12 +317,12 @@ INFO METRIC: <metrics-json>
 
 * `type` - The type of the metric. Indicates how consumers of the data
   should interpret the `value` field. There are two types of metrics:
-  
+
     * `counter` - The value should be interpreted as a number that is added
       to a cumulative or running total.
-      
+
     * `timer` - The value is the duration in seconds of some operation.
-  
+
 * `metric` - The name of the metric. This should consist only of letters,
   numbers, underscore, and dash characters. For example,
   `"http_request_duration"`.
@@ -372,7 +334,7 @@ INFO METRIC: <metrics-json>
   strings consisting solely of letters, numbers, underscores, and dashes.
   For consistency's sake, we recommend using the following tags when they
   are relevant.
-  
+
     * `endpoint` - For a Tap that pulls data from an HTTP API, this should
       be a descriptive name for the endpoint, such as `"users"` or `"deals"`
       or `"orders"`.
@@ -384,11 +346,11 @@ INFO METRIC: <metrics-json>
       the type of the job. For example, if we have a Tap that does a POST
       to an HTTP API to generate a report and then polls with a GET until
       the report is done, we could use a job type of `"run_report"`.
-    
+
     * `status` - Either `"succeeded"` or `"failed"`.
 
   Note that for many metrics, many of those tags will _not_ be relevant.
-  
+
 ### Examples
 
 Here are some examples of metrics and how those metrics should be
@@ -423,4 +385,3 @@ INFO METRIC: {"type": "counter", "metric": "record_count", "value": 14, "tags": 
 ```
 
 > We fetched a total of 314 records from an "orders" endpoint.
-
