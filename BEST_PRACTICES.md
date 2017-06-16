@@ -191,8 +191,8 @@ objects, each having the following fields:
 | `schema`          | object             | required  | The JSON schema for the stream.  |
 | `replication_key` | string             | optional  | The name of a property in the source to use as a "bookmark". For example, this will often be an "updated-at" field or an auto-incrementing primary key. |
 | `is_view`         | boolean            | optional  | For a database source, indicates that the source is a view. |
-| `database`        | string             | optional  | For a database source, the name of the database. |
-| `table`           | string             | optional  | For a database source, the name of the table. |
+| `database_name`   | string             | optional  | For a database source, the name of the database. |
+| `table_name`      | string             | optional  | For a database source, the name of the table. |
 | `row_count`       | integer            | optional  | The number of rows in the source data, for taps that have access to that information. |
 
 ### JSON Schema Extensions
