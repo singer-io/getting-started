@@ -177,31 +177,6 @@ A Tap that supports a catalog should provide two additional options:
 * `--catalog CATALOG` - the Tap should sync data, based on the selections
   made in the provided CATALOG file.
 
-### JSON Schema Extensions
-
-For the purposes of stream and property selection, we extend JSON schema
-by adding two additional properties:
-
-* `inclusion`: Either `available`, `automatic`, or `unsupported`.
-  
-    * `"available"` means that the field is available for selection, and that
-      the Tap will only emit values for that field if it is marked with
-      `"selected": true`. 
-    * `"automatic"` means that the Tap may emit values for the field, but it
-      is not up to the user to select it.
-    * `"unsupported"` means that the field exists in the source data but the
-      Tap is unable to provide it.
-* `selected`: Either `true` or `false`. For a top-level schema, `true`
-   indicates that the stream should be synced, and `false` indicates it
-   should be omitted entirely. For a property within a stream, `true`
-   means include the property, `false` means leave it out.
-
-Note that JSON Schema has a recursive structure, and that the `inclusion`
-and `selected` properties may appear on any Schema node. For the top-level
-schema, the value of `selected` determines whether the stream is emitted
-at all. For non-top-level schemas, `selected` determines whether that
-property is included.
-
 ### Catalog Format
 
 The format of the catalog is as follows. The top level is an
@@ -220,6 +195,28 @@ objects, each having the following fields:
 | `database`        | string             | optional  | For a database source, the name of the database. |
 | `table`           | string             | optional  | For a database source, the name of the table. |
 | `row_count`       | integer            | optional  | The number of rows in the source data, for taps that have access to that information. |
+
+### JSON Schema Extensions
+
+In order to allow a Tap to indicate which fields are selectable and to
+allow the user to make their selections, we extend JSON Schema by adding
+two additional properties. Note that since JSON Schema is recursive, these
+properties may appear on the top-level schema or on properties within the
+schema:
+
+* `inclusion`: Either `available`, `automatic`, or `unsupported`.
+  
+    * `"available"` means that the field is available for selection, and that
+      the Tap will only emit values for that field if it is marked with
+      `"selected": true`. 
+    * `"automatic"` means that the Tap may emit values for the field, but it
+      is not up to the user to select it.
+    * `"unsupported"` means that the field exists in the source data but the
+      Tap is unable to provide it.
+* `selected`: Either `true` or `false`. For a top-level schema, `true`
+   indicates that the stream should be synced, and `false` indicates it
+   should be omitted entirely. For a property within a stream, `true`
+   means include the property, `false` means leave it out.
 
 Here's an example of a discovered catalog
 
@@ -279,8 +276,6 @@ Here's an example of a discovered catalog
 }
 ```
 
-
-
 ### Discovery Mode
 
 A Tap that wants to support property selection should add an optional
@@ -288,13 +283,13 @@ A Tap that wants to support property selection should add an optional
 connect to its data source, find the list of streams available, and print
 out the catalog to stdout. The discovery output MUST go to STDOUT, and it
 MUST be the only thing written to STDOUT. If the `--discover` flag is
-supplied, a tap MOST NOT emit any RECORD, SCHEMA, or STATE messages.
+supplied, a tap MUST NOT emit any RECORD, SCHEMA, or STATE messages.
 
 ### Sync Mode
 
 A tap that supports property selection should accept an optional
 `--catalog CATALOG` option. `CATALOG` should point to a file containing
-the catalog, annotated with the user's "selected" shources.
+the catalog, annotated with the user's "selected" choices.
 
 The Tap SHOULD attempt to sync every stream that is listed in the
 PROPERTIES file where the "selected" property of the stream's schema is
