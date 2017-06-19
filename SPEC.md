@@ -14,7 +14,7 @@ Taps are designed to produce a stream of data from sources like
 databases and web service APIs for use in a data integration or ETL
 pipeline.
 
-## Synopsis
+## 1. Synopsis
 
 ```
 tap --config CONFIG [--state STATE]
@@ -28,7 +28,7 @@ like, for example, the point where it left off.
 
 ```
 
-## Input
+## 2. Input
 
 ### Configuration
 
@@ -94,7 +94,7 @@ Sync starting from a stored state
 $ ./tap --config config.json --state state.json
 ```
 
-## Output
+## 3. Output
 
 A Tap outputs structured messages to `stdout` in JSON format, one
 message per line. Logs and other information can be emitted to `stderr`
@@ -176,7 +176,9 @@ send for a particular version. This is a signal to the target that it
 should have all the data it needs for this version of the stream and
 should replace the current version with this version.
 
-## Example:
+## 4. Example output
+
+### Example without versioned records
 
 ```
 {"type": "SCHEMA", "stream": "users", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
@@ -187,7 +189,21 @@ should replace the current version with this version.
 {"type": "STATE", "value": {"users": 2, "locations": 1}}
 ```
 
-## Versioning
+### Example with versioned records
+
+```
+{"type": "SCHEMA", "stream": "users", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
+{"type": "RECORD", "stream": "users", "version": 1, "record": {"id": 1, "name": "Chris"}}
+{"type": "RECORD", "stream": "users", "version": 1, "record": {"id": 2, "name": "Mike"}}
+{"type": "RECORD", "stream": "users", "version": 1, "record": {"id": 3, "name": "Pat"}}
+{"type": "ACTIVATE_VERSION", "stream": "users", "version": 1}
+{"type": "SCHEMA", "stream": "users", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
+{"type": "RECORD", "stream": "users", "version": 2, "record": {"id": 1, "name": "Christopher"}}
+{"type": "RECORD", "stream": "users", "version": 2, "record": {"id": 2, "name": "Michael"}}
+{"type": "ACTIVATE_VERSION", "stream": "users", "version": 2}
+```
+
+## 5. Versioning
 
 A Tap's API encompasses its input and output - including its
 configuration, how it interprets state, and how the data it
