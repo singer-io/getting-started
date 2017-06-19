@@ -1,6 +1,6 @@
 # Singer Specification
 
-### Version 0.1
+### Version 0.2
 
 A *Tap* is an application that takes a *configuration* file and an
 optional *state* file as input and produces an ordered stream of *record*,
@@ -108,12 +108,14 @@ following `type`s have specific meaning:
 
 ### RECORD
 
-RECORD messages contain the data from the data stream. They must have
-the following properties:
+RECORD messages contain the data from the data stream. They may have the
+following properties:
 
  - `record` **Required**. A JSON map containing a streamed data point
 
  - `stream` **Required**. The string name of the stream
+
+ - `version` **Optional**. Version number for the record, for streams that are versioned.
 
 A single Tap may output RECORDs messages with different stream
 names.  A single RECORD entry may only contain records for a single
@@ -165,6 +167,14 @@ STATE messages have the following properties:
 
 The semantics of a STATE value are not part of the specification,
 and should be determined independently by each Tap.
+
+### ACTIVATE_VERSION
+
+For a Stream that supports versioning, the Tap should send an
+ACTIVATE_VERSION message after it has sent all the RECORD messages it will
+send for a particular version. This is a signal to the target that it
+should have all the data it needs for this version of the stream and
+should replace the current version with this version.
 
 ## Example:
 
