@@ -30,13 +30,13 @@ like, for example, the point where it left off.
 
 ## 2. Input
 
-### Configuration
+### 2.1. Configuration
 
 The configuration contains whatever parameters the Tap needs in order
 to pull data from the source. Typically this will include the credentials
 for the API or data source.
 
-#### Special Fields
+#### 2.1.1 Special Fields
 
 `start_date` should be used on first sync to indicate how far back to grab
 records. Start dates should conform to the
@@ -46,7 +46,7 @@ records. Start dates should conform to the
 address should the API provider need to contact you for any reason.
 (e.g. "Stitch (+support@stitchdata.com)")
 
-#### Examples
+#### 2.1.2 Examples
 
 The format of the configuration will vary by Tap, but it must be
 JSON-encoded and the root of the configuration must be an object. For
@@ -61,7 +61,7 @@ key. This should still be encoded as JSON. For example:
 }
 ```
 
-### State
+### 2.2. State
 
 The state is used to persist information between invocations of a
 Tap. The state must be encoded in JSON, but beyond that the
@@ -80,7 +80,7 @@ appropriate default position. If it is invoked with a `--state STATE`
 argument it should read in the state file and start from the corresponding
 position in the stream.
 
-### Example invocations
+### 2.3. Example invocations
 
 Sync from the beginning
 
@@ -106,7 +106,7 @@ line. Each message must contain a `type` attribute. Any message `type`
 is permitted, and `type`s are interpreted case-insensitively. The
 following `type`s have specific meaning:
 
-### RECORD
+### 3.1. RECORD
 
 RECORD messages contain the data from the data stream. They may have the
 following properties:
@@ -127,7 +127,7 @@ Example:
 {"type": "RECORD", "stream": "users", "record": {"id": 0, "name": "Chris"}}
 ```
 
-### SCHEMA
+### 3.2. SCHEMA
 
 SCHEMA messages describe the datatypes of data in the stream. They
 must have the following properties:
@@ -157,7 +157,7 @@ Example:
   "key_properties": ["id"]}
 ```
 
-### STATE
+### 3.3. STATE
 
 STATE messages contain the state that the Tap wishes to persist.
 STATE messages have the following properties:
@@ -168,7 +168,7 @@ STATE messages have the following properties:
 The semantics of a STATE value are not part of the specification,
 and should be determined independently by each Tap.
 
-### ACTIVATE_VERSION
+### 3.4. ACTIVATE_VERSION
 
 For a Stream that supports versioning, the Tap should send an
 ACTIVATE_VERSION message after it has sent all the RECORD messages it will
@@ -178,7 +178,7 @@ should replace the current version with this version.
 
 ## 4. Example output
 
-### Example without versioned records
+### 4.1. Example without versioned records
 
 ```
 {"type": "SCHEMA", "stream": "users", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
@@ -189,7 +189,7 @@ should replace the current version with this version.
 {"type": "STATE", "value": {"users": 2, "locations": 1}}
 ```
 
-### Example with versioned records
+### 4.2. Example with versioned records
 
 ```
 {"type": "SCHEMA", "stream": "users", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
