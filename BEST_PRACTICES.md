@@ -61,9 +61,9 @@ States that are datetimes will all be in RFC3339 format. Using ids or other iden
 is possible but could cause issues if the entities are not immutable and change out of order. If
 the API supports filtering by created timestamps but is not immutable (meaning a record can be
 updated after creation), DO NOT use the created timestamp for saving state. States using created
-timestamps or ids are a sure way to have data discrepencies.
+timestamps or ids are a sure way to have data discrepancies.
 
-State as early and often as possible, but no sooner and no more often than is required. When a
+Write state as early and often as possible, but no sooner and no more often than is required. When a
 state is written, no data prior to that state will be synced, so do not update the state until all
 possible exceptions will be thrown.
 
@@ -80,7 +80,45 @@ Keep in mind that jobs can be interrupted at any point. States should never be i
 state. Interrupted jobs that save state too early will have data missing. Interrupted jobs that
 save state too late will cause an increase in duplicate rows being replicated.
 
-The tap's config file must ALWAYS have a `start_date` field indicating the default state.
+The Tap's config file can include a `start_date` field indicating the default state.
+
+### Stream bookmark format
+
+State records serve to indicate a Tap's progress through a data source, but they can also provide
+more granular information about progress through individual streams.
+
+If a Tap's streams can each have an individual state, the state output by the Tap should conform to
+the following format: the state object contains a top-level property `"bookmarks"` that maps to an
+object. The bookmarks object contains stream identifiers as property names, each of which maps to an
+object describing the respective stream's state. As a concrete example:
+
+```
+{
+  "bookmarks": {
+    "orders": {
+      "last_record": "2017-07-07T10:20:00Z"
+    },
+    "customers": {
+      "last_record": 123
+    }
+  }
+}
+```
+
+In the above example, there are two streams that have been bookmarked: `"orders"` and `"customers"`.
+Each of those streams has some replication key field, like an `updated_at` timestamp or a sequential
+ID for append-only sources. The replication key value persisted as part of the state message allows
+the Tap to:
+
+- bookmark its progress through the stream
+- serve as a query parameter upon subsequent invocations, (e.g. the equivalent of `SELECT * from
+  customers where id >= 123`)
+
+The state record above indicates that the Tap last output an entry from the `"orders"` stream where
+the source record's replication key field had the value "2017-07-07T10:20:00Z", and that it last
+output an entry from the `"customers"` stream where the source record's replication key field had
+the value 123.
+
 
 Logging and Exception Handling
 ------------------------------
