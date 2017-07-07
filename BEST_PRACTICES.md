@@ -87,8 +87,8 @@ The Tap's config file can include a `start_date` field indicating the default st
 State records serve to indicate a Tap's progress through a data source, but they can also provide
 more granular information about progress through individual streams.
 
-If Tap streams can each have an individual state, the state output by the Tap should conform to the
-following format: the state object contains a top-level property `"bookmarks"` that maps to an
+If a Tap's streams can each have an individual state, the state output by the Tap should conform to
+the following format: the state object contains a top-level property `"bookmarks"` that maps to an
 object. The bookmarks object contains stream identifiers as property names, each of which maps to an
 object describing the respective stream's state. As a concrete example:
 
@@ -111,8 +111,8 @@ ID for append-only sources. The replication key value persisted as part of the s
 the Tap to:
 
 - bookmark its progress through the stream
-- serve as a query parameter upon subsequent invocations, (e.g. `SELECT * from customers where id >
-  123`)
+- serve as a query parameter upon subsequent invocations, (e.g. the equivalent of `SELECT * from
+  customers where id >= 123`)
 
 The state record above indicates that the Tap last output an entry from the `"orders"` stream where
 the source record's replication key field had the value "2017-07-07T10:20:00Z", and that it last
