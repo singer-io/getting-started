@@ -1,4 +1,4 @@
-!(https://trello-attachments.s3.amazonaws.com/58c8696247956895aea87ef2/58d2d15c8baaf0c33f36c87f/a789e41241329c5b972a6e105e954543/Screen_Shot_2017-04-27_at_3.58.09_PM.png)
+![https://trello-attachments.s3.amazonaws.com/58c8696247956895aea87ef2/58d2d15c8baaf0c33f36c87f/a789e41241329c5b972a6e105e954543/Screen_Shot_2017-04-27_at_3.58.09_PM.png]
 
 #🎉👋🏽 Welcome to Singer: Open-source ETL 🎉👋🏽
 
