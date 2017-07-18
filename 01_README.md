@@ -23,7 +23,7 @@ If you're feeling social we'd love to chat. Pick your poison(s):
 - [Twitter](https://twitter.com/singer_io)
 - [Our Public Roadmap on Trello](https://trello.com/b/BMNRnIoU/singer-roadmap)
 - Feel free to create an issue on any repo's for specific questions
-- [Carrier pigeon](beta)
+- Carrier pigeon (beta)
 
 
 ---
