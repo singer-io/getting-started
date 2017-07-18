@@ -1,9 +1,9 @@
-![Singer Logo](https://trello-attachments.s3.amazonaws.com/58c8696247956895aea87ef2/58d2d15c8baaf0c33f36c87f/a789e41241329c5b972a6e105e954543/Screen_Shot_2017-04-27_at_3.58.09_PM.png)
+[[https://trello-attachments.s3.amazonaws.com/58c8696247956895aea87ef2/58d2d15c8baaf0c33f36c87f/a789e41241329c5b972a6e105e954543/Screen_Shot_2017-04-27_at_3.58.09_PM.png]]
 
-# 🎉👋🏽 Welcome to Singer: Open-source ETL 🎉👋🏽
+#🎉👋🏽 Welcome to Singer: Open-source ETL 🎉👋🏽
 
 
-Singer is an open source ETL tool. In case you're unfamiliar ETL stands for Extract, Transform, and Load. It's a term used in the data warehousing world. If you happen to be moving data or needing to pull data we want to help!
+## Singer is an open source ETL tool. In case you're unfamiliar ETL stands for Extract, Transform, and Load. It's a term used in the data warehousing world. If you happen to be moving data or needing to pull data we want to help!
 
 ### Singer sets a standard for moving data between databases, web APIs, files, queues, or just about anything else you can think of. _(Except penguins 🐧 and candy 🍬. We haven't figured out how to move those yet unfortunately.)_
 
@@ -23,7 +23,7 @@ If you're feeling social we'd love to chat. Pick your poison(s):
 - [Twitter](https://twitter.com/singer_io)
 - [Our Public Roadmap on Trello](https://trello.com/b/BMNRnIoU/singer-roadmap)
 - Feel free to create an issue on any repo's for specific questions
-- Carrier pigeon (beta)
+- 🐦 Carrier pigeon (beta)
 
 
 ---
