@@ -2,7 +2,7 @@
 
 So you've built a tap or a target have you? We think that's pretty groovy. To submit a tap for integration with Stitch an become official we ask that they follow a set standard. If you're interested in submitting to be an official tap we're mighty obliged and created a checklist so you can increase your chances of integration. 
 
-### Check out the [BEST PRACTICES](06_BEST_PRACTICES.md) doc which will have all the instructions and way more in depth details of the following:
+### Check out the [BEST PRACTICES](05_BEST_PRACTICES.md) doc which will have all the instructions and way more in depth details of the following:
 - [ ] Your work has a `start_date` field in the config
 - [ ] Your work accepts a `user_agent` field in the config
 - [ ] Your work respects API rate limits

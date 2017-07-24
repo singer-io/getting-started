@@ -130,7 +130,7 @@ Example:
 SCHEMA messages describe the datatypes of data in the stream. They
 must have the following properties:
 
- - `schema` **Required**. A [JSON Schema] describing the
+ - `schema` **Required**. A [JSON Schema](http://json-schema.org/) describing the
    `data` property of RECORDs from the same `stream`
 
  - `stream` **Required**. The string name of the stream that this
@@ -206,7 +206,7 @@ as JSON like web APIs. However, JSON is far from perfect:
 *Schemas* are used to solve these problems. Generally speaking, a schema
 is anything that describes how data is structured. In Streams, schemas are
 written by streamers in *SCHEMA* messages, formatted following the
-[JSON Schema] spec.
+[JSON Schema](http://json-schema.org/) spec.
 
 Schemas solve the limited data types problem by providing more information
 about how to interpret JSON's basic types. For example, the [JSON Schema]
@@ -254,6 +254,3 @@ The Stitch persister and Stitch API use schemas as follows:
    it adds the data to the
    [reject pile](https://www.stitchdata.com/docs/data-structure/identifying-rejected-records)
  
-
-[JSON Schema]: http://json-schema.org/
-

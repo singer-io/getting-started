@@ -2,7 +2,7 @@
 
 ## Taps extract data from any source and write that data to a standard stream in a JSON-based format.
 
-Be Check out our [official](05_MAKE_IT_OFFICIAL.md) and [unofficial](04_COOL_UNOFFICIAL_CLUB.md) pages before creating your own since it might save you some time in the long run.
+Be Check out our [official](04_MAKE_IT_OFFICIAL.md) and [unofficial](03_COOL_TAPS_CLUB.md) pages before creating your own since it might save you some time in the long run.
 
 ### Making Taps
 
@@ -10,7 +10,7 @@ If a tap for your use case doesn't exist yet have no fear! This documentation wi
  
 ### 👩🏽‍💻 👨🏻‍💻 Hello, world
 
-A Tap is just a program, written in any language, that outputs data to `stdout` according to the [Singer spec](07_SPEC.md). 
+A Tap is just a program, written in any language, that outputs data to `stdout` according to the [Singer spec](06_SPEC.md). 
 
 In fact, your first Tap can be written from the command line, without any programming at all:
 
@@ -114,4 +114,4 @@ More simply the formula is:
 › python YOUR_TAP_FILE.py | TARGET-TYPE 
 ```
 
-This assumes your target is intalled locally. Which you can read more about by heading over to the [targets page](03_SEND_TO_TARGETS). 
+This assumes your target is intalled locally. Which you can read more about by heading over to the [targets page](02_SEND_TO_TARGETS). 

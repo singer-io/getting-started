@@ -9,12 +9,12 @@
 
 In this documentation we'll take you through a number of scenarios. 
 
-- 🍺 If you'd like to pull or extract data check out [TAPS](02_EXTRACT_WITH_TAPS.md)
-- 🎯 If you'd like to send or load data check out [TARGETS](03_LOAD_WITH_TARGETS.md)
+- 🍺 If you'd like to pull or extract data check out [TAPS](01_EXTRACT_WITH_TAPS.md)
+- 🎯 If you'd like to send or load data check out [TARGETS](02_LOAD_WITH_TARGETS.md)
 - 📝 If you want to dive in some technical goodness check out our [SPECS](07_SPEC.md)
-- 😎✅ Once you've created your own tap or target be sure to let us know and join our kool kids [UNOFFICIAL](04_COOL_UNOFFICIAL_CLUB.md) club or learn how to submit to be part of the super cool [OFFICIAL](05_MAKE_IT_OFFICIAL.md) integrations.
-- 💯 Check this out to learn more about [BEST PRACTICES](06_BEST_PRACTICES.md)
-- 🤝 And above all please respect our [CODE OF CONDUCT](09_CODE_OF_CONDUCT.md)
+- 😎✅ Once you've created your own tap or target be sure to let us know and join our kool kids [UNOFFICIAL](03_COOL_UNOFFICIAL_CLUB.md) club or learn how to submit to be part of the super cool [OFFICIAL](04_MAKE_IT_OFFICIAL.md) integrations.
+- 💯 Check this out to learn more about [BEST PRACTICES](05_BEST_PRACTICES.md)
+- 🤝 And above all please respect our [CODE OF CONDUCT](08_CODE_OF_CONDUCT.md)
 
 
 ### Communication
