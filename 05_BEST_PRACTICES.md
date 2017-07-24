@@ -1,5 +1,4 @@
-Best Practices for Building a Singer Tap
-============================================
+# BEST PRACTICES
 
 Language
 --------
