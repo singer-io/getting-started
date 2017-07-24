@@ -1,4 +1,4 @@
-# 😎 BECOME OFFICIALLY C00L 😎
+# BECOME OFFICIALLY COOL
 
 So you've built a tap or a target have you? We think that's pretty groovy. To submit a tap for integration with Stitch an become official we ask that they follow a set standard. If you're interested in submitting to be an official tap we're mighty obliged and created a checklist so you can increase your chances of integration. 
 
@@ -15,4 +15,4 @@ So you've built a tap or a target have you? We think that's pretty groovy. To su
 - [ ] You've tested your work
 - [ ] Please run pylint on your work
 - [ ] Your work shows metrics 
-- [ ] Message [@BrianSloane](mailto:brian@stitchdata.com) or [@Ash_Hathaway](mailto:ashley@stitchdata.com) or reach out to them on [Slack](https://singer-slackin.herokuapp.com/) and let them know you'd like some 🎁 swag 🎁, please.
+- [ ] Message [@BrianSloan](brian@stitchdata.com) or [@Ash_Hathaway](ashley@stitchdata.com) or reach out to them on [Slack](https://singer-slackin.herokuapp.com/) and let them know you'd like some swag, please.

@@ -83,26 +83,35 @@ two calls to the `singer` library:
 We can send this data to Google Sheets as an example by running our new Tap
 with the Google Sheets Target:
 
-```bash
+```
 › python tap_ip.py | target-gsheet -c config.json
 ```
 
 Alternatively you could send it to a csv just as easy by doing this:
 
-```bash
+```
 › python tap_ip.py | target-csv -c config.json
 ```
 
 ## To summarize the formula for pulling with a tap and sending to a target is:
 
-```bash
+```
 › python YOUR_TAP_FILE.py -c TAP_CONFIG_FILE_HERE.json | TARGET-NAME -c TARGET_CONFIG_FILE_HERE.json
+To summarize the formula for pulling with a tap and sending to a target is:
+
+```
+› python YOUR_TAP_FILE.py -c TAP_CONFIG_FILE_HERE.json | TARGET-TYPE -c TARGET_CONFIG_FILE_HERE.json
 ```
 
 You might not always need config files, in which case it would just be:
 
-```bash
+```
 › python YOUR_TAP_FILE.py | TARGET-NAME 
 ```
 
-This assumes your target is intalled locally. Which you can read more about by heading over to the [targets page](03_SEND_TO_TARGETS)
+More simply the formula is:
+```
+› python YOUR_TAP_FILE.py | TARGET-TYPE 
+```
+
+This assumes your target is intalled locally. Which you can read more about by heading over to the [targets page](03_SEND_TO_TARGETS). 
