@@ -187,17 +187,18 @@ operate well with each other.
 
 ### Type
 
-The `type` field of the schema describes the high-level datatype.
+The `type` field of the schema describes the high-level datatype. JSON
+Schema defines the following values for `type`:
 
-* null
-* boolean
-* string
-* object - nested object. The schema should contain a "properties" key
+* `null`
+* `boolean`
+* `string`
+* `object` - nested object. The schema should contain a "properties" key
   that describes each of the allowed properties on the nested object.
-* array - nested array. The schema should contain an "items" key that
+* `array` - nested array. The schema should contain an "items" key that
   describes the items in the array.
-* number - number with arbitrary precision.
-* integer - number with zero fractional part.
+* `number` - number with arbitrary precision.
+* `integer` - number with zero fractional part.
 
 ### Validation keywords
 
@@ -207,12 +208,12 @@ is available on
 [json-schema.org](http://json-schema.org/latest/json-schema-validation.html#rfc.section.6),
 but here are some suggestion for using validation keywords in Singer:
 
-* multipleOf - Use this to specify the scale of fixed-point
+* `multipleOf` - Use this to specify the scale of fixed-point
   numbers. For example, for a currency value with two digits to the
   right of the decimal, use `{"multipleOf": 0.01}`.
-* minimum / maximum - Specify the range of values for an integer
+* `minimum` / `maximum` - Specify the range of values for an integer
   field.
-* exclusiveMinimum / exclusiveMaximum - Boolean indicating whether the
+* `exclusiveMinimum` / `exclusiveMaximum` - Boolean indicating whether the
   minimum and maximum values are exclusive.
 
 ### Examples
@@ -238,24 +239,12 @@ but here are some suggestion for using validation keywords in Singer:
  "minimum": 0,
  "maximum": 4294967295}
 
-#### Floating point, unspecified size
+#### Number, fixed point
 
-For a floating point number, "type" should be "number", and
-"multipleOf" should not be specified.
-
-```json
-{"type": "number"}
-```
-
-Note that we do not currently have a suggestion for communicating the
-size of a floating point number.
-
-### Fixed point
-
-"type" should be "number". "maximum" and "minimum" communicate the
-precision and signedness. multipleOf indicates the scale.
-
-For example, the SQL datatype `decimal(5, 2)` would correspond to
+For a fixed point number, use `minimum` and `maximum` along with
+`exclusiveMinimum` and `exclusiveMaximum` to indicate the range and
+`multipleOf` to indicate the scale. For example, the SQL datatype
+`decimal(5, 2)` would be represented as
 
 ```json
 {"type": "number",
@@ -266,12 +255,16 @@ For example, the SQL datatype `decimal(5, 2)` would correspond to
  "exclusiveMinimum": true}
 ```
 
+#### Number, unspecified precision
 
-maximum= 10000000000,
-exclusiveMaximum=True,
-minimum=-10000000000,
-exclusiveMinimum=True,
-multipleOf=1
+The most general numeric datatype is "number". In JSON Schema, numbers
+have arbitrary precision, but this is not always feasible in a tap or
+target. A target may interpret a "number" without any other validation
+keywords as either floating point or arbitrary precision.
+
+```json
+{"type": "number"}
+```
 
 ## Versioning
 
