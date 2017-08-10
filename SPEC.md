@@ -177,6 +177,102 @@ and should be determined independently by each Tap.
 {"type": "STATE", "value": {"users": 2, "locations": 1}}
 ```
 
+## Datatypes
+
+Singer uses JSON Schema to describe the structure of records and the
+datatypes of their fields. Readers should refer to [json-schema.org]
+as the authoritative guide, but here is a brief summary of the parts
+of JSON Schema that are essential to producing taps and targets that
+operate well with each other.
+
+### Type
+
+The `type` field of the schema describes the high-level datatype.
+
+* null
+* boolean
+* string
+* object - nested object. The schema should contain a "properties" key
+  that describes each of the allowed properties on the nested object.
+* array - nested array. The schema should contain an "items" key that
+  describes the items in the array.
+* number - number with arbitrary precision.
+* integer - number with zero fractional part.
+
+### Validation keywords
+
+JSON Schema provides several keywords that allow for more precision in
+the description of datatypes.  The full listing of validation keywords
+is available on
+[json-schema.org](http://json-schema.org/latest/json-schema-validation.html#rfc.section.6),
+but here are some suggestion for using validation keywords in Singer:
+
+* multipleOf - Use this to specify the scale of fixed-point
+  numbers. For example, for a currency value with two digits to the
+  right of the decimal, use `{"multipleOf": 0.01}`.
+* minimum / maximum - Specify the range of values for an integer
+  field.
+* exclusiveMinimum / exclusiveMaximum - Boolean indicating whether the
+  minimum and maximum values are exclusive.
+
+### Examples
+
+#### Integer, unspecified size
+
+```json
+{"type": "integer"}
+```
+
+#### 32 bit signed integer
+
+```json
+{"type": "integer",
+ "minimum": -2147483648,
+ "maximum": 2147483647}
+```
+
+#### 32 bit unsigned integer
+
+```json
+{"type": "integer",
+ "minimum": 0,
+ "maximum": 4294967295}
+
+#### Floating point, unspecified size
+
+For a floating point number, "type" should be "number", and
+"multipleOf" should not be specified.
+
+```json
+{"type": "number"}
+```
+
+Note that we do not currently have a suggestion for communicating the
+size of a floating point number.
+
+### Fixed point
+
+"type" should be "number". "maximum" and "minimum" communicate the
+precision and signedness. multipleOf indicates the scale.
+
+For example, the SQL datatype `decimal(5, 2)` would correspond to
+
+```json
+{"type": "number",
+ "maximum": 1000,
+ "minimum": -1000,
+ "multipleOf": 0.01,
+ "exclusiveMaximum": true,
+ "exclusiveMinimum": true}
+```
+
+
+maximum= 10000000000,
+exclusiveMaximum=True,
+minimum=-10000000000,
+exclusiveMinimum=True,
+multipleOf=1
+
 ## Versioning
 
 A Tap's API encompasses its input and output - including its
