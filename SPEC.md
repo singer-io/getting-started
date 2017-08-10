@@ -267,6 +267,19 @@ keywords as either floating point or arbitrary precision.
 {"type": "number"}
 ```
 
+### String, unspecified length
+
+```json
+{"type": "string"}
+```
+
+### String with maxLength
+
+```json
+{"type": "string",
+ "maxLength": 32}
+ ```
+
 ## Versioning
 
 A Tap's API encompasses its input and output - including its
