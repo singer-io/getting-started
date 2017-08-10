@@ -179,11 +179,11 @@ and should be determined independently by each Tap.
 
 ## Datatypes
 
-Singer uses JSON Schema to describe the structure of records and the
-datatypes of their fields. Readers should refer to [json-schema.org]
-as the authoritative guide, but here is a brief summary of the parts
-of JSON Schema that are essential to producing taps and targets that
-operate well with each other.
+Singer uses [JSON Schema] to describe the structure of records and the
+datatypes of their fields. Readers should refer to
+[json-schema.org](json-schema.org) as the authoritative guide, but
+here is a brief summary of the parts of JSON Schema that are essential
+to producing taps and targets that operate well with each other.
 
 ### Type
 
@@ -238,6 +238,7 @@ but here are some suggestion for using validation keywords in Singer:
 {"type": "integer",
  "minimum": 0,
  "maximum": 4294967295}
+```
 
 #### Number, fixed point
 
