@@ -78,8 +78,8 @@ The ID of this spreadsheet is
 ### Step 3 - Install
 
 First, make sure Python 3 is installed on your system or follow these
-installation instructions for [Mac](python-mac) or
-[Ubuntu](python-ubuntu).
+installation instructions for [Mac][python-mac] or
+[Ubuntu][python-ubuntu].
 
 `target-gsheet` can be run with any [Singer Tap] to move data from
 sources like [Braintree], [Freshdesk] and [Hubspot] to Google
