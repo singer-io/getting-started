@@ -217,6 +217,8 @@ A Tap that supports a catalog should provide two additional options:
   
 The Tap should then filter requests and data based on selections present in the catalog.
 
+For python implementations, leverage the catalog module in the singer-python package.
+
 ### Catalog Format
 
 The format of the catalog is as follows. The top level is an object,
