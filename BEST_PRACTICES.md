@@ -212,8 +212,10 @@ A Tap that supports a catalog should provide two additional options:
 * `--discover` - indicates that the Tap should not sync data, but should
   just write its catalog to stdout.
 
-* `--catalog CATALOG` - the Tap should sync data, based on the selections
+* `--properties CATALOG` - the Tap should sync data, based on the selections
   made in the provided CATALOG file.
+  
+The Tap should then filter requests and data based on selections present in the catalog.
 
 ### Catalog Format
 
@@ -232,6 +234,7 @@ objects, each having the following fields:
 | `database_name`   | string             | optional  | For a database source, the name of the database. |
 | `table_name`      | string             | optional  | For a database source, the name of the table. |
 | `row_count`       | integer            | optional  | The number of rows in the source data, for taps that have access to that information. |
+| `selected`        | boolean            | optional  | If this property should be synced, set to True. |
 
 ### JSON Schema Extensions
 
