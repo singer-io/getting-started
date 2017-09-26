@@ -138,10 +138,10 @@ non-zero error code (raise an exception or use `sys.exit(1)`)
 
 | Prefix         | Tap / Target interpretation             | Caller interpretation |
 |----------------|-----------------------------------------|-----------------------|
-|DEBUG           |                                         |                       |
-|INFO            |                                         |                       |
-|WARN, WARNING   | There's a condition the end-user should know about but does not necessarily mean the tap or target can't function. Examples: The schema of a stream has changed in a way that means I'll need to modify the schema in the destination. |                       |
-|ERROR           | There's an error that will definitely affect the end-user. Examples: I don't have permission to access some endpoints of the API. Some of the records contain datatypes that I don't recognize. | Send these to the end-user and note that the jobs are making partial progress. |
+|DEBUG           | Messages that are primarily useful when debugging a problem in the tap or target and would not normally need to be seen by anyone. | Don't show DEBUG-level messages by default. |
+|INFO            | Messages that do not indicate any thing is wrong, at a level of detail that would be appropriate for a user to examine if they're curious about how the tap or target operates. Examples: I made an HTTP request that took M seconds and got N records. I persisted a batch of records to the destination. | Collect these messages and make them available to the user if the want to see them. |
+|WARN, WARNING   | There's a condition that the end-user should know about but does not necessarily affect my ability to do my job. Examples: An authentication token will expire soon. The schema of a stream has changed in a way that means I'll need to modify the schema in the destination. | Send these messages to the end-user periodically. |
+|ERROR           | There's an error that the end-user will notice, but I'm still able to continue. Under normal execution a tap or target should not encounter these conditions. Examples: I don't have permission to access some endpoints of the API. Some of the records contain datatypes that I don't recognize and need to drop. | Send these to the end-user and note that the jobs are making partial progress. |
 |CRITICAL, FATAL | This error is causing me to terminate. Examples: I'm getting a 4xx response from an API. I'm getting a 5xx response from an API after repeated retries.  | Send these messages to the end-user as an explanation for why the jobs are not working. |
 
 
