@@ -135,13 +135,14 @@ If an intermittent error is detected from the API, retry using an exponential ba
 `backoff` library for Python). If an unrecoverable error is detected, exit the script with a
 non-zero error code (raise an exception or use `sys.exit(1)`)
 
+
 | Prefix         | Tap / Target interpretation             | Caller interpretation |
 |----------------|-----------------------------------------|-----------------------|
 |DEBUG           |                                         |                       |
 |INFO            |                                         |                       |
 |WARN, WARNING   |                                         |                       |
 |ERROR           |                                         |                       |
-|CRITICAL, FATAL | This error is causing me to terminate. Examples: I'm getting a 4xx response from an API. I'm getting a 5xx response from an API after repeated retries.  |                       |
+|CRITICAL, FATAL | This error is causing me to terminate. Examples: I'm getting a 4xx response from an API. I'm getting a 5xx response from an API after repeated retries.  | Send these messages to the end-user as an explanation for why the jobs are not working. |
 
 
 Module Structure
