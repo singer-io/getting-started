@@ -140,8 +140,8 @@ non-zero error code (raise an exception or use `sys.exit(1)`)
 |----------------|-----------------------------------------|-----------------------|
 |DEBUG           |                                         |                       |
 |INFO            |                                         |                       |
-|WARN, WARNING   |                                         |                       |
-|ERROR           |                                         |                       |
+|WARN, WARNING   | There's a condition the end-user should know about but does not necessarily mean the tap or target can't function. Examples: The schema of a stream has changed in a way that means I'll need to modify the schema in the destination. |                       |
+|ERROR           | There's an error that will definitely affect the end-user. Examples: I don't have permission to access some endpoints of the API. Some of the records contain datatypes that I don't recognize. | Send these to the end-user and note that the jobs are making partial progress. |
 |CRITICAL, FATAL | This error is causing me to terminate. Examples: I'm getting a 4xx response from an API. I'm getting a 5xx response from an API after repeated retries.  | Send these messages to the end-user as an explanation for why the jobs are not working. |
 
 
