@@ -135,6 +135,14 @@ If an intermittent error is detected from the API, retry using an exponential ba
 `backoff` library for Python). If an unrecoverable error is detected, exit the script with a
 non-zero error code (raise an exception or use `sys.exit(1)`)
 
+| Prefix         | Tap / Target interpretation             | Caller interpretation |
+|----------------|-----------------------------------------|-----------------------|
+|DEBUG           |                                         |                       |
+|INFO            |                                         |                       |
+|WARN, WARNING   |                                         |                       |
+|ERROR           |                                         |                       |
+|CRITICAL, FATAL | This error is causing me to terminate.  |                       |
+
 
 Module Structure
 ----------------
