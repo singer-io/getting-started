@@ -141,7 +141,7 @@ non-zero error code (raise an exception or use `sys.exit(1)`)
 |INFO            |                                         |                       |
 |WARN, WARNING   |                                         |                       |
 |ERROR           |                                         |                       |
-|CRITICAL, FATAL | This error is causing me to terminate.  |                       |
+|CRITICAL, FATAL | This error is causing me to terminate. Examples: I'm getting a 4xx response from an API. I'm getting a 5xx response from an API after repeated retries.  |                       |
 
 
 Module Structure
