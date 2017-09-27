@@ -127,9 +127,14 @@ Log every URL + params that will be requested, but be sure to exclude any sensit
 such as api keys and client secrets. Log the progress of the sync (e.g. Starting entity 1,
 Starting entity 2, etc.) When the API returns with an error, log the status code and body.
 
-Allow exceptions to be bubbled up and interrupt the tap. DO NOT wrap the tap code in one large
-try/except block and log the exception message. The stack trace is much more useful than the error
-message.
+If an error causes the tap or target to exit, log the error at the
+CRITICAL or FATAL level just before exiting with a non-zero status. The
+expectation is that if the tap or target fails, a calling script can look
+for lines that begin with CRITICAL or FATAL in order to get the relevant
+error message. If the fatal error is one that the tap or target explicitly
+raises, consider omitting the stack trace. However if it's an Exception
+from an unknown origin, log the full stack trace in addition to logging
+the message at the CRITICAL or FATAL level.
 
 If an intermittent error is detected from the API, retry using an exponential backoff (try using
 `backoff` library for Python). If an unrecoverable error is detected, exit the script with a
