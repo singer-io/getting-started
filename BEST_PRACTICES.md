@@ -151,8 +151,9 @@ file).
 Schemas
 -------
 
-Schemas should be stored in a `schemas` folder under the module directory
-as JSON files rather than as native dicts in the source code.
+If the schema is static, it should be stored in a `schemas` folder under
+the module directory as JSON files rather than as native dicts in the
+source code.
 
 Always stream the entity's schema before streaming any records for that
 entity.
@@ -161,6 +162,15 @@ If the API you're using does not publish a schema, you can use the
 `singer-infer-schema` program in [singer-tools] to generate a base schema
 to start from.
 
+Please avoid vague schemas:
+
+1. Do not use the empty schema `{}`. An empty schema means the target will
+   be unable to do validation or data type transformation.
+   
+2. Set `"additionalProperties": false` for all "object" schemas. If you do
+   not specify `"additionalProperties": false`, the target will be unable
+   to do any validation or data type transformation on properties that
+   aren't defined in the schema.
 
 Testing
 -------
