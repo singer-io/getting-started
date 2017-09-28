@@ -219,6 +219,9 @@ The Tap should then filter requests and data based on selections present in the 
 
 For python implementations, leverage the catalog module in the singer-python package.
 
+### Discover Mode and Connection Checks
+When the `--discover` options is passed to the Tap, that tap should do two things.  It should write to stdout the full catalog of the tap.  The Catalog format can be found below.  The second thing it should do is interact with the data source in some way.  This will exercise the credentials provided and prove that the tap can interact with the data source.
+
 ### Catalog Format
 
 The format of the catalog is as follows. The top level is an object,
