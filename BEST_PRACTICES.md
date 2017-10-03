@@ -57,6 +57,9 @@ Bad:
 State
 -----
 
+Endpoints that support filtering or provide an accurate time-based field can utilized state.
+State is a way to describe how much progess the tap has made through the endpoint in time.
+
 States that are datetimes will all be in RFC3339 format. Using ids or other identifiers for state
 is possible but could cause issues if the entities are not immutable and change out of order. If
 the API supports filtering by created timestamps but is not immutable (meaning a record can be
@@ -123,7 +126,7 @@ the value 123.
 Logging and Exception Handling
 ------------------------------
 
-Log every URL + params that will be requested, but be sure to exclude any sensitive information
+During tap execution, log every URL + params that will be requested, but be sure to exclude any sensitive information
 such as api keys and client secrets. Log the progress of the sync (e.g. Starting entity 1,
 Starting entity 2, etc.) When the API returns with an error, log the status code and body.
 
@@ -145,6 +148,8 @@ file).
 
 Schemas
 -------
+
+Taps should describe the format of an entity's expected data using JSON schema.
 
 Schemas should be stored in a `schemas` folder under the module directory
 as JSON files rather than as native dicts in the source code.
