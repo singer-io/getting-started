@@ -57,6 +57,15 @@ Bad:
 State
 -----
 
+State is a JSON map that can be saved for use in between invocations of the tap.
+See the [SPEC](SPEC.md) document for more information on its format.
+
+When an endpoint provides an acurate time-based field, it is possible to leverage this feild
+to track progress in a data set.  We describe this tracking as bookmarking, and the "bookmark"
+key in state is where an endpoint's progress should be saved.
+
+A state's bookmark is a way to describe how much progess the tap has made through the endpoint in time.
+
 States that are datetimes will all be in RFC3339 format. Using ids or other identifiers for state
 is possible but could cause issues if the entities are not immutable and change out of order. If
 the API supports filtering by created timestamps but is not immutable (meaning a record can be
@@ -123,7 +132,7 @@ the value 123.
 Logging and Exception Handling
 ------------------------------
 
-Log every URL + params that will be requested, but be sure to exclude any sensitive information
+During tap execution, log every URL + params that will be requested, but be sure to exclude any sensitive information
 such as api keys and client secrets. Log the progress of the sync (e.g. Starting entity 1,
 Starting entity 2, etc.) When the API returns with an error, log the status code and body.
 
@@ -151,6 +160,10 @@ file).
 Schemas
 -------
 
+Taps should describe the format of an entity's expected data using JSON schema.
+
+To understand the rationale for using schemas, read [Data Types and Schemas](SCHEMAS.md)
+
 If the schema is static, it should be stored in a `schemas` folder under
 the module directory as JSON files rather than as native dicts in the
 source code.
@@ -171,6 +184,9 @@ Please avoid vague schemas:
    not specify `"additionalProperties": false`, the target will be unable
    to do any validation or data type transformation on properties that
    aren't defined in the schema.
+
+To implement [Structure detection and selection](PROPOSALS.md), leverage the
+JSON Schema Extensions described below.
 
 Testing
 -------
@@ -227,8 +243,15 @@ A Tap that supports a catalog should provide two additional options:
 * `--discover` - indicates that the Tap should not sync data, but should
   just write its catalog to stdout.
 
-* `--catalog CATALOG` - the Tap should sync data, based on the selections
+* `--properties CATALOG` - the Tap should sync data, based on the selections
   made in the provided CATALOG file.
+  
+The Tap should then filter requests and data based on selections present in the catalog.
+
+For python implementations, leverage the catalog module in the singer-python package.
+
+### Discover Mode and Connection Checks
+When the `--discover` options is passed to the Tap, that tap should do two things.  It should write to stdout the full catalog of the tap.  The Catalog format can be found below.  The second thing it should do is interact with the data source in some way.  This will exercise the credentials provided and prove that the tap can interact with the data source.
 
 ### Catalog Format
 
@@ -247,6 +270,7 @@ objects, each having the following fields:
 | `database_name`   | string             | optional  | For a database source, the name of the database. |
 | `table_name`      | string             | optional  | For a database source, the name of the table. |
 | `row_count`       | integer            | optional  | The number of rows in the source data, for taps that have access to that information. |
+| `selected`        | boolean            | optional  | If this property should be synced, set to True. |
 
 ### JSON Schema Extensions
 

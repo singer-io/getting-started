@@ -17,7 +17,7 @@ pipeline.
 ## Synopsis
 
 ```
-tap --config CONFIG [--state STATE]
+tap --config CONFIG [--state STATE] [--properties CATALOG]
 
 CONFIG is a required argument that points to a JSON file containing any
 configuration parameters the Tap needs.
@@ -25,6 +25,10 @@ configuration parameters the Tap needs.
 STATE is an optional argument pointing to a JSON file that the
 Tap can use to remember information from the previous invocation,
 like, for example, the point where it left off.
+
+CATALOG is an optional argument pointing to a JSON file that the
+Tap can use to filter which streams should be synced.  See
+the Best Practices document for more info.
 
 ```
 
