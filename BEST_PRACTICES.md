@@ -156,6 +156,8 @@ Schemas
 
 Taps should describe the format of an entity's expected data using JSON schema.
 
+To understand our reasoning for this choice, read [Data Types and Schemas](SCHEMAS.md)
+
 If the schema is static, it should be stored in a `schemas` folder under
 the module directory as JSON files rather than as native dicts in the
 source code.
@@ -176,6 +178,9 @@ Please avoid vague schemas:
    not specify `"additionalProperties": false`, the target will be unable
    to do any validation or data type transformation on properties that
    aren't defined in the schema.
+
+To implement [Structure detection and selection](PROPOSALS.md), leverage the
+JSON Schema Extensions described below.
 
 Testing
 -------
