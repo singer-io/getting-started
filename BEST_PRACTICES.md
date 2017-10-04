@@ -57,8 +57,14 @@ Bad:
 State
 -----
 
-Endpoints that support filtering or provide an accurate time-based field can utilized state.
-State is a way to describe how much progess the tap has made through the endpoint in time.
+State is a JSON map that can be saved for use in between invocations of the tap.
+See the [SPEC](SPEC.md) document for more information on its format.
+
+When an endpoint provides an acurate time-based field, it is possible to leverage this feild
+to track progress in a data set.  We describe this tracking as bookmarking, and the "bookmark"
+key in state is where an endpoint's progress should be saved.
+
+A state's bookmark is a way to describe how much progess the tap has made through the endpoint in time.
 
 States that are datetimes will all be in RFC3339 format. Using ids or other identifiers for state
 is possible but could cause issues if the entities are not immutable and change out of order. If
@@ -156,7 +162,7 @@ Schemas
 
 Taps should describe the format of an entity's expected data using JSON schema.
 
-To understand our reasoning for this choice, read [Data Types and Schemas](SCHEMAS.md)
+To understand the rationale for using schemas, read [Data Types and Schemas](SCHEMAS.md)
 
 If the schema is static, it should be stored in a `schemas` folder under
 the module directory as JSON files rather than as native dicts in the
