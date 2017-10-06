@@ -265,7 +265,8 @@ objects, each having the following fields:
 | `stream`          | string             | required  | The name that will be used for the stream in the data produced by this Tap. |
 | `key_properties`  | array of strings   | optional  |  List of key properties. |
 | `schema`          | object             | required  | The JSON schema for the stream.  |
-| `replication_key` | string             | optional  | The name of a property in the source to use as a "bookmark". For example, this will often be an "updated-at" field or an auto-incrementing primary key. |
+| `replication_key` | string             | optional  | The name of a property in the source to use as a "bookmark". For example, this will often be an "updated-at" field or an auto-incrementing primary key. (requires `replication_method`). |
+| `replication_method` | string          | optional  | The replication method to use for the table, either "FULL_TABLE" or "INCREMENTAL". (requires `replication_key`). |
 | `is_view`         | boolean            | optional  | For a database source, indicates that the source is a view. |
 | `database_name`   | string             | optional  | For a database source, the name of the database. |
 | `table_name`      | string             | optional  | For a database source, the name of the table. |
