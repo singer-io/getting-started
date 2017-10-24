@@ -279,8 +279,10 @@ objects, each having the following fields:
 Metadata is the preferred mechanism for associating extra information about nodes in the schema.  A tap is free to write ANY type of metadata they feel is useful for describing fields in the schema, although several several reserved keywords exist:
 * `selected`: Either `true` or `false`.
     * an indication that this node in the schemas has been selected by the user for replication
+    * please note that taps are NOT permitted to produce `selected` metadata themselves although they obviously should consume it.  Production of `selected` metadata is reserved for other systems such as UI's and allowing a tap to also express an opinion on selected would result in a race condition.
 * `selected-by-default`: Either `true` or `false`.
-    * if a user has not expressed any opinion on whether or not to replicate this field, the tap should default to replicating it
+    * if a user has not expressed any opinion on whether or not to replicate this field, the tap should default to replicating it.
+    * ONLY taps may produce `selected-by-default` metadata.
 * `inclusion`: Either `available`, `automatic`, or `unsupported`.
 
     * `"available"` means that the field is available for selection, and that
