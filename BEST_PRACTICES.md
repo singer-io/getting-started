@@ -294,10 +294,10 @@ Metadata is the preferred mechanism for associating extra information about node
       Tap is unable to provide it.
 
 Each piece of metadata has the following canonical shape:
-```
+```json
 {'metadata' : { 'selected' : True, 'some-other-metadata' : 'whatever' },
  'breadcrumb' : ['properties', 'some-field-name']}
-```json
+```
 
 The breadcrumb object above defines the path into the schema to the node to which the metadata belongs.
 
