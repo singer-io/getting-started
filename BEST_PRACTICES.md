@@ -179,7 +179,7 @@ Please avoid vague schemas:
 
 1. Do not use the empty schema `{}`. An empty schema means the target will
    be unable to do validation or data type transformation.
-   
+
 2. Set `"additionalProperties": false` for all "object" schemas. If you do
    not specify `"additionalProperties": false`, the target will be unable
    to do any validation or data type transformation on properties that
@@ -245,7 +245,7 @@ A Tap that supports a catalog should provide two additional options:
 
 * `--properties CATALOG` - the Tap should sync data, based on the selections
   made in the provided CATALOG file.
-  
+
 The Tap should then filter requests and data based on selections present in the catalog.
 
 For python implementations, leverage the catalog module in the singer-python package.
@@ -271,16 +271,16 @@ objects, each having the following fields:
 | `database_name`   | string             | optional  | For a database source, the name of the database. |
 | `table_name`      | string             | optional  | For a database source, the name of the table. |
 | `row_count`       | integer            | optional  | The number of rows in the source data, for taps that have access to that information. |
-| `selected`        | boolean            | optional  | If this property should be synced, set to True. |
+| `selected`        | boolean            | optional  | If this property should be synced, set to True.
+| `metadata`        | array of metadata            | optional  | See metadata below for an explanation |
 
-### JSON Schema Extensions
+### Metadata
 
-In order to allow a Tap to indicate which fields are selectable and to
-allow the user to make their selections, we extend JSON Schema by adding
-two additional properties. Note that since JSON Schema is recursive, these
-properties may appear on the top-level schema or on properties within the
-schema:
-
+Metadata is the preferred mechanism for associating extra information about nodes in the schema.  A tap is free to write ANY type of metadata they feel is useful for describing fields in the schema, although several several reserved keywords exist:
+* `selected`: Either `true` or `false`.
+    * an indication that this node in the schemas has been selected by the user for replication
+* `selected-by-default`: Either `true` or `false`.
+    * if a user has not expressed any opinion on whether or not to replicate this field, the tap should default to replicating it
 * `inclusion`: Either `available`, `automatic`, or `unsupported`.
 
     * `"available"` means that the field is available for selection, and that
@@ -290,68 +290,15 @@ schema:
       is not up to the user to select it.
     * `"unsupported"` means that the field exists in the source data but the
       Tap is unable to provide it.
-* `selected`: Either `true` or `false`. For a top-level schema, `true`
-   indicates that the stream should be synced, and `false` indicates it
-   should be omitted entirely. For a property within a stream, `true`
-   means include the property, `false` means leave it out.
 
-Here's an example of a discovered catalog
-
-```javascript
-{
-  "streams": [
-    {
-      "stream": "users",
-      "tap_stream_id": "users",
-      "schema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "inclusion": "automatic"
-          },
-          "name": {
-            "type": "object",
-            "inclusion": "available",
-            "properties": {
-              "first_name": {"type": "string", "inclusion": "available"},
-              "last_name": {"type": "string", "inclusion": "available"}
-            },
-          },
-          "addresses": {
-            "type": "array",
-            "inclusion": "available",
-            "items": {
-              "type": "object",
-              "inclusion": "available",
-              "properties": {
-                "addr1": {"type": "string", "inclusion": "available"},
-                "addr2": {"type": "string", "inclusion": "available"},
-                "city": {"type": "string", "inclusion": "available"},
-                "state": {"type": "string", "inclusion": "available"},
-                "zip": {"type": "string", "inclusion": "available"},
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "stream": "orders",
-      "tap_stream_id": "orders",
-      "schema": {
-        "type": "object",
-        "properties": {
-          "id": {"type": "integer"},
-          "user_id": {"type": "integer", "inclusion": "available"},
-          "amount": {"type": "number", "inclusion": "available"},
-          "credit_card_number": {"type": "string", "inclusion": "available"},
-        }
-      }
-    }
-  ]
-}
+Each piece of metadata has the following canonical shape:
 ```
+{'metadata' : { 'selected' : True, 'some-other-metadata' : 'whatever' }, 'breadcrumb' : ['properties', 'some-field-name']}
+```
+
+The breadcrumb object above defines the path into the schema to the node to which the metadata belongs.
+
+The `metadata` module in singer-python provides several utility functions for working with and writing metadata.
 
 ### Discovery Mode
 
