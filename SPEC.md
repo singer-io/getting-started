@@ -1,6 +1,6 @@
 # Singer Specification
 
-### Version 0.1
+### Version 0.1.0
 
 A *Tap* is an application that takes a *configuration* file and an
 optional *state* file as input and produces an ordered stream of *record*,
