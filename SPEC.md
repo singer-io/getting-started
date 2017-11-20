@@ -164,10 +164,26 @@ names.  If a RECORD message from a stream is not preceded by a
 Example:
 
 ```json
-{"type": "SCHEMA",
- "stream": "users",
-  "schema": {"properties":{"id":{"type":"integer"}}}, "record": {"id": 0, "name": "Chris"},
-  "primary_keys": ["id"]}
+{
+  "type": "SCHEMA",
+  "stream": "users",
+  "schema": {
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "string"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "primary_keys": ["id"],
+  "replication_bookmark_keys": ["updated_at"]
+}
 ```
 
 ### STATE
