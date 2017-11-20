@@ -118,6 +118,9 @@ the following properties:
  - `record` **Required**. A JSON map containing a streamed data point
 
  - `stream` **Required**. The string name of the stream
+ 
+ - `time_extracted` **Optional**. The time this record was observed in the
+   source.
 
 A single Tap may output RECORDs messages with different stream
 names.  A single RECORD entry may only contain records for a single
@@ -125,8 +128,18 @@ stream.
 
 Example:
 
+*Note: Every message must be on its own line, but the examples here use multiple lines for readability.*
+
 ```json
-{"type": "RECORD", "stream": "users", "record": {"id": 0, "name": "Chris"}}
+{
+  "type": "RECORD",
+  "stream": "users",
+  "time_extracted": "2017-11-20T16:45:33.000Z",
+  "record": {
+    "id": 0, 
+    "name": "Chris"
+  }
+}
 ```
 
 ### SCHEMA
@@ -162,6 +175,8 @@ names.  If a RECORD message from a stream is not preceded by a
 `SCHEMA` message for that stream, it is assumed to be schema-less.
 
 Example:
+
+*Note: Every message must be on its own line, but the examples here use multiple lines for readability.*
 
 ```json
 {
