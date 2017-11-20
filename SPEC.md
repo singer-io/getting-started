@@ -1,6 +1,6 @@
 # Singer Specification
 
-### Version 0.1.0
+### Version 0.2.0
 
 A *Tap* is an application that takes a *configuration* file and an
 optional *state* file as input and produces an ordered stream of *record*,
@@ -140,11 +140,22 @@ must have the following properties:
  - `stream` **Required**. The string name of the stream that this
    schema describes
 
- - `key_properties` **Required**. A list of strings indicating which
+ - `key_properties` **Optional** **Deprecated**. A list of strings indicating which
    properties make up the primary key for this stream. Each item in the
    list must be the name of a top-level property defined in the schema. A
    value for `key_properties` must be provided, but it may be an empty
    list to indicate that there is no primary key.
+   
+ - `primary_keys` **Optional**. A list of strings indicating which the
+   primary key properties for this stream. Each item in the list must be
+   the name of a top-level property defined in the schema. A value for
+   `key_properties` must be provided, but it may be an empty
+   list to indicate that there is no primary key.   
+   
+ - `replication_bookmark_keys` **Optional**. A list of strings indicating
+   which keys the tap is using for incremental replication. Each item in
+   the list must be the name of a top-level property defined in the
+   schema.
 
 A single Tap may output SCHEMA messages with different stream
 names.  If a RECORD message from a stream is not preceded by a
