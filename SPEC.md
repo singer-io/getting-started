@@ -153,17 +153,11 @@ must have the following properties:
  - `stream` **Required**. The string name of the stream that this
    schema describes
 
- - `key_properties` **Optional** **Deprecated**. A list of strings indicating which
+ - `key_properties` **Required**. A list of strings indicating which
    properties make up the primary key for this stream. Each item in the
    list must be the name of a top-level property defined in the schema. A
    value for `key_properties` must be provided, but it may be an empty
    list to indicate that there is no primary key.
-   
- - `primary_keys` **Optional**. A list of strings indicating which the
-   primary key properties for this stream. Each item in the list must be
-   the name of a top-level property defined in the schema. A value for
-   `primary_keys` must be provided, but it may be an empty
-   list to indicate that there is no primary key.   
    
  - `replication_bookmark_keys` **Optional**. A list of strings indicating
    which keys the tap is using for incremental replication. Each item in
@@ -196,7 +190,7 @@ Example:
       }
     }
   },
-  "primary_keys": ["id"],
+  "key_properties": ["id"],
   "replication_bookmark_keys": ["updated_at"]
 }
 ```
@@ -215,10 +209,10 @@ and should be determined independently by each Tap.
 ## Example:
 
 ```
-{"type": "SCHEMA", "stream": "users", "primary_keys": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
+{"type": "SCHEMA", "stream": "users", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
 {"type": "RECORD", "stream": "users", "record": {"id": 1, "name": "Chris"}}
 {"type": "RECORD", "stream": "users", "record": {"id": 2, "name": "Mike"}}
-{"type": "SCHEMA", "stream": "locations", "primary_keys": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
+{"type": "SCHEMA", "stream": "locations", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
 {"type": "RECORD", "stream": "locations", "record": {"id": 1, "name": "Philadelphia"}}
 {"type": "STATE", "value": {"users": 2, "locations": 1}}
 ```
