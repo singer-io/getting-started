@@ -159,7 +159,7 @@ must have the following properties:
    value for `key_properties` must be provided, but it may be an empty
    list to indicate that there is no primary key.
    
- - `replication_bookmark_keys` **Optional**. A list of strings indicating
+ - `bookmark_properties` **Optional**. A list of strings indicating
    which keys the tap is using for incremental replication. Each item in
    the list must be the name of a top-level property defined in the
    schema.
@@ -191,7 +191,7 @@ Example:
     }
   },
   "key_properties": ["id"],
-  "replication_bookmark_keys": ["updated_at"]
+  "bookmark_properties": ["updated_at"]
 }
 ```
 
