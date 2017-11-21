@@ -120,7 +120,8 @@ the following properties:
  - `stream` **Required**. The string name of the stream
  
  - `time_extracted` **Optional**. The time this record was observed in the
-   source.
+   source. This should be an ISO 8601 formatted date-time, like
+   "2017-11-20T16:45:33.000Z".
 
 A single Tap may output RECORDs messages with different stream
 names.  A single RECORD entry may only contain records for a single
@@ -159,10 +160,9 @@ must have the following properties:
    value for `key_properties` must be provided, but it may be an empty
    list to indicate that there is no primary key.
    
- - `bookmark_properties` **Optional**. A list of strings indicating
-   which keys the tap is using for incremental replication. Each item in
-   the list must be the name of a top-level property defined in the
-   schema.
+ - `bookmark_properties` **Optional**. A list of strings indicating which
+   properties the tap is using as bookmarks. Each item in the list must be
+   the name of a top-level property defined in the schema.
 
 A single Tap may output SCHEMA messages with different stream
 names.  If a RECORD message from a stream is not preceded by a
