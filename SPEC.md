@@ -1,6 +1,6 @@
 # Singer Specification
 
-### Version 0.1
+### Version 0.2.0
 
 A *Tap* is an application that takes a *configuration* file and an
 optional *state* file as input and produces an ordered stream of *record*,
@@ -118,6 +118,11 @@ the following properties:
  - `record` **Required**. A JSON map containing a streamed data point
 
  - `stream` **Required**. The string name of the stream
+ 
+ - `time_extracted` **Optional**. The time this record was observed in the
+   source. This should be an
+   [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) formatted date-time,
+   like "2017-11-20T16:45:33.000Z".
 
 A single Tap may output RECORDs messages with different stream
 names.  A single RECORD entry may only contain records for a single
@@ -125,8 +130,18 @@ stream.
 
 Example:
 
+*Note: Every message must be on its own line, but the examples here use multiple lines for readability.*
+
 ```json
-{"type": "RECORD", "stream": "users", "record": {"id": 0, "name": "Chris"}}
+{
+  "type": "RECORD",
+  "stream": "users",
+  "time_extracted": "2017-11-20T16:45:33.000Z",
+  "record": {
+    "id": 0, 
+    "name": "Chris"
+  }
+}
 ```
 
 ### SCHEMA
@@ -145,6 +160,10 @@ must have the following properties:
    list must be the name of a top-level property defined in the schema. A
    value for `key_properties` must be provided, but it may be an empty
    list to indicate that there is no primary key.
+   
+ - `bookmark_properties` **Optional**. A list of strings indicating which
+   properties the tap is using as bookmarks. Each item in the list must be
+   the name of a top-level property defined in the schema.
 
 A single Tap may output SCHEMA messages with different stream
 names.  If a RECORD message from a stream is not preceded by a
@@ -152,11 +171,29 @@ names.  If a RECORD message from a stream is not preceded by a
 
 Example:
 
+*Note: Every message must be on its own line, but the examples here use multiple lines for readability.*
+
 ```json
-{"type": "SCHEMA",
- "stream": "users",
-  "schema": {"properties":{"id":{"type":"integer"}}}, "record": {"id": 0, "name": "Chris"},
-  "key_properties": ["id"]}
+{
+  "type": "SCHEMA",
+  "stream": "users",
+  "schema": {
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "string"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "key_properties": ["id"],
+  "bookmark_properties": ["updated_at"]
+}
 ```
 
 ### STATE
