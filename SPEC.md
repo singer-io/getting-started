@@ -120,8 +120,9 @@ the following properties:
  - `stream` **Required**. The string name of the stream
  
  - `time_extracted` **Optional**. The time this record was observed in the
-   source. This should be an ISO 8601 formatted date-time, like
-   "2017-11-20T16:45:33.000Z".
+   source. This should be an
+   [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) formatted date-time,
+   like "2017-11-20T16:45:33.000Z".
 
 A single Tap may output RECORDs messages with different stream
 names.  A single RECORD entry may only contain records for a single
