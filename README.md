@@ -167,6 +167,7 @@ to build your own.
 **Topics**:
  - [Hello, world](#hello-world)
  - [A Python Tap](#a-python-tap)
+ - [Tap Template](#tap-template)
  
 ### Hello, world
 
@@ -249,6 +250,10 @@ with the [Google Sheets Target]:
 › python tap_ip.py | target-gsheet -c config.json
 ```
 
+### Tap Template
+
+The python-based [singer-tap-template] provides some skeleton code for a new tap, so you can spend less time on setup and more time coding!
+
 ## Additional Resources
 
 Join the [Singer Slack channel] to get help from members of the Singer
@@ -256,7 +261,7 @@ community.
 
 ---
 
-Copyright &copy; 2017 Stitch
+Copyright &copy; 2018 Stitch
 
 [Singer spec]: SPEC.md
 [Singer Tap]: https://singer.io
@@ -271,4 +276,5 @@ Copyright &copy; 2017 Stitch
 [Singer helper library]: https://github.com/singer-io/singer-python
 [JSON Schema]: http://json-schema.org/
 [Singer Slack channel]: https://singer-slackin.herokuapp.com/
+[singer-tap-template]: https://github.com/singer-io/singer-tap-template
 
