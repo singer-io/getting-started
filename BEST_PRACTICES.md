@@ -101,7 +101,7 @@ the following format: the state object contains a top-level property `"bookmarks
 object. The bookmarks object contains stream identifiers as property names, each of which maps to an
 object describing the respective stream's state. As a concrete example:
 
-```
+```json
 {
   "bookmarks": {
     "orders": {
@@ -263,45 +263,158 @@ objects, each having the following fields:
 | ----------------- |--------------------|-----------|--------------------------------|
 | `tap_stream_id`   | string             | required  | The unique identifier for the stream. This is allowed to be different from the name of the stream in order to allow for sources that have duplicate stream names. |
 | `stream`          | string             | required  | The name that will be used for the stream in the data produced by this Tap. |
-| `key_properties`  | array of strings   | optional  |  List of key properties. |
 | `schema`          | object             | required  | The JSON schema for the stream.  |
-| `replication_key` | string             | optional  | The name of a property in the source to use as a "bookmark". For example, this will often be an "updated-at" field or an auto-incrementing primary key. (requires `replication_method`). |
-| `replication_method` | string          | optional  | The replication method to use for the table, either "FULL_TABLE" or "INCREMENTAL". (requires `replication_key`). |
-| `is_view`         | boolean            | optional  | For a database source, indicates that the source is a view. |
-| `database_name`   | string             | optional  | For a database source, the name of the database. |
 | `table_name`      | string             | optional  | For a database source, the name of the table. |
-| `row_count`       | integer            | optional  | The number of rows in the source data, for taps that have access to that information. |
-| `selected`        | boolean            | optional  | If this property should be synced, set to True.
 | `metadata`        | array of metadata            | optional  | See metadata below for an explanation |
+
+
+Example catalog with one simple stream and no metadata:
+```json
+{
+  "streams": [
+    {
+      "tap_stream_id": "users",
+      "stream": "users",
+      "schema": {
+        "type": ["null", "object"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": [
+              "null",
+              "string"
+            ],
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ],
+          },
+          "date_modified": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time",
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
 
 ### Metadata
 
-Metadata is the preferred mechanism for associating extra information about nodes in the schema.  A tap is free to write ANY type of metadata they feel is useful for describing fields in the schema, although several several reserved keywords exist:
-* `selected`: Either `true` or `false`.
-    * an indication that this node in the schema has been selected by the user for replication
-    * please note that taps are NOT permitted to produce `"selected"` metadata themselves although they obviously should consume it.  Production of `selected` metadata is reserved for other systems such as UI's and allowing a tap to also express an opinion on `"selected"` would result in a race condition.
-* `selected-by-default`: Either `true` or `false`.
-    * if a user has not expressed any opinion on whether or not to replicate this field, should the tap default to replicating it?
-    * ONLY taps may produce `selected-by-default` metadata.
-* `inclusion`: Either `available`, `automatic`, or `unsupported`.
+Metadata is the preferred mechanism for associating extra information about nodes in the schema.
 
-    * `"available"` means that the field is available for selection, and that
-      the Tap will only emit values for that field if it is marked with
-      `"selected": true`.
-    * `"automatic"` means that the Tap may emit values for the field, but it
-      is not up to the user to select it.
-    * `"unsupported"` means that the field exists in the source data but the
-      Tap is unable to provide it.
+Certain metadata should be written _and_ read by a tap.  This metadata is known as `discoverable` metadata.  Other metadata will be written by other systems such as the UI and therefore should only be read by the tap.  This type of metadata is called `non-discoverable` metadata.
+
+A tap is free to write ANY type of metadata they feel is useful for describing fields in the schema, although several several reserved keywords exist.  A tap that extracts data from a database should use additional metadata to describe the properties of the database.
+
+|  Keyword                    |  Tap Type  |  Discoverable?      |  Description  |
+| ----------------------------|------------|---------------------|---------------|
+| `selected`                  | any        | non-discoverable    | Either `true` or `false`.  Indicates that this node in the schema has been selected by the user for replication. |
+| `replication-method`        | any        | non-discoverable    | Either `FULL_TABLE` or `INCREMENTAL`. The replication method to use for a stream.|
+| `replication-key`           | any        | non-discoverable    | The name of a property in the source to use as a "bookmark".  For example, this will often be an "updated-at" field or an auto-incrementing primary key (requires `replication-method`).|
+| `view-key-properties`       | database   | non-discoverable    | List of key properties for a database view. |
+| `inclusion`                 | any        | discoverable        | Either `available`, `automatic`, or `unsupported`. </br></br>`available` means the field is available for selection, and the tap will only emit values for that field if it is marked with `"selected": true`. </br></br>`automatic` means that the tap may emit values for the field, but it is not up the user to select it.  </br></br>`unsupported` means that the field exists in the source data but the tap is unable to provide it.|
+| `selected-by-default`       | any        | discoverable        | Either `true` or `false`.  Indicates if a node in the schema should be replicated _if_ a user has not expressed any opinion on whether or not to replicate it.|
+| `valid-replication-keys`    | any        | discoverable        | List of the fields that could be used as replication keys.|
+| `schema-name`               | any        | discoverable        | The name of the stream.|
+| `forced-replication-method` | any        | discoverable        | Used to force the replication method to either `FULL_TABLE` or `INCREMENTAL`.|
+| `table-key-properties`      | database   | discoverable        | List of key properties for a database table.|
+| `is-view`                   | database   | discoverable        | Either `true` or `false`.  Indicates whether a stream corresponds to a database view.|
+| `row-count`                 | database   | discoverable        | Number of rows in a database table/view.|
+| `database-name`             | database   | discoverable        | Name of database.|
+| `sql-datatype`              | database   | discoverable        | Represents the datatype of a database column.|
+
 
 Each piece of metadata has the following canonical shape:
 ```json
-{'metadata' : { 'selected' : True, 'some-other-metadata' : 'whatever' },
- 'breadcrumb' : ['properties', 'some-field-name']}
+{
+  "metadata" : {
+    "selected" : true,
+    "some-other-metadata" : "whatever"
+  },
+  "breadcrumb" : ["properties", "some-field-name"]
+}
 ```
 
 The breadcrumb object above defines the path into the schema to the node to which the metadata belongs.
 
 The `metadata` module in singer-python provides several utility functions for working with and writing metadata.
+
+Example of the catalog from the previous section with metadata:
+Example catalog with one simple stream and no metadata:
+```json
+{
+  "streams": [
+    {
+      "tap_stream_id": "users",
+      "stream": "users",
+      "schema": {
+        "type": ["null", "object"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": [
+              "null",
+              "string"
+            ],
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ],
+          },
+          "date_modified": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time",
+          }
+        }
+      },
+      "metadata": [
+        {
+          "metadata": {
+            "inclusion": "available",
+            "table-key-properties": ["id"],
+            "selected-by-default": true,
+            "valid-replication-keys": ["date_modified"],
+            "schema-name": "users",
+          },
+          "breadcrumb": []
+        },
+        {
+          "metadata": {
+            "inclusion": "automatic",
+          },
+          "breadcrumb": ["properties", "id"]
+        },
+        {
+          "metadata": {
+            "inclusion": "available",
+          },
+          "breadcrumb": ["properties", "name"]
+        },
+        {
+          "metadata": {
+            "inclusion": "automatic",
+          },
+          "breadcrumb": ["properties", "date_modified"]
+        }
+      ]
+    }
+  ]
+}
+```
+
 
 ### Discovery Mode
 
