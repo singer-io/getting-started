@@ -262,7 +262,6 @@ objects, each having the following fields:
 | Property          | type               | required? | Description                    |
 | ----------------- |--------------------|-----------|--------------------------------|
 | `tap_stream_id`   | string             | required  | The unique identifier for the stream. This is allowed to be different from the name of the stream in order to allow for sources that have duplicate stream names. |
-| `stream`          | string             | required  | The name that will be used for the stream in the data produced by this Tap. |
 | `schema`          | object             | required  | The JSON schema for the stream.  |
 | `table_name`      | string             | optional  | For a database source, the name of the table. |
 | `metadata`        | array of metadata            | optional  | See metadata below for an explanation |
