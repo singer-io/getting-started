@@ -310,9 +310,9 @@ Example catalog with one simple stream and no metadata:
 
 Metadata is the preferred mechanism for associating extra information about nodes in the schema.
 
-Certain metadata should be written _and_ read by a tap.  This metadata is known as `discoverable` metadata.  Other metadata will be written by other systems such as the UI and therefore should only be read by the tap.  This type of metadata is called `non-discoverable` metadata.
+Certain metadata should be written _and_ read by a tap.  This metadata is known as `discoverable` metadata.  Other metadata will be written by other systems such as a UI and therefore should only be read by the tap.  This type of metadata is called `non-discoverable` metadata.
 
-A tap is free to write ANY type of metadata they feel is useful for describing fields in the schema, although several several reserved keywords exist.  A tap that extracts data from a database should use additional metadata to describe the properties of the database.
+A tap is free to write ANY type of metadata they feel is useful for describing fields in the schema, although several reserved keywords exist.  A tap that extracts data from a database should use additional metadata to describe the properties of the database.
 
 |  Keyword                    |  Tap Type  |  Discoverable?      |  Description  |
 | ----------------------------|------------|---------------------|---------------|
@@ -320,7 +320,7 @@ A tap is free to write ANY type of metadata they feel is useful for describing f
 | `replication-method`        | any        | non-discoverable    | Either `FULL_TABLE` or `INCREMENTAL`. The replication method to use for a stream.|
 | `replication-key`           | any        | non-discoverable    | The name of a property in the source to use as a "bookmark".  For example, this will often be an "updated-at" field or an auto-incrementing primary key (requires `replication-method`).|
 | `view-key-properties`       | database   | non-discoverable    | List of key properties for a database view. |
-| `inclusion`                 | any        | discoverable        | Either `available`, `automatic`, or `unsupported`. </br></br>`available` means the field is available for selection, and the tap will only emit values for that field if it is marked with `"selected": true`. </br></br>`automatic` means that the tap may emit values for the field, but it is not up the user to select it.  </br></br>`unsupported` means that the field exists in the source data but the tap is unable to provide it.|
+| `inclusion`                 | any        | discoverable        | Either `available`, `automatic`, or `unsupported`. </br></br>`available` means the field is available for selection, and the tap will only emit values for that field if it is marked with `"selected": true`. </br></br>`automatic` means that the tap will emit values for the field, but it is not up the user to select it.  </br></br>`unsupported` means that the field exists in the source data but the tap is unable to provide it.|
 | `selected-by-default`       | any        | discoverable        | Either `true` or `false`.  Indicates if a node in the schema should be replicated _if_ a user has not expressed any opinion on whether or not to replicate it.|
 | `valid-replication-keys`    | any        | discoverable        | List of the fields that could be used as replication keys.|
 | `schema-name`               | any        | discoverable        | The name of the stream.|
@@ -348,7 +348,6 @@ The breadcrumb object above defines the path into the schema to the node to whic
 The `metadata` module in singer-python provides several utility functions for working with and writing metadata.
 
 Example of the catalog from the previous section with metadata:
-Example catalog with one simple stream and no metadata:
 ```json
 {
   "streams": [
