@@ -181,7 +181,7 @@ The breadcrumb object above defines the path into the schema to the node to whic
 
 The `metadata` module in singer-python provides several utility functions for working with and writing metadata.
 
-###Example 
+### Example 
 Here is an example of the catalog from the previous section with metadata:
 ```json
 {
