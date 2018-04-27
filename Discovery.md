@@ -95,6 +95,7 @@ Here is a basic example of a JSON schema:
 
 ## The Catalog
 The output of discovery mode should be a list of the streams a tap supports.  This JSON formatted list is known as the catalog.  The top level is an object, with a single key called `"streams"` that points to an array of objects, each having the following fields
+
 | Property          | type               | required? | Description                    |
 | ----------------- |--------------------|-----------|--------------------------------|
 | `tap_stream_id`   | string             | required  | The unique identifier for the stream. This is allowed to be different from the name of the stream in order to allow for sources that have duplicate stream names. |
