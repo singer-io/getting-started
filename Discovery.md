@@ -1,5 +1,5 @@
 # Discovery Mode
-Discovery mode provides a way for a tap to describe the data streams it supports.  JSON schema is used to describe the structure and type of data for each stream.  The implementation of discovery mode will depend on the tap's data source. Some taps will hard code the schema for each stream, while others will connect to an API that provides a desription of the available streams.  When discovery mode is run, the tap should write to stdout a list of streams, each containing some basic information about the stream and a JSON schema describing the stream's data.
+Discovery mode provides a way for a tap to describe the data streams it supports.  JSON schema is used to describe the structure and type of data for each stream.  The implementation of discovery mode will depend on the tap's data source. Some taps will hard code the schema for each stream, while others will connect to an API that provides a desription of the available streams.  When discovery mode is run, the tap should write to stdout a list of streams, known as the catalog, with each entry containing some basic information about the stream and a JSON schema describing the stream's data.
 
 To run a tap in discovery mode, the `--discover` flag should be provided:
 ```bash
@@ -94,7 +94,7 @@ Here is a basic example of a JSON schema:
 ```
 
 ## The Catalog
-The output of discovery mode should be a list of the streams a tap supports.  This JSON formatted list is known as the catalog.  The top level is an object, with a single key called `"streams"` that points to an array of objects, each having the following fields
+The output of discovery mode should be a list of the streams a Tap supports.  This JSON formatted list is known as the catalog.  The top level is an object, with a single key called `"streams"` that points to an array of objects, each having the following fields
 
 | Property          | type               | required? | Description                    |
 | ----------------- |--------------------|-----------|--------------------------------|
@@ -146,7 +146,7 @@ Metadata is the preferred mechanism for associating extra information about node
 
 Certain metadata should be written _and_ read by a tap.  This metadata is known as `discoverable` metadata.  Other metadata will be written by other systems such as a UI and therefore should only be read by the tap.  This type of metadata is called `non-discoverable` metadata.
 
-A tap is free to write ANY type of metadata they feel is useful for describing fields in the schema, although several reserved keywords exist.  A tap that extracts data from a database should use additional metadata to describe the properties of the database.
+ A tap is free to write ANY type of metadata they feel is useful for describing fields in the schema, although several reserved keywords exist.  A tap that extracts data from a database should use additional metadata to describe the properties of the database.
 
 |  Keyword                    |  Tap Type  |  Discoverable?      |  Description  |
 | ----------------------------|------------|---------------------|---------------|
@@ -181,7 +181,7 @@ The breadcrumb object above defines the path into the schema to the node to whic
 
 The `metadata` module in singer-python provides several utility functions for working with and writing metadata.
 
-###Example 
+### Example 
 Here is an example of the catalog from the previous section with metadata:
 ```json
 {
