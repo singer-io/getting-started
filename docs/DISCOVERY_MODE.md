@@ -18,29 +18,29 @@ JSON is used to represent data because it is ubiquitous, readable, and especiall
 
 -  while its flexibility makes it easy to use, it can also cause compatibility problems
 
-*Schemas* are used to solve these problems. Generally speaking, a schema is anything that describes how data is structured. In Streams, schemas are written by streamers in *SCHEMA* messages, formatted following the [JSON Schema](http://json-schema.org/) spec.
+*Schemas* are used to solve these problems. Generally speaking, a schema is anything that describes how data is structured. Schemas are written by Taps in *SCHEMA* messages, formatted following the [JSON Schema](http://json-schema.org/) spec.
 
 Schemas solve the limited data types problem by providing more information
 about how to interpret JSON's basic types. For example, the [JSON Schema](http://json-schema.org/) spec distinguishes between `integer` and `number` types, where the latter is appropriately interpretted as a floating point. Additionally, it defines a string format called `date-time` that can be used to indicate when a data point is expected to be a [properly formatted](https://tools.ietf.org/html/rfc3339) timestamp string.
 
 Schemas mitigate JSON's compatibility problem by providing an easy way to
-validate the structure of a set of data points. Streams deploys this
-concept by encouraging use of only a single schema for each substream, and
+validate the structure of a set of data points. Taps deploy this
+concept by encouraging use of only a single schema for each stream, and
 validating each data point against its schema prior to persistence. This
-forces the streamer author to think about how to resolve schema evolution
+forces the Tap author to think about how to resolve schema evolution
 and compatibility questions, placing that responsibility as close to the
 original data source as possible, and freeing downstream systems from
 making uninformed assumptions to resolve these issues.
 
 Schemas are required, but they can be defined in the broadest terms - a
 JSON Schema of '{}' validates all data points. However, it is a best
-practice for streamer authors to define schemas as narrowly as possible.
+practice for Tap authors to define schemas as narrowly as possible.
 
 ### Schemas in Stitch
 
-The Stitch persister and Stitch API use schemas as follows:
+The Stitch Target and Stitch API use schemas as follows:
 
- - the Stitch persister fails when it encounters a data point that doesn't
+ - the Stitch Target fails when it encounters a data point that doesn't
    validate against its stream's latest schema
  - schemas must be an 'object' at the top level
  - Stitch supports schemas with objects nested to any depth, and arrays of
