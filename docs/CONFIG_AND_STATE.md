@@ -69,7 +69,7 @@ output an entry from the `"customers"` stream where the source record's replicat
 the value 123.
 
 ### Things to keep in mind
-- Write state as early and often as possible, but no sooner and no more often than is required. When a state is written, no data prior to that state will be synced, so do not update the state until all possible exceptions will be thrown.
+- When a state is written, no data prior to that state will be synced, so do not update the state until all possible exceptions will be thrown.
 - Endpoints that do not support filtering by updated timestamps or include updated timestamps do not support saving state.
 - If the API supports filtering by updated timestamp, use that for filtering. If the API doesn't support filtering but does return updated timestamps with the data, filter by the timestamp before streaming the data.
 - When streaming data in, stream the data in ascending order when possible.
