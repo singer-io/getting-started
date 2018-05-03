@@ -38,5 +38,5 @@ community.
   - [Module Structure](docs/BEST_PRACTICES.md#module-structure)
   - [Schemas](docs/BEST_PRACTICES.md#schemas)
   - [Code Quality](docs/BEST_PRACTICES.md#code-quality)
-
+---
   Copyright &copy; 2018 Stitch
