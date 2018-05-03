@@ -1,11 +1,11 @@
-# Singer Docs
+# Singer
 
 Singer is an open source standard for moving data between databases, web APIs, files, queues, and just about anything else you can think of. The Singer spec describes how data extraction scripts — called “Taps” — and data loading scripts — called “Targets” — should communicate using a standard JSON-based data format over stdout. By conforming to this spec, Taps and Targets can be used in any combination to move data from any source to any destination.
 
 Join the [Singer Slack channel](https://singer-slackin.herokuapp.com/) to get help from members of the Singer
 community.
 
-## Contents
+## Docs
 - [Singer Specification](docs/SPEC.md#singer-specification)
   - [Synopsis](docs/SPEC.md#synopsis)
   - [Input](docs/SPEC.md#input)
