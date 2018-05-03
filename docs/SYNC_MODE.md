@@ -1,5 +1,5 @@
 # Sync Mode
-Sync mode is the standard mode of operation for a Tap.  During sync mode, the Tap is expected to emit Schema, Record, and State messages to stdout.  The [SPEC](https://github.com/singer-io/getting-started/blob/master/SPEC.md) contains detailed explanations for each type of message.  
+Sync mode is the standard mode of operation for a Tap.  During sync mode, the Tap is expected to emit Schema, Record, and State messages to stdout.  The [SPEC](SPEC.md) contains detailed explanations for each type of message.
 
 To run a Tap in sync mode:
 ```bash
@@ -16,19 +16,19 @@ like, for example, the point where it left off.
 - `CATALOG` is an optional argument pointing to a JSON file that the
 Tap can use to filter which streams should be synced.
 
-## Streams to Sync
-Taps should use the [TODO Link]Catalog provided as the output of discovery mode to decide which data streams are available to sync.  Each stream's metadata also contains information that can be used to add flexibility to the sync.
+## Streams
+The [Catalog](DISCOVERY_MODE.md#the-catalog) provided to the Tap contains the streams that are available to sync.  Each stream's [metadata](DISCOVERY_MODE.md#metadata) contains information that can be used to control sync behavior.
 
-### Replication Method
-Taps can support two replication methods, and should decide which to use by checking the `replication-method` metadata for a stream during the sync, which can be one of the following:
+## Replication Method
+Taps can support two replication methods, and should decide which to use by checking the `replication-method` metadata for a stream, which should be one of the following:
 
 - `INCREMENTAL` - The Tap saves it's progress via bookmarks or some other mechanism in the state. Only new or updated records are replicated during each sync.
 
 - `FULL_TABLE` - The Tap replicates all available records dating back to a `start_date`, defined in the config file, during every sync.
 
 
-### Stream/Field Selection
-Taps should allow users to choose which streams and fields to replicate.  The following metadata should be checked during a sync to decide whether a stream/field should be replicated:
+## Stream/Field Selection
+Taps should allow users to choose which streams and fields to replicate.  The following metadata should be checked to decide whether a stream/field should be replicated:
 
 | Metadata Keyword | Description  | 
 | ----------------- | ------- |
@@ -36,7 +36,7 @@ Taps should allow users to choose which streams and fields to replicate.  The fo
 | `selected` | If this is set to `True`, the stream (empty breadcrumb), or field should be replicated.  If `False`, the stream or field should be omitted.  This metadata is written by services outside the tap. |
 | `selected-by-default` | Only applies to fields.  If there is no `selected` metadata for a  field, this can be set to `True` or `False` to set a default behavior. Can be written by a tap during discovery |
 
-## Metrics
+## Metric Messages
 A Tap should periodically emit structured log messages containing metrics about read operations. Consumers of the tap logs can parse these metrics out of the logs for monitoring or analysis.
 ```
 INFO METRIC: <metrics-json>
@@ -54,7 +54,7 @@ INFO METRIC: <metrics-json>
 Here are some examples of metrics and how those metrics should be
 interpreted.
 
-#### Example 1: Timer for Successful HTTP GET
+#### Timer for Successful HTTP GET
 
 ```
 INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 1.23, "tags": {"endpoint": "orders", "http_status_code": 200, "status": "succeeded"}}
@@ -63,7 +63,7 @@ INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 1.23,
 > We made an HTTP request to an "orders" endpoint that took 1.23 seconds
 > and succeeded with a status code of 200.
 
-#### Example 2: Timer for Failed HTTP GET
+#### Timer for Failed HTTP GET
 
 ```
 INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 30.01, "tags": {"endpoint": "orders", "http_status_code": 500, "status": "failed"}}
@@ -72,7 +72,7 @@ INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 30.01
 > We made an HTTP request to an "orders" endpoint that took 30.01 seconds
 > and failed with a status code of 500.
 
-#### Example 3: Counter for Records
+#### Counter for Records
 
 ```
 INFO METRIC: {"type": "counter", "metric": "record_count", "value": 100, "tags": {"endpoint: "orders"}}

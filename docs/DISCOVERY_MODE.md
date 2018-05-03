@@ -94,7 +94,7 @@ Here is a basic example of a JSON schema:
 ```
 
 ## The Catalog
-The output of discovery mode should be a list of the streams a Tap supports.  This JSON formatted list is known as the catalog.  The top level is an object, with a single key called `"streams"` that points to an array of objects, each having the following fields
+The output of discovery mode should be a list of the data streams a Tap supports.  This JSON formatted list is known as the catalog.  The top level is an object, with a single key called `"streams"` that points to an array of objects, each having the following fields:
 
 | Property          | type               | required? | Description                    |
 | ----------------- |--------------------|-----------|--------------------------------|

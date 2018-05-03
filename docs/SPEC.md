@@ -27,8 +27,7 @@ Tap can use to remember information from the previous invocation,
 like, for example, the point where it left off.
 
 CATALOG is an optional argument pointing to a JSON file that the
-Tap can use to filter which streams should be synced.  See
-the Discovery document for more info.
+Tap can use to filter which streams should be synced.  See the [Catalog](DISCOVERY_MODE.md#the-catalog) section for additional information.
 
 ```
 
@@ -38,7 +37,7 @@ the Discovery document for more info.
 
 The configuration contains whatever parameters the Tap needs in order to pull data from the source. Typically this will include the credentials for the API or data source.  The format of the configuration will vary by Tap, but it must be JSON-encoded and the root of the configuration must be an object.  
 
-See the [TODO LINK] Config File section for more information.
+See the [Config File](CONFIG_AND_STATE.md#config-file) section for more information.
 
 ### State
 
@@ -49,20 +48,20 @@ of the STATE messages it emits.
 
 A common use case of state is to record the spot in the stream where the last invocation left off. If the Tap is invoked without a `--state STATE` argument, it should start at the beginning of the stream or at some appropriate default position. If it is invoked with a `--state STATE` argument it should read in the state file and start from the corresponding position in the stream.
 
-See the [TODO link]State File section for more information.
+See the [State File](CONFIG_AND_STATE.md#state-file) section for more information.
 
-### Example invocations
+### Example Invocations
 
 Sync from the beginning
 
 ```bash
-$ ./tap --config config.json
+$ tap --config config.json
 ```
 
 Sync starting from a stored state
 
 ```bash
-$ ./tap --config config.json --state state.json
+$ tap --config config.json --state state.json
 ```
 
 ## Output
@@ -77,7 +76,7 @@ line. Each message must contain a `type` attribute. Any message `type`
 is permitted, and `type`s are interpreted case-insensitively. The
 following `type`s have specific meaning:
 
-### RECORD
+### RECORD Message
 
 RECORD messages contain the data from the data stream. They must have
 the following properties:
@@ -111,7 +110,7 @@ Example:
 }
 ```
 
-### SCHEMA
+### SCHEMA Message
 
 SCHEMA messages describe the datatypes of data in the stream. They
 must have the following properties:
@@ -163,7 +162,7 @@ Example:
 }
 ```
 
-### STATE
+### STATE Message
 
 STATE messages contain the state that the Tap wishes to persist.
 STATE messages have the following properties:
@@ -174,7 +173,7 @@ STATE messages have the following properties:
 The semantics of a STATE value are not part of the specification,
 and should be determined independently by each Tap.
 
-## Example:
+## Example
 
 ```
 {"type": "SCHEMA", "stream": "users", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
