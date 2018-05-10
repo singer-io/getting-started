@@ -52,16 +52,16 @@ See the [State File](CONFIG_AND_STATE.md#state-file) section for more informatio
 
 ### Example Invocations
 
-Sync from the beginning
+Sync from the beginning with catalog
 
 ```bash
-$ tap --config config.json
+$ tap --config config.json --catalog catalog.json
 ```
 
-Sync starting from a stored state
+Sync starting from a stored state with catalog
 
 ```bash
-$ tap --config config.json --state state.json
+$ tap --config config.json --state state.json --catalog catalog.json
 ```
 
 ## Output
