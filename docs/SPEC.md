@@ -17,7 +17,7 @@ pipeline.
 ## Synopsis
 
 ```
-tap --config CONFIG [--state STATE] [--properties CATALOG]
+tap --config CONFIG [--state STATE] [--catalog CATALOG]
 
 CONFIG is a required argument that points to a JSON file containing any
 configuration parameters the Tap needs.
@@ -27,7 +27,7 @@ Tap can use to remember information from the previous invocation,
 like, for example, the point where it left off.
 
 CATALOG is an optional argument pointing to a JSON file that the
-Tap can use to filter which streams should be synced.  See the [Catalog](DISCOVERY_MODE.md#the-catalog) section for additional information.
+Tap can use to filter which streams should be synced.
 
 ```
 
@@ -50,12 +50,18 @@ A common use case of state is to record the spot in the stream where the last in
 
 See the [State File](CONFIG_AND_STATE.md#state-file) section for more information.
 
+### Catalog
+
+The catalog is a JSON encoded file that lists the available streams and their schemas.  The top level is an object, with a single key called "streams" that points to an array of stream objects.  The metadata for each stream object can be modified to select whether a stream and/or its fields should be replicated, and how the data should be replicated (FULL TABLE vs INCREMENTAL).
+
+See the [Catalog](DISCOVERY_MODE.md#the-catalog) section for more information.
+
 ### Example Invocations
 
-Sync from the beginning with catalog
+Sync from the beginning without catalog
 
 ```bash
-$ tap --config config.json --catalog catalog.json
+$ tap --config config.json
 ```
 
 Sync starting from a stored state with catalog
