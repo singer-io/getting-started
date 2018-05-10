@@ -28,7 +28,7 @@ pip install tap-foo
 ```bash
 ~/.virtualenvs/tap-foo/bin/tap-foo --config tap_config.json --catalog catalog.json
 ``` 
-The output should consist of SCHEMA, RECORD, STATE, and METRIC messages.  
+The output should consist of [SCHEMA](SPEC.md#schema-message), [RECORD](SPEC.md#record-message), [STATE](SPEC.md#state-message), and [METRIC](SYNC_MODE.md#metric-messages) messages.  
 
 ### Running a Singer Tap with a Singer Target
 To run a Singer Tap with a Singer Target, follow steps 1-5 above to set up the Tap, and then continue with the following steps. 
