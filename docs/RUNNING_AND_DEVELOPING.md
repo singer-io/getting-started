@@ -16,13 +16,13 @@ source ~/.virtualenvs/tap-foo/bin/activate
 ```bash
 pip install tap-foo
 ```
-3. Edit the Tap's [config file](CONFIG_AND_STATE#config-file) (tap_config.json) to include any necessary credentials or parameters.
+3. Edit the Tap's [config file](CONFIG_AND_STATE.md#config-file) (tap_config.json) to include any necessary credentials or parameters.
 
-4. If the tap supports [discovery mode](DISCOVERY_MODE), run it to obtain the catalog:
+4. If the tap supports [discovery mode](DISCOVERY_MODE.md), run it to obtain the catalog:
 ```bash
 ~/.virtualenvs/tap-foo/bin/tap-foo --config tap_config.json --discover > catalog.json
 ```
-5. Depending on what features the Tap supports, you may need to add metadata in the catalog for [stream/field selection](SYNC_MODE#streamfield-selection) or [replication-method](SYNC_MODE#replication-method).  
+5. Depending on what features the Tap supports, you may need to add metadata in the catalog for [stream/field selection](SYNC_MODE.md#streamfield-selection) or [replication-method](SYNC_MODE.md#replication-method).  
 
 6. Run the Tap in sync mode:
 ```bash
