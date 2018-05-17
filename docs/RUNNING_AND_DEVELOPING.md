@@ -7,46 +7,46 @@ To run Singer with Python, first make sure Python 3 is installed on your system 
 We recommend installing each Tap and Target in a separate Python virtual environment.  This will insure that you won't have conflicting dependencies between any Taps and Targets.  
 
 ### Running a Singer Tap
-1. Create and activate a Python 3 virtual environment for the Tap, which we'll call `tap-foo`:
+1. Create and activate a Python 3 virtual environment for the Tap, which we'll call `tap-foo`.  When you run this yourself, change the tap name in the angle brackets `< >`
 ```bash
-python3 -m venv ~/.virtualenvs/tap-foo
-source ~/.virtualenvs/tap-foo/bin/activate
+python3 -m venv ~/.virtualenvs/<tap-foo>
+source ~/.virtualenvs/<tap-foo>/bin/activate
 ```
 2. Install the Tap using pip:
 ```bash
-pip install tap-foo
+pip install <tap-foo>
 ```
 3. Edit the Tap's [config file](CONFIG_AND_STATE.md#config-file) (tap_config.json) to include any necessary credentials or parameters.
 
 4. If the tap supports [discovery mode](DISCOVERY_MODE.md), run it to obtain the catalog:
 ```bash
-~/.virtualenvs/tap-foo/bin/tap-foo --config tap_config.json --discover > catalog.json
+~/.virtualenvs/<tap-foo>/bin/<tap-foo> --config tap_config.json --discover > catalog.json
 ```
 5. Depending on what features the Tap supports, you may need to add metadata in the catalog for [stream/field selection](SYNC_MODE.md#streamfield-selection) or [replication-method](SYNC_MODE.md#replication-method).  
 
 6. Run the Tap in sync mode:
 ```bash
-~/.virtualenvs/tap-foo/bin/tap-foo --config tap_config.json --catalog catalog.json
+~/.virtualenvs/<tap-foo>/bin/<tap-foo> --config tap_config.json --catalog catalog.json
 ``` 
 The output should consist of [SCHEMA](SPEC.md#schema-message), [RECORD](SPEC.md#record-message), [STATE](SPEC.md#state-message), and [METRIC](SYNC_MODE.md#metric-messages) messages.  
 
 ### Running a Singer Tap with a Singer Target
-To run a Singer Tap with a Singer Target, follow steps 1-5 above to set up the Tap, and then continue with the following steps. 
+To run a Singer Tap with a Singer Target, follow steps 1-5 above to set up the Tap, and then continue with the following steps.
 
-1. reate and activate a Python 3 virtual environment for the Target, which we'll call `target-bar`:
+1. reate and activate a Python 3 virtual environment for the Target, which we'll call `target-bar`.  Again, when you run this yourself, change the target name in the angle brackets `< >`
 ```bash
-python3 -m venv ~/.virtualenvs/target-bar
-source ~/.virtualenvs/target-bar/bin/activate
+python3 -m venv ~/.virtualenvs/<target-bar>
+source ~/.virtualenvs/<target-bar>/bin/activate
 ```
 2. Install the Target in its virtual environment using pip:
 ```bash
-pip install target-bar
+pip install <target-bar>
 ```
 3. Edit the Target's config file (target_config.json) to include any necessary credentials or parameters.
 
 4. Run the Singer Tap and pipe the output to the Singer Target:
 ```bash
-~/.virtualenvs/tap-foo/bin/tap-foo --config tap_config.json --catalog catalog.json | ~/.virtualenvs/target-bar/bin/target-bar --config target_config.json
+~/.virtualenvs/<tap-foo>/bin/<tap-foo> --config tap_config.json --catalog catalog.json | ~/.virtualenvs/<target-bar>/bin/<target-bar> --config target_config.json
 ```
 
 ### Example - Using Singer to populate Google Sheets

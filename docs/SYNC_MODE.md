@@ -16,6 +16,8 @@ like, for example, the point where it left off.
 - `CATALOG` is an optional argument pointing to a JSON file that the
 Tap can use to filter which streams should be synced.
 
+Note: Some legacy taps use `--propertes PROPERTIES` instead of `--catalog CATALOG` where `PROPERTIES` points to the catalog.
+
 ## Streams
 The [Catalog](DISCOVERY_MODE.md#the-catalog) provided to the Tap contains the streams that are available to sync.  Each stream's [metadata](DISCOVERY_MODE.md#metadata) contains information that can be used to control sync behavior.
 
@@ -28,13 +30,58 @@ Taps can support two replication methods, and should decide which to use by chec
 
 
 ## Stream/Field Selection
-Taps should allow users to choose which streams and fields to replicate.  The following metadata should be checked to decide whether a stream/field should be replicated:
+Taps should allow users to choose which streams and fields to replicate. The following metadata should be checked to decide whether a stream/field should be replicated:
 
 | Metadata Keyword | Description  | 
 | ----------------- | ------- |
 | `inclusion` | Only applies to fields.  If this is set to `automatic`, the field should be replicated.  If this is set to `unsupported`, the field should not be replicated.  Can be written by a tap during discovery |
 | `selected` | If this is set to `True`, the stream (empty breadcrumb), or field should be replicated.  If `False`, the stream or field should be omitted.  This metadata is written by services outside the tap. |
 | `selected-by-default` | Only applies to fields.  If there is no `selected` metadata for a  field, this can be set to `True` or `False` to set a default behavior. Can be written by a tap during discovery |
+
+### Legacy Stream/Field Selection
+Some legacy Taps handle stream and field selection by looking for `"selected": true` directly in the stream's schema (or properties.json).
+
+#### Example of legacy Stream/Field Selection
+Here is an example catalog with a selected stream that has two fields selected and one field unselected
+```json
+{
+  "streams": [
+    {
+      "tap_stream_id": "users",
+      "stream": "users",
+      "schema": {
+        "type": ["null", "object"],
+        "selected": true,
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "selected": true,
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "selected": false,
+          },
+          "date_modified": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time",
+            "selected": true,
+          }
+        }
+      }
+    }
+  ]
+}
+```
 
 ## Metric Messages
 A Tap should periodically emit structured log messages containing metrics about read operations. Consumers of the tap logs can parse these metrics out of the logs for monitoring or analysis.

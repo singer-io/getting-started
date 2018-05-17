@@ -11,6 +11,8 @@ Discovery is typically run with the output redirected to a file so it can be pas
 tap --config CONFIG --discover > catalog.json
 ```
 
+Note that some legacy taps use `properties.json` as the catalog.
+
 ## Schemas
 JSON is used to represent data because it is ubiquitous, readable, and especially appropriate for the large universe of sources that expose data as JSON like web APIs. However, JSON is far from perfect:
 
