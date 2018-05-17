@@ -39,7 +39,7 @@ Taps should allow users to choose which streams and fields to replicate. The fol
 | `selected-by-default` | Only applies to fields.  If there is no `selected` metadata for a  field, this can be set to `True` or `False` to set a default behavior. Can be written by a tap during discovery |
 
 ### Legacy Stream/Field Selection
-Some legacy Taps handle stream and field selection by looking for `"selected": true` directly in the stream's schema (or properties.json).
+Some legacy Taps handle stream and field selection by looking for `"selected": true` directly in the stream's schema in the catalog.json file (or properties.json).
 
 #### Example of legacy Stream/Field Selection
 Here is an example catalog with a selected stream that has two fields selected and one field unselected
