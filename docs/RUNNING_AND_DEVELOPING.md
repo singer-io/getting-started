@@ -44,9 +44,11 @@ pip install <target-bar>
 ```
 3. Edit the Target's config file (target_config.json) to include any necessary credentials or parameters.
 
-4. Run the Singer Tap and pipe the output to the Singer Target:
+4. Run the Singer Tap, pipe the output to the Singer Target, and save the final state emitted by the target for future runs:
 ```bash
-~/.virtualenvs/<tap-foo>/bin/<tap-foo> --config tap_config.json --catalog catalog.json | ~/.virtualenvs/<target-bar>/bin/<target-bar> --config target_config.json
+~/.virtualenvs/<tap-foo>/bin/<tap-foo> --config tap_config.json --catalog catalog.json | ~/.virtualenvs/<target-bar>/bin/<target-bar> --config target_config.json >> state.json
+
+tail -1 state.json > state.json.tmp && mv state.json.tmp state.json
 ```
 
 ### Example - Using Singer to populate Google Sheets
