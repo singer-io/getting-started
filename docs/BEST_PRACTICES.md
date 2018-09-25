@@ -36,8 +36,9 @@ Good:
 Bad:
  - 2017-01-01 00:00:00
 
-When parsing datetimes or converting between timezones, the library accepted for use by singer
-taps is `pytz`. This project has more accurate timezone data than the builtin datetime.timezone.
+When parsing datetimes or converting between timezones, the library
+accepted for use by singer taps is `pytz`. This project has more accurate
+timezone data than the builtin datetime.timezone.
 
 ## Logging and Exception Handling
 
