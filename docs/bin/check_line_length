@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+while read -r line
+do
+    if (( 74 < "${#line}" ))
+    then
+        echo 'Found line longer than 74 characters ('"${#line})"
+        echo "$line"
+        exit 1
+    fi
+done < "$1"
