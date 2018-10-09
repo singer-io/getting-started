@@ -153,7 +153,7 @@ Certain metadata should be written _and_ read by a tap.  This metadata is known 
 |  Keyword                    |  Tap Type  |  Discoverable?      |  Description  |
 | ----------------------------|------------|---------------------|---------------|
 | `selected`                  | any        | non-discoverable    | Either `true` or `false`.  Indicates that this node in the schema has been selected by the user for replication. |
-| `replication-method`        | any        | non-discoverable    | Either `FULL_TABLE` or `INCREMENTAL`. The replication method to use for a stream.|
+| `replication-method`        | any        | non-discoverable    | Either `FULL_TABLE`, `INCREMENTAL`, or `LOG_BASED`. The replication method to use for a stream.|
 | `replication-key`           | any        | non-discoverable    | The name of a property in the source to use as a "bookmark".  For example, this will often be an "updated-at" field or an auto-incrementing primary key (requires `replication-method`).|
 | `view-key-properties`       | database   | non-discoverable    | List of key properties for a database view. |
 | `inclusion`                 | any        | discoverable        | Either `available`, `automatic`, or `unsupported`. </br></br>`available` means the field is available for selection, and the tap will only emit values for that field if it is marked with `"selected": true`. </br></br>`automatic` means that the tap will emit values for the field.  </br></br>`unsupported` means that the field exists in the source data but the tap is unable to provide it.|
