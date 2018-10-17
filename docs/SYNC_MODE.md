@@ -36,7 +36,6 @@ Taps should allow users to choose which streams and fields to replicate. The fol
 | ----------------- | ------- |
 | `inclusion` | Only applies to fields.  If this is set to `automatic`, the field should be replicated.  If this is set to `unsupported`, the field should not be replicated.  Can be written by a tap during discovery |
 | `selected` | If this is set to `True`, the stream (empty breadcrumb), or field should be replicated.  If `False`, the stream or field should be omitted.  This metadata is written by services outside the tap. |
-| `selected-by-default` | Only applies to fields.  If there is no `selected` metadata for a  field, this can be set to `True` or `False` to set a default behavior. Can be written by a tap during discovery |
 
 ### Legacy Stream/Field Selection
 Some legacy Taps handle stream and field selection by looking for `"selected": true` directly in the stream's schema in the catalog.json file (or properties.json).
