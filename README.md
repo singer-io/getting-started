@@ -43,6 +43,7 @@ community.
   - [Schemas](docs/BEST_PRACTICES.md#schemas)
   - [Code Quality](docs/BEST_PRACTICES.md#code-quality)
 - [FAQ](docs/FAQ.md#FAQ)
+  - [How do I prevent dependancy conflicts between my tap and target?](docs/FAQ.md#how-do-i-prevent-dependancy-conflicts-between-my-tap-and-target)
 
 ---
   Copyright &copy; 2018 Stitch
