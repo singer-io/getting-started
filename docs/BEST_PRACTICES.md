@@ -99,9 +99,9 @@ disabling the message in Pylint. We are flexible about which Pylint issues
 are acceptable, but we generally run Pylint with some of the more pedantic
 messages disabled. See any of our recently adopted taps for an example.
 
-## Dependancy Versioning
+## Dependency Versioning
 
-When writing a new tap, all dependancies should be pinned to a specific version.  Loose dependancy versions leave your tap susceptible to dependancy updates breaking functionality.  Pinning dependancies to a version ensure that the tap works the same way it did during development.  
+When writing a new tap, all dependencies should be pinned to a specific version.  Loose dependency versions leave your tap susceptible to dependency updates breaking functionality.  Pinning dependencies to a version ensure that the tap works the same way it did during development.  
 
 Good:
 ```
