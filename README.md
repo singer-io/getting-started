@@ -42,9 +42,9 @@ community.
   - [Module Structure](docs/BEST_PRACTICES.md#module-structure)
   - [Schemas](docs/BEST_PRACTICES.md#schemas)
   - [Code Quality](docs/BEST_PRACTICES.md#code-quality)
-  - [Dependancy Versioning](docs/BEST_PRACTICES.md#dependancy-versioning)
+  - [Dependency Versioning](docs/BEST_PRACTICES.md#dependency-versioning)
 - [FAQ](docs/FAQ.md#FAQ)
-  - [How do I prevent dependancy conflicts between my tap and target?](docs/FAQ.md#how-do-i-prevent-dependancy-conflicts-between-my-tap-and-target)
+  - [How do I prevent dependency conflicts between my tap and target?](docs/FAQ.md#how-do-i-prevent-dependency-conflicts-between-my-tap-and-target)
 
 ---
   Copyright &copy; 2018 Stitch
