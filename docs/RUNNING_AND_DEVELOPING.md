@@ -33,7 +33,7 @@ The output should consist of [SCHEMA](SPEC.md#schema-message), [RECORD](SPEC.md#
 ### Running a Singer Tap with a Singer Target
 To run a Singer Tap with a Singer Target, follow steps 1-5 above to set up the Tap, and then continue with the following steps.
 
-1. reate and activate a Python 3 virtual environment for the Target, which we'll call `target-bar`.  Again, when you run this yourself, change the target name in the angle brackets `< >`
+1. Create and activate a Python 3 virtual environment for the Target, which we'll call `target-bar`.  Again, when you run this yourself, change the target name in the angle brackets `< >`
 ```bash
 python3 -m venv ~/.virtualenvs/<target-bar>
 source ~/.virtualenvs/<target-bar>/bin/activate
