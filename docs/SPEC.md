@@ -114,7 +114,7 @@ the following properties:
  - `record` **Required**. A JSON map containing a streamed data point
 
  - `stream` **Required**. The string name of the stream
- 
+
  - `time_extracted` **Optional**. The time this record was observed in the
    source. This should be an
    [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) formatted date-time,
@@ -135,7 +135,7 @@ Example:
   "stream": "users",
   "time_extracted": "2017-11-20T16:45:33.000Z",
   "record": {
-    "id": 0, 
+    "id": 0,
     "name": "Chris"
   }
 }
@@ -157,7 +157,7 @@ must have the following properties:
    list must be the name of a top-level property defined in the schema. A
    value for `key_properties` must be provided, but it may be an empty
    list to indicate that there is no primary key.
-   
+
  - `bookmark_properties` **Optional**. A list of strings indicating which
    properties the tap is using as bookmarks. Each item in the list must be
    the name of a top-level property defined in the schema.
@@ -207,7 +207,7 @@ and should be determined independently by each Tap.
 
 ## Example
 
-``` 
+```
 {"type": "SCHEMA", "stream": "users", "key_properties": ["id"],
 "schema": {"required": ["id"], "type": "object", "properties": {"id":
 {"type": "integer"}}}} {"type": "RECORD", "stream": "users", "record":
