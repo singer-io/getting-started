@@ -35,24 +35,41 @@ Tap can use to filter which streams should be synced.
 
 ### Config
 
-The configuration contains whatever parameters the Tap needs in order to pull data from the source. Typically this will include the credentials for the API or data source.  The format of the configuration will vary by Tap, but it must be JSON-encoded and the root of the configuration must be an object.  
+The configuration contains whatever parameters the Tap needs in order to
+pull data from the source. Typically this will include the credentials for
+the API or data source. The format of the configuration will vary by Tap,
+but it must be JSON-encoded and the root of the configuration must be an
+object.
 
-See the [Config File](CONFIG_AND_STATE.md#config-file) section for more information.
+See the [Config File](CONFIG_AND_STATE.md#config-file) section for more
+information.
 
 ### State
 
 The JSON encoded state is used to persist information between invocations of a Tap.
 
-A Tap that wishes to persist state should periodically write STATE messages to stdout as it processes the stream, and should expect the file named by the `--state STATE` argument to have the same format as the value
+A Tap that wishes to persist state should periodically write STATE
+messages to stdout as it processes the stream, and should expect the file
+named by the `--state STATE` argument to have the same format as the value
 of the STATE messages it emits.
 
-A common use case of state is to record the spot in the stream where the last invocation left off. If the Tap is invoked without a `--state STATE` argument, it should start at the beginning of the stream or at some appropriate default position. If it is invoked with a `--state STATE` argument it should read in the state file and start from the corresponding position in the stream.
+A common use case of state is to record the spot in the stream where the
+last invocation left off. If the Tap is invoked without a `--state STATE`
+argument, it should start at the beginning of the stream or at some
+appropriate default position. If it is invoked with a `--state STATE`
+argument it should read in the state file and start from the corresponding
+position in the stream.
 
 See the [State File](CONFIG_AND_STATE.md#state-file) section for more information.
 
 ### Catalog
 
-The catalog is a JSON encoded file that lists the available streams and their schemas.  The top level is an object, with a single key called "streams" that points to an array of stream objects.  The metadata for each stream object can be modified to select whether a stream and/or its fields should be replicated, and how the data should be replicated (FULL TABLE vs INCREMENTAL).
+The catalog is a JSON encoded file that lists the available streams and
+their schemas. The top level is an object, with a single key called
+"streams" that points to an array of stream objects. The metadata for each
+stream object can be modified to select whether a stream and/or its fields
+should be replicated, and how the data should be replicated (FULL TABLE vs
+INCREMENTAL).
 
 See the [Catalog](DISCOVERY_MODE.md#the-catalog) section for more information.
 
@@ -90,7 +107,7 @@ the following properties:
  - `record` **Required**. A JSON map containing a streamed data point
 
  - `stream` **Required**. The string name of the stream
- 
+
  - `time_extracted` **Optional**. The time this record was observed in the
    source. This should be an
    [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) formatted date-time,
@@ -102,7 +119,8 @@ stream.
 
 Example:
 
-*Note: Every message must be on its own line, but the examples here use multiple lines for readability.*
+*Note: Every message must be on its own line, but the examples here use
+ multiple lines for readability.*
 
 ```json
 {
@@ -110,7 +128,7 @@ Example:
   "stream": "users",
   "time_extracted": "2017-11-20T16:45:33.000Z",
   "record": {
-    "id": 0, 
+    "id": 0,
     "name": "Chris"
   }
 }
@@ -132,7 +150,7 @@ must have the following properties:
    list must be the name of a top-level property defined in the schema. A
    value for `key_properties` must be provided, but it may be an empty
    list to indicate that there is no primary key.
-   
+
  - `bookmark_properties` **Optional**. A list of strings indicating which
    properties the tap is using as bookmarks. Each item in the list must be
    the name of a top-level property defined in the schema.
@@ -143,7 +161,8 @@ names.  If a RECORD message from a stream is not preceded by a
 
 Example:
 
-*Note: Every message must be on its own line, but the examples here use multiple lines for readability.*
+*Note: Every message must be on its own line, but the examples here use
+ multiple lines for readability.*
 
 ```json
 {
@@ -182,12 +201,15 @@ and should be determined independently by each Tap.
 ## Example
 
 ```
-{"type": "SCHEMA", "stream": "users", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
-{"type": "RECORD", "stream": "users", "record": {"id": 1, "name": "Chris"}}
-{"type": "RECORD", "stream": "users", "record": {"id": 2, "name": "Mike"}}
-{"type": "SCHEMA", "stream": "locations", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
-{"type": "RECORD", "stream": "locations", "record": {"id": 1, "name": "Philadelphia"}}
-{"type": "STATE", "value": {"users": 2, "locations": 1}}
+{"type": "SCHEMA", "stream": "users", "key_properties": ["id"],
+"schema": {"required": ["id"], "type": "object", "properties": {"id":
+{"type": "integer"}}}} {"type": "RECORD", "stream": "users", "record":
+{"id": 1, "name": "Chris"}} {"type": "RECORD", "stream": "users",
+"record": {"id": 2, "name": "Mike"}} {"type": "SCHEMA", "stream":
+"locations", "key_properties": ["id"], "schema": {"required": ["id"],
+"type": "object", "properties": {"id": {"type": "integer"}}}} {"type":
+"RECORD", "stream": "locations", "record": {"id": 1, "name":
+"Philadelphia"}} {"type": "STATE", "value": {"users": 2, "locations": 1}}
 ```
 
 ## Versioning
