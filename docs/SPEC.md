@@ -35,26 +35,48 @@ Tap can use to filter which streams should be synced.
 
 ### Config
 
-The configuration contains whatever parameters the Tap needs in order to pull data from the source. Typically this will include the credentials for the API or data source.  The format of the configuration will vary by Tap, but it must be JSON-encoded and the root of the configuration must be an object.  
+The configuration contains whatever parameters the Tap needs in order to
+pull data from the source. Typically this will include the credentials for
+the API or data source. The format of the configuration will vary by Tap,
+but it must be JSON-encoded and the root of the configuration must be an
+object.
 
-For taps where the credentials need to be refreshed before or during a run, the tap can write changes to the config file, and the changes will be saved and picked up on subsequent runs.  The singer-python method update_config_file() can be used to make the necessary changes.
+For taps where the credentials need to be refreshed before or during a
+run, the tap can write changes to the config file, and the changes will be
+saved and picked up on subsequent runs. The singer-python method
+'update_config_file()' can be used to make the necessary changes.
 
-See the [Config File](CONFIG_AND_STATE.md#config-file) section for more information.
+See the [Config File](CONFIG_AND_STATE.md#config-file) section for more
+information.
 
 ### State
 
-The JSON encoded state is used to persist information between invocations of a Tap.
+The JSON encoded state is used to persist information between invocations
+of a Tap.
 
-A Tap that wishes to persist state should periodically write STATE messages to stdout as it processes the stream, and should expect the file named by the `--state STATE` argument to have the same format as the value
+A Tap that wishes to persist state should periodically write STATE
+messages to stdout as it processes the stream, and should expect the file
+named by the `--state STATE` argument to have the same format as the value
 of the STATE messages it emits.
 
-A common use case of state is to record the spot in the stream where the last invocation left off. If the Tap is invoked without a `--state STATE` argument, it should start at the beginning of the stream or at some appropriate default position. If it is invoked with a `--state STATE` argument it should read in the state file and start from the corresponding position in the stream.
+A common use case of state is to record the spot in the stream where the
+last invocation left off. If the Tap is invoked without a `--state STATE`
+argument, it should start at the beginning of the stream or at some
+appropriate default position. If it is invoked with a `--state STATE`
+argument it should read in the state file and start from the corresponding
+position in the stream.
 
-See the [State File](CONFIG_AND_STATE.md#state-file) section for more information.
+See the [State File](CONFIG_AND_STATE.md#state-file) section for more
+information.
 
 ### Catalog
 
-The catalog is a JSON encoded file that lists the available streams and their schemas.  The top level is an object, with a single key called "streams" that points to an array of stream objects.  The metadata for each stream object can be modified to select whether a stream and/or its fields should be replicated, and how the data should be replicated (FULL TABLE vs INCREMENTAL).
+The catalog is a JSON encoded file that lists the available streams and
+their schemas. The top level is an object, with a single key called
+"streams" that points to an array of stream objects. The metadata for each
+stream object can be modified to select whether a stream and/or its fields
+should be replicated, and how the data should be replicated (FULL TABLE vs
+INCREMENTAL).
 
 See the [Catalog](DISCOVERY_MODE.md#the-catalog) section for more information.
 
@@ -104,7 +126,8 @@ stream.
 
 Example:
 
-*Note: Every message must be on its own line, but the examples here use multiple lines for readability.*
+*Note: Every message must be on its own line, but the examples here use
+ multiple lines for readability.*
 
 ```json
 {
@@ -145,7 +168,8 @@ names.  If a RECORD message from a stream is not preceded by a
 
 Example:
 
-*Note: Every message must be on its own line, but the examples here use multiple lines for readability.*
+*Note: Every message must be on its own line, but the examples here use
+ multiple lines for readability.*
 
 ```json
 {
@@ -183,13 +207,16 @@ and should be determined independently by each Tap.
 
 ## Example
 
-```
-{"type": "SCHEMA", "stream": "users", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
-{"type": "RECORD", "stream": "users", "record": {"id": 1, "name": "Chris"}}
-{"type": "RECORD", "stream": "users", "record": {"id": 2, "name": "Mike"}}
-{"type": "SCHEMA", "stream": "locations", "key_properties": ["id"], "schema": {"required": ["id"], "type": "object", "properties": {"id": {"type": "integer"}}}}
-{"type": "RECORD", "stream": "locations", "record": {"id": 1, "name": "Philadelphia"}}
-{"type": "STATE", "value": {"users": 2, "locations": 1}}
+``` 
+{"type": "SCHEMA", "stream": "users", "key_properties": ["id"],
+"schema": {"required": ["id"], "type": "object", "properties": {"id":
+{"type": "integer"}}}} {"type": "RECORD", "stream": "users", "record":
+{"id": 1, "name": "Chris"}} {"type": "RECORD", "stream": "users",
+"record": {"id": 2, "name": "Mike"}} {"type": "SCHEMA", "stream":
+"locations", "key_properties": ["id"], "schema": {"required": ["id"],
+"type": "object", "properties": {"id": {"type": "integer"}}}} {"type":
+"RECORD", "stream": "locations", "record": {"id": 1, "name":
+"Philadelphia"}} {"type": "STATE", "value": {"users": 2, "locations": 1}}
 ```
 
 ## Versioning
