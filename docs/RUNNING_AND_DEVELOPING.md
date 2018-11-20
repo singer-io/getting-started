@@ -2,7 +2,7 @@
 Since most Singer Taps and Targets are written in Python, the examples given on this page will all be written in Python.  
 
 ## Running Singer with Python
-To run Singer with Python, first make sure Python 3 is installed on your system or follow these installation instructions for [Mac](http://docs.python-guide.org/en/latest/starting/install3/osx/) or [Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-install-python-3-and-set-up-a-local-programming-environment-on-ubuntu-16-04).  
+To run Singer with Python, first make sure Python 3.5.2 is installed on your system or follow these installation instructions for [Mac](http://docs.python-guide.org/en/latest/starting/install3/osx/) or [Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-install-python-3-and-set-up-a-local-programming-environment-on-ubuntu-16-04).  
 
 We recommend installing each Tap and Target in a separate Python virtual environment.  This will insure that you won't have conflicting dependencies between any Taps and Targets.  
 
