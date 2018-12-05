@@ -41,10 +41,9 @@ the API or data source. The format of the configuration will vary by Tap,
 but it must be JSON-encoded and the root of the configuration must be an
 object.
 
-For taps where the credentials need to be refreshed before or during a
-run, the tap can write changes to the config file, and the changes will be
-saved and picked up on subsequent runs. The singer-python method
-`update_config_file()` can be used to make the necessary changes.
+For taps where the configuration needs to be changed during a run, the tap
+should write changes back to the supplied config file, so that the changes
+can be used on subsequent runs.
 
 See the [Config File](CONFIG_AND_STATE.md#config-file) section for more
 information.
