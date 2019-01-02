@@ -48,6 +48,7 @@ The Stitch Target and Stitch API use schemas as follows:
  - Stitch supports schemas with objects nested to any depth, and arrays of
    objects nested to any depth - more info in the
    [Stitch docs](https://www.stitchdata.com/docs/data-structure/nested-data-structures-row-count-impact)
+ - References using the JSON Schema [`$ref` feature](https://tools.ietf.org/html/draft-zyp-json-schema-04#section-7) must be fully resolved and replaced before constructing a `SCHEMA` message. The spec does not support a method of passing extra schemas to serve as reference resolution.
  - properties of type `string` and format `date-time` are converted to
    the appropriate timestamp or datetime type in the destination database
  - properties of type `integer` are converted to integer in the destination
