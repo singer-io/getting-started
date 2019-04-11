@@ -48,7 +48,6 @@ Here is an example catalog with a selected stream that has two fields selected a
       "stream": "users",
       "schema": {
         "type": ["null", "object"],
-        "selected": true,
         "additionalProperties": false,
         "properties": {
           "id": {
@@ -75,6 +74,11 @@ Here is an example catalog with a selected stream that has two fields selected a
       },
       "metadata": [
         {
+          "breadcrumb": [],
+          "metadata": {
+            "selected": "true"
+          }
+        },{
           "breadcrumb": [
             "properties",
             "id"
