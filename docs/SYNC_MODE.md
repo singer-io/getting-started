@@ -37,10 +37,8 @@ Taps should allow users to choose which streams and fields to replicate. The fol
 | `inclusion` | Only applies to fields.  If this is set to `automatic`, the field should be replicated.  If this is set to `unsupported`, the field should not be replicated.  Can be written by a tap during discovery |
 | `selected` | If this is set to `True`, the stream (empty breadcrumb), or field should be replicated.  If `False`, the stream or field should be omitted.  This metadata is written by services outside the tap. |
 
-### Legacy Stream/Field Selection
-Some legacy Taps handle stream and field selection by looking for `"selected": true` directly in the stream's schema in the catalog.json file (or properties.json).
 
-#### Example of legacy Stream/Field Selection
+#### Example of Stream/Field Selection
 Here is an example catalog with a selected stream that has two fields selected and one field unselected
 ```json
 {
@@ -57,15 +55,13 @@ Here is an example catalog with a selected stream that has two fields selected a
             "type": [
               "null",
               "string"
-            ],
-            "selected": true,
+            ]
           },
           "name": {
             "type": [
               "null",
               "string"
-            ],
-            "selected": false,
+            ]
           },
           "date_modified": {
             "type": [
@@ -76,11 +72,46 @@ Here is an example catalog with a selected stream that has two fields selected a
             "selected": true,
           }
         }
-      }
+      },
+      "metadata": [
+        {
+          "breadcrumb": [
+            "properties",
+            "id"
+          ],
+          "metadata": {
+            "inclusion": "automatic",
+            "selected": "true"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "name"
+          ],
+          "metadata": {
+            "inclusion": "available",
+            "selected": "false"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "date_modified"
+          ],
+          "metadata": {
+            "inclusion": "available",
+            "selected": "true"
+          }
+        }
+      ]
     }
   ]
 }
 ```
+
+### Legacy Stream/Field Selection (DEPRECATED)
+Some legacy Taps handle stream and field selection by looking for `"selected": true` directly in the stream's schema in the catalog.json file (called properties.json in legacy taps).
 
 ## Metric Messages
 A Tap should periodically emit structured log messages containing metrics about read operations. Consumers of the tap logs can parse these metrics out of the logs for monitoring or analysis.
