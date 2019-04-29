@@ -230,7 +230,7 @@ Here is an example of the catalog from the previous section with metadata:
         },
         {
           "metadata": {
-            "inclusion": "automatic
+            "inclusion": "automatic"
           },
           "breadcrumb": ["properties", "id"]
         },
