@@ -222,7 +222,7 @@ Here is an example of the catalog from the previous section with metadata:
           "metadata": {
             "inclusion": "available",
             "table-key-properties": ["id"],
-            "selected-by-default": true,
+            "selected": true,
             "valid-replication-keys": ["date_modified"],
             "schema-name": "users",
           },
@@ -237,13 +237,14 @@ Here is an example of the catalog from the previous section with metadata:
         {
           "metadata": {
             "inclusion": "available",
-            "selected-by-default": true,
+            "selected": true
           },
           "breadcrumb": ["properties", "name"]
         },
         {
           "metadata": {
             "inclusion": "automatic",
+            "selected": true
           },
           "breadcrumb": ["properties", "date_modified"]
         }
