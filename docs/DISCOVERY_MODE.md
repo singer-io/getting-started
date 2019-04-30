@@ -101,6 +101,7 @@ The output of discovery mode should be a list of the data streams a Tap supports
 
 | Property          | type               | required? | Description                    |
 | ----------------- |--------------------|-----------|--------------------------------|
+| `stream`          | string             | required  | The name of the stream.        |
 | `tap_stream_id`   | string             | required  | The unique identifier for the stream. This is allowed to be different from the name of the stream in order to allow for sources that have duplicate stream names. |
 | `schema`          | object             | required  | The JSON schema for the stream.  |
 | `table_name`      | string             | optional  | For a database source, the name of the table. |
@@ -162,7 +163,7 @@ Certain metadata should be written _and_ read by a tap.  This metadata is known 
 | `valid-replication-keys`    | any        | discoverable        | List of the fields that could be used as replication keys.|
 | `schema-name`               | any        | discoverable        | The name of the stream.|
 | `forced-replication-method` | any        | discoverable        | Used to force the replication method to either `FULL_TABLE` or `INCREMENTAL`.|
-| `table-key-properties`      | database   | discoverable        | List of key properties for a database table.|
+| `table-key-properties`      | any        | discoverable        | List of key properties for a database table.|
 | `is-view`                   | database   | discoverable        | Either `true` or `false`.  Indicates whether a stream corresponds to a database view.|
 | `row-count`                 | database   | discoverable        | Number of rows in a database table/view.|
 | `database-name`             | database   | discoverable        | Name of database.|
