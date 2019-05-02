@@ -161,9 +161,9 @@ Certain metadata should be written _and_ read by a tap.  This metadata is known 
 | `inclusion`                 | any        | discoverable        | Either `available`, `automatic`, or `unsupported`. </br></br>`available` means the field is available for selection, and the tap will only emit values for that field if it is marked with `"selected": true`. </br></br>`automatic` means that the tap will emit values for the field.  </br></br>`unsupported` means that the field exists in the source data but the tap is unable to provide it.|
 | `selected-by-default`       | any        | discoverable        | Either `true` or `false`.  Indicates if a node in the schema should be replicated _if_ a user has not expressed any opinion on whether or not to replicate it.|
 | `valid-replication-keys`    | any        | discoverable        | List of the fields that could be used as replication keys.|
-| `schema-name`               | any        | discoverable        | The name of the stream.|
 | `forced-replication-method` | any        | discoverable        | Used to force the replication method to either `FULL_TABLE` or `INCREMENTAL`.|
 | `table-key-properties`      | any        | discoverable        | List of key properties for a database table.|
+| `schema-name`               | database   | discoverable        | The name of the stream.|
 | `is-view`                   | database   | discoverable        | Either `true` or `false`.  Indicates whether a stream corresponds to a database view.|
 | `row-count`                 | database   | discoverable        | Number of rows in a database table/view.|
 | `database-name`             | database   | discoverable        | Name of database.|
