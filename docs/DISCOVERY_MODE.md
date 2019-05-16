@@ -253,3 +253,24 @@ Here is an example of the catalog from the previous section with metadata:
   ]
 }
 ```
+### Singer Python Helper Functions
+
+In the `singer-python` library, there's a number of helpful functions in the `metadata.py` file. These functions cover common tasks when around creating and handling metadata. As of `singer-python v5.6.0`, there is a `get_standard_metadata()` function. Typically in Discovery Mode, there is we loop over the streams of a tap to create "catalog entries". This `get_standard_metadata()` function intended to be used in this loop either to fully set up the metadata objects or to provide a basic boilerplate a tap author can add to.
+
+#### Example
+```
+for stream_name in list_of_all_streams:
+    raw_schema = get_schema(stream_name)
+    schema = process_schema(raw_schema)
+    catalog_entry = {
+        'stream' : stream_name,
+        'tap_stream_id' : stream_name,
+        'schema' : schema,
+        'metadata' : get_standard_metadata(schema,
+                                           stream_name,
+                                           get_key_properties(stream_name),
+                                           get_valid_replication_keys(stream_name),
+                                           get_replication_method(stream_name))
+    }
+    catalog['streams'].append(catalog_entry)
+```
