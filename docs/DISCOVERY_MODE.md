@@ -185,7 +185,7 @@ The breadcrumb object above defines the path into the schema to the node to whic
 
 The `metadata` module in singer-python provides several utility functions for working with and writing metadata.
 
-### Example 
+### Example
 Here is an example of the catalog from the previous section with metadata:
 ```json
 {
@@ -274,3 +274,34 @@ for stream_name in list_of_all_streams:
     }
     catalog['streams'].append(catalog_entry)
 ```
+
+#### Database Tap Metadata
+Database taps require some additional metadata.
+
+#### Written during discovery:
+- Stream Level
+  - `database-name`
+  - `schema-name`
+  - `is-view`
+  - `table-key-properties`
+- Prop level
+  - `sql-datatype`
+    - UI supports following types as replication-keys for incremental:
+      - DATE
+      - TIMESTAMP
+      - NUMBER
+  - `inclusion`
+  - `selected-by-default`
+    - True for all fields except for those whose inclusion is "unsupported"
+
+#### Read during sync:
+- Stream Level
+  - `schema-name`
+  - `is-view`
+  - `table-key-properties` or `view-key-properties`
+  - `replication-key`
+  - `replication-key-value`
+  - `selected`
+- Prop Level
+  - `sql-datatype`
+  - `selected`
