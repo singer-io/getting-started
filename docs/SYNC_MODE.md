@@ -16,7 +16,7 @@ like, for example, the point where it left off.
 - `CATALOG` is an optional argument pointing to a JSON file that the
 Tap can use to filter which streams should be synced.
 
-Note: Some legacy taps use `--propertes PROPERTIES` instead of `--catalog CATALOG` where `PROPERTIES` points to the catalog.
+Note: Some legacy taps use `--properties PROPERTIES` instead of `--catalog CATALOG` where `PROPERTIES` points to the catalog.
 
 ## Streams
 The [Catalog](DISCOVERY_MODE.md#the-catalog) provided to the Tap contains the streams that are available to sync.  Each stream's [metadata](DISCOVERY_MODE.md#metadata) contains information that can be used to control sync behavior.
