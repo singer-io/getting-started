@@ -123,6 +123,7 @@ A Tap should periodically emit structured log messages containing metrics about 
 INFO METRIC: <metrics-json>
 ```
 `<metrics-json>` should be a JSON object with the following keys:
+
 | Metric Key | Description | 
 | ---------- | ----------- |
 | `type` | The type of the metric. Indicates how consumers of the data should interpret the value field. There are two types of metrics: </br></br> `counter` - The value should be interpreted as a number that is added to a cumulative or running total </br></br> `timer` - The value is the duration in seconds of some operation. | 
