@@ -2,16 +2,16 @@
 
 ## Context
 
-The Singer specification is pretty mature and allow a lot of 
+The Singer specification is pretty mature and allows a lot of 
 end-users to extract and load data from one source to a 
-specific target very simply, and allow developer to easily
+specific target very simply, and allows developers to easily
 implement new taps without worrying about targets and vice-versa.
 
 However, it is not straightforward, as of now, to run Singer channels (taps + targets)
 in a production environment.
 Because logs and metrics, by default when using the [singer-python](https://github.com/singer-io/singer-python) lib, 
 are send to [stderr](https://github.com/singer-io/singer-python/blob/master/singer/logging.conf#L12), it is very difficult
-and not straightforward to get to them to exploit them.
+and not straightforward to get to them and exploit them.
 
 To bring the specification one step further, we need to improve on this point.
 One possible implementation to resolve this problem, would be the implementation of a *broker* type and *LOG* messages into the specification.
@@ -20,7 +20,7 @@ One possible implementation to resolve this problem, would be the implementation
 
 ### LOG Message
 
-A LOG message contain useful information relatives to the run of the tap/broker/target.
+A LOG message contain useful information relative to the run of the tap/broker/target.
 
 
 A LOG message have the following properties:
@@ -59,7 +59,7 @@ configuration parameters the Broker needs.
 ```
 
 Theoretically, you could have an infinite sequence of brokers,
-one after another, without perturbing the flow of a tap/target.
+one after another, without perturbing the flow of a Singer channel.
 
 Example of a theoretical flow:
 ```
@@ -68,7 +68,7 @@ tap | broker_1 | broker_2 | ... | broker_n | target | broker_m | ... | broker_z
 
 Broker are designed so Singer users could be able to add custom actions
 on a Singer flow in a transparent way.
-A broker could operate on in input, or letting it flow transparently to the next pipe.
+A broker could operate on in input, or let it flow transparently to the next pipe.
 
 Typical usecases could cover:
 
