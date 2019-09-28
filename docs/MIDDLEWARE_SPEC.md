@@ -48,16 +48,18 @@ A *middleware* is an application that read from stdin as input.
 It should have a *configuration* file to be able to change
 its behaviour when run.
 
-A middleware, unlike a tap, should not have any *state* and be agnostic
-of the invocation environment.
+A middleware, like a tap, could have a *state*.
 A middleware could be implemented in any programming language.
 
 Usage
 ```
-middleware --config CONFIG
+middleware --config CONFIG --state STATE
 
 CONFIG is a required argument that points to a JSON file containing any
 configuration parameters the middleware needs.
+
+STATE is a optional argument that points to a JSON file containing the desired
+state of the middleware.
 ```
 
 Theoretically, you could have an infinite sequence of middlewares,
@@ -107,5 +109,5 @@ tap-exchangeratesapi | target-csv
 to
 
 ```
-tap-exchangeratesapi | middleware-statsd --config stats.json | middleware-elastic --config elastic.json | target-csv | middleware-pagerduty --config pagerduty.json
+tap-exchangeratesapi | middleware-statsd --config stats.json | middleware-elastic --config elastic.json | target-csv | middleware-pagerduty --config pagerduty.json --state state.json
 ```
