@@ -1,4 +1,4 @@
-# Broker Specification (v0.1.0)
+# Middelware Specification (v0.1.0)
 
 ## Context
 
@@ -14,7 +14,7 @@ are send to [stderr](https://github.com/singer-io/singer-python/blob/master/sing
 and not straightforward to get to them and exploit them.
 
 To bring the specification one step further, we need to improve on this point.
-One possible implementation to resolve this problem, would be the implementation of a *broker* type and *LOG* messages into the specification.
+One possible implementation to resolve this problem, would be the implementation of a *middleware* type and *LOG* messages into the specification.
 
 ## Definition
 
@@ -25,8 +25,10 @@ A LOG message contain useful information relative to the run of the tap/broker/t
 
 A LOG message have the following properties:
 
+- `type` **Required**. Always `LOG`
 - `level` **Required**. The level of the LOG message. Should be one of `CRITICAL`, `ERROR`, `WARNING`, `INFO`, `DEBUG`
 - `value` **Required**. The JSON formatted log
+- `tags` **Optionnal**. An object of tags
 
 The semantics of a LOG value are not part of the specification,
 and should be determined independently by each tap/broker/target.
@@ -34,41 +36,41 @@ and should be determined independently by each tap/broker/target.
 
 Example
 ```
-{"type": "LOG", "type": "DEBUG", "value": {"message": "All is good there"}}
-{"type": "LOG", "type": "INFO", "value": {"metric": {"type": "counter", "metric": "record_count", "value": 10000, "tags": {"a": "tag"}}}}
-{"type": "LOG", "type": "INFO", "value": {"metric": {"type": "timer", "metric": "job_duration", "value": 10.0, "tags": {"a": "tag"}}}}
-{"type": "LOG", "type": "ERROR", "value": {"message": "I'm a teapot", "code": "418"}}
+{"type": "LOG", "level": "DEBUG", "value": {"message": "All is good there"}, "tags": {"endpoint": "users", "elastic": "true"}}
+{"type": "LOG", "level": "INFO", "value": {"type": "counter", "metric": "record_count", "value": 10000}, "tags": {"kind": "metric", "statsd": "true"}}
+{"type": "LOG", "level": "INFO", "value": {"type": "timer", "metric": "job_duration", "value": 10.0}, "tags": {"kind": "metric"}}
+{"type": "LOG", "level": "ERROR", "value": {"message": "I'm a teapot", "code": "418"}, "tags": {"pagerduty": "alert_1"}}
 ```
 
-### Broker
+### Middleware
 
-A *Broker* is an application that read from stdin as input.
+A *middleware* is an application that read from stdin as input.
 It should have a *configuration* file to be able to change
 its behaviour when run.
 
-A broker, unlike a tap, should not have any *state* and be agnostic
+A middleware, unlike a tap, should not have any *state* and be agnostic
 of the invocation environment.
-A broker could be implemented in any programming language.
+A middleware could be implemented in any programming language.
 
 Usage
 ```
-broker --config CONFIG
+middleware --config CONFIG
 
 CONFIG is a required argument that points to a JSON file containing any
-configuration parameters the Broker needs.
+configuration parameters the middleware needs.
 ```
 
-Theoretically, you could have an infinite sequence of brokers,
+Theoretically, you could have an infinite sequence of middlewares,
 one after another, without perturbing the flow of a Singer channel.
 
 Example of a theoretical flow:
 ```
-tap | broker_1 | broker_2 | ... | broker_n | target | broker_m | ... | broker_z
+tap | middleware_1 | middleware_2 | ... | middleware_n | target | middleware_m | ... | middleware_z
 ```
 
-Broker are designed so Singer users could be able to add custom actions
+Middlewares are designed so Singer users could be able to add custom actions
 on a Singer flow in a transparent way.
-A broker could operate on in input, or let it flow transparently to the next pipe.
+A middleware could operate on in input, or let it flow transparently to the next pipe.
 
 Typical usecases could cover:
 
@@ -88,12 +90,12 @@ Typical usecases could cover:
   * Send an error code and/or an error message to a external tool for debugging or alerting
   * Send metrics to a remote monitoring system and/or time series databases for deeper analysis and monitoring
 
-Example of potentials brokers
-* broker-statsd to send metrics to statsd
-* broker-prometheus to send metrics to prometheus
-* broker-elastic to send logs to elasticsearch
-* broker-pagerduty to send an alert on pagerduty 
-* broker-datadog to send logs and metrics on datadog
+Example of potentials middlewares
+* middleware-statsd to send metrics to statsd
+* middleware-prometheus to send metrics to prometheus
+* middleware-elastic to send logs to elasticsearch
+* middleware-pagerduty to send an alert on pagerduty 
+* middleware-datadog to send logs and metrics on datadog
 
 ## Example of a new production-ready Singer channel
 
@@ -105,5 +107,5 @@ tap-exchangeratesapi | target-csv
 to
 
 ```
-tap-exchangeratesapi | broker-statsd --config stats.json | broker-elastic --config elastic.json | target-csv | broker-pagerduty --config pagerduty.json
+tap-exchangeratesapi | middleware-statsd --config stats.json | middleware-elastic --config elastic.json | target-csv | middleware-pagerduty --config pagerduty.json
 ```
