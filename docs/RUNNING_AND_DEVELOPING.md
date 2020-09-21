@@ -243,7 +243,7 @@ python tap_ip.py | target-gsheet -c config.json
 The python-based [singer-tap-template](https://github.com/singer-io/singer-tap-template) provides some skeleton code for a new tap, so you can spend less time on setup and more time coding!
 
 ## Developing a Target
-A Singer Target should read lines from `stdin` and process [Schema](SPEC#schema-message), [Record](SPEC#record-message), and [State](SPEC#state-message) Messages.
+A Singer Target should read lines from `stdin` and process [Schema](SPEC.md#schema-message), [Record](SPEC.md#record-message), and [State](SPEC.md#state-message) Messages.
 
 ### Guidelines
 - Schema validation should be performed to ensure that the records being written for a stream comform to the schema defined for that stream.
