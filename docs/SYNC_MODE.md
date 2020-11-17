@@ -90,10 +90,10 @@ with Transformer() as transformer:
 If there are child streams, this means that they rely on some piece of information from a corresponding parent.
 if child stream `CHILD` relies on parent stream `PARENT`'s id, then if we sync `CHILD` without `PARENT` being selected, the python process will error out with an unclear error message.
 The tap can do one of two things to handle this:
-    - grab parent ids in child stream sync function:
-      - in the function to sync `CHILD`, we can grab all id's for and iterate through that list. This will allow us to sync `CHILD` without selecting `PARENT`
-    - log a clear error that parent stream `PARENT` must be selected if we want to sync `CHILD`
-      - make it clear in the logs: "in order to sync `CHILD`, you must also select `PARENT`
+- grab parent ids in child stream sync function:
+  - in the function to sync `CHILD`, we can grab all id's for and iterate through that list. This will allow us to sync `CHILD` without selecting `PARENT`
+- log a clear error that parent stream `PARENT` must be selected if we want to sync `CHILD`
+  - make it clear in the logs: "in order to sync `CHILD`, you must also select `PARENT`
 
 #### Example of Stream/Field Selection
 Here is an example catalog with a selected stream that has two fields selected and one field unselected
