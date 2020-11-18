@@ -37,7 +37,9 @@ Taps should allow users to choose which streams and fields to replicate. The fol
 | `inclusion` | Only applies to fields.  If this is set to `automatic`, the field should be replicated. If this is set to `available`, the field can be either selected or left unselected.  If this is set to `unsupported`, the field should not be replicated.  Can be written by a tap during discovery |
 | `selected` | If this is set to `True`, the stream (empty breadcrumb), or field should be replicated.  If `False`, the stream or field should be omitted.  This metadata is written by services outside the tap. |
 
-Streams shouldn’t be selected by default. They must have an `inclusion: available` property. Each field needs to have its own metadata object that labels the field as `inclusion: automatic` or `inclusion: available`.
+Streams shouldn’t be selected by default. They must have an `inclusion: available` property.
+
+Additionally, each field needs to have its own metadata object that labels the field as `inclusion: automatic`, `inclusion: available`, or `inclusion: unsupported`.
 
 ### Suggested Pattern for implementing stream selection and field selection
 #### Discovery
@@ -62,10 +64,10 @@ selected_streams = catalog.get_selected_streams(state)
 for stream in selected_streams:
     <sync stream>
  ```
-(see [tap-trello discover.py](https://github.com/singer-io/tap-trello/blob/master/tap_trello/discover.py) for an example)
+(see [here](https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/discover.py#L38) for an example)
 
 ##### Field Selection
-The tap must pass every record through the transformer, as is done here:
+To filter a record's fields using the selected metadata from the catalog, the supported approach is to pass every record through the transformer with a metadata dictionary, as is done here:
  ```
 with Transformer() as transformer:
     for rec in stream_object.sync():
@@ -76,13 +78,13 @@ with Transformer() as transformer:
             )
         )
 ```
-(see [tap-trello sync.py](https://github.com/singer-io/tap-trello/blob/master/tap_trello/sync.py) for an example)
+(see [here](https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/sync.py#L10) for an example)
 
 
 ## How to handle child streams
 If there are child streams, this means that they rely on some piece of information from a corresponding parent.
 To handle this, the tap must grab parent ids in child stream sync function
-(see [tap-trello streams.py](https://github.com/singer-io/tap-trello/blob/master/tap_trello/streams.py) in the ClientStream sync method)
+(see [here](https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/streams.py#L55) in the ClientStream sync method)
 
 
 #### Example of Stream/Field Selection
