@@ -6,7 +6,7 @@ Before submitting your tap for review, make sure that you have completed all of 
 
 - [stream selection](#stream-selection)
 - [field selection](#field-selection)
-- [correct handling of child streams](#how-to-handle-child-streams])
+- [correct handling of child streams](#how-to-handle-child-streams)
 
 ##### Stream Selection
 Iterate over only selected streams.
