@@ -86,8 +86,7 @@ def get_format_values(self): # pylint: disable=no-self-use
 
 [Source][trello-streams]
 
-See the [pylint Block Disables Docs][pylint-docs] for more information and
-more examples
+See the [pylint Block Disables Docs][pylint-docs] for more information and more examples.
 
 
 <!-- Links -->
