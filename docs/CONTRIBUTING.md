@@ -1,6 +1,9 @@
 # CONTRIBUTING DOCUMENT
 This is the doc that will outline all requirements for contributors.
 
+Before working on your project, please check that someone else has not already submitted the same project already.
+The [Singer website][singer-io] and the [Singer Slack][singer-slack] are great resources for this.
+
 
 Before submitting your tap for review, make sure that you have completed all of the following:
 
@@ -47,6 +50,8 @@ handle this, the tap must grab parent ids in child stream sync function.
 (see [here][adroll-streams] in the ClientStream sync method)
 
 <!-- Links -->
+[singer-io]: https://www.singer.io/
+[singer-slack]: https://singer-slackin.herokuapp.com/
 [adroll-discovery]: https://github.com/singer-io/tap-adroll/blob/v1.0.0/tap_adroll/discover.py#L38
 [adroll-sync]: https://github.com/singer-io/tap-adroll/blob/v1.0.0/tap_adroll/sync.py#L10
 [adroll-streams]: https://github.com/singer-io/tap-adroll/blob/v1.0.0/tap_adroll/streams.py#L55
