@@ -4,12 +4,12 @@ jobs:
     docker:
       - image: ubuntu:16.04
     steps:
-      - checkout
       - run:
           name: 'Setup environment'
           command: |
             apt update
-            apt install --yes make
+            apt install --yes make git
+      - checkout
       - run:
           name: 'Tests'
           command: |
