@@ -1,7 +1,7 @@
 # CONTRIBUTING DOCUMENT
 This is the doc that will outline all requirements for contributors.
 
-Before working on your project, please check that someone else has not already submitted the same project already.
+Before working on your project, please check that someone else has not submitted the same project already.
 The [Singer website][singer-io] and the [Singer Slack][singer-slack] are great resources for this.
 
 
