@@ -8,7 +8,7 @@ Before submitting your tap for review, make sure that you have completed all of 
 - [field selection](#field-selection)
 - [correct handling of child streams](#how-to-handle-child-streams)
 
-##### Stream Selection
+## Stream Selection
 Iterate over only selected streams.
 The tap can get a list of the selected stream objects by calling `get_selected_streams()` on a singer-python `Catalog` object, as is done here:
  ```
@@ -19,7 +19,7 @@ for stream in selected_streams:
  ```
 (see [here](https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/discover.py#L38) for an example)
 
-##### Field Selection
+## Field Selection
 To filter a record's fields using the selected metadata from the catalog, the supported approach is to pass every record through the transformer with a metadata dictionary, as is done here:
  ```
 with Transformer() as transformer:
