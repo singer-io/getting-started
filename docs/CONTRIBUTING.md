@@ -10,6 +10,7 @@ Before submitting your tap for review, make sure that you have completed all of 
 - [Implemented stream selection](#stream-selection)
 - [Implemented field selection](#field-selection)
 - [Handled child streams correctly](#how-to-handle-child-streams)
+- [Run pylint](#pylint)
 
 ## Stream Selection
 Iterate over only selected streams.
@@ -49,9 +50,51 @@ handle this, the tap must grab parent ids in child stream sync function.
 
 (see [here][adroll-streams] in the ClientStream sync method)
 
+## Pylint
+
+Assuming your project has the following structure,
+
+``` shell
+/home/singer/tap-adroll
+├── LICENSE
+├── MANIFEST.in
+├── README.md
+├── setup.py
+├── tap_adroll
+│   ├── schemas
+│   ├── client.py
+│   ├── discover.py
+│   ├── __init__.py
+│   ├── streams.py
+│   └── sync.py
+└── tests
+    └── base.py
+```
+
+you can pass `tap_adroll` to the following command to run `pylint`,
+
+``` shell
+pylint tap_adroll --disable 'broad-except,chained-comparison,empty-docstring,fixme,invalid-name,line-too-long,missing-class-docstring,missing-function-docstring,missing-module-docstring,no-else-raise,no-else-return,too-few-public-methods,too-many-arguments'
+```
+
+We strive to use this as the list of disables. If any other disables are needed, then use `pylint`'s inline syntax,
+
+``` python
+def get_format_values(self): # pylint: disable=no-self-use
+    return []
+```
+
+[Source][trello-streams]
+
+See the [pylint Block Disables Docs][pylint-docs] for more information and
+more examples
+
+
 <!-- Links -->
 [singer-io]: https://www.singer.io/
 [singer-slack]: https://singer-slackin.herokuapp.com/
 [adroll-discovery]: https://github.com/singer-io/tap-adroll/blob/v1.0.0/tap_adroll/discover.py#L38
 [adroll-sync]: https://github.com/singer-io/tap-adroll/blob/v1.0.0/tap_adroll/sync.py#L10
 [adroll-streams]: https://github.com/singer-io/tap-adroll/blob/v1.0.0/tap_adroll/streams.py#L55
+[trello-streams]: https://github.com/singer-io/tap-trello/blob/v1.0.0/tap_trello/streams.py#L187
+[pylint-docs]: http://pylint.pycqa.org/en/latest/user_guide/message-control.html#block-disables
