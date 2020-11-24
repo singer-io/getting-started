@@ -17,7 +17,7 @@ selected_streams = catalog.get_selected_streams(state)
 for stream in selected_streams:
     <sync stream>
  ```
-(see [here](https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/discover.py#L38) for an example)
+(see [here][adroll-discovery] for an example)
 
 ## Field Selection
 To filter a record's fields using the selected metadata from the catalog, the supported approach is to pass every record through the transformer with a metadata dictionary, as is done here:
@@ -31,10 +31,16 @@ with Transformer() as transformer:
             )
         )
 ```
-(see [here](https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/sync.py#L10) for an example)
+
+(see [here][adroll-sync] for an example)
 
 
 ## How to handle child streams
 If there are child streams, this means that they rely on some piece of information from a corresponding parent.
 To handle this, the tap must grab parent ids in child stream sync function
-(see [here](https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/streams.py#L55) in the ClientStream sync method)
+(see [here][adroll-streams] in the ClientStream sync method)
+
+<!-- Links -->
+[adroll-discovery]: https://github.com/singer-io/tap-adroll/blob/v1.0.0/tap_adroll/discover.py#L38
+[adroll-sync]: https://github.com/singer-io/tap-adroll/blob/v1.0.0/tap_adroll/sync.py#L10
+[adroll-streams]: https://github.com/singer-io/tap-adroll/blob/v1.0.0/tap_adroll/streams.py#L55
