@@ -13,6 +13,7 @@ Before submitting your tap for review, make sure that you have completed all of 
 - [Handled child streams correctly](#how-to-handle-child-streams)
 - [Run pylint](#pylint)
 - [Pypi](#pypi)
+- [Contributor License Agreement](#contributor-license-agreement)
 
 ## Project Structure
 
