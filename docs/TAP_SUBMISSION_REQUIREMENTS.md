@@ -8,10 +8,11 @@ The [Singer website][singer-io] and the [Singer Slack][singer-slack] are great r
 Before submitting your tap for review, make sure that you have completed all of the following:
 
 - [Project Structure](#projectstructure)
-- [Implemented stream selection](#stream-selection)
-- [Implemented field selection](#field-selection)
-- [Handled child streams correctly](#how-to-handle-child-streams)
-- [Run pylint](#pylint)
+- [Catalog](#catalog)
+- [Stream selection](#stream-selection)
+- [Field selection](#field-selection)
+- [Child Streams Handled Correctly](#how-to-handle-child-streams)
+- [Pylint](#pylint)
 - [PyPi](#pypi)
 - [Contributor License Agreement](#contributor-license-agreement)
 
@@ -47,7 +48,7 @@ files/directories to note:
 - `sync.py`: This is where the sync function is run
 
 
-## Correct Catalog
+## Catalog
 In order for sync to run properly, the tap must correctly output a catalog during discovery.
 
 The catalog structure is described [here][catalog]
@@ -55,18 +56,18 @@ The catalog structure is described [here][catalog]
 An easy way to construct the catalog is by using the following call:
 
 ```
-        catalog_entry = {
-            "stream": stream_name,
-            "tap_stream_id": stream_name,
-            "schema": schema,
-            "metadata": metadata.get_standard_metadata(
-                schema=schema,
-                key_properties=stream.key_properties,
-                valid_replication_keys=stream.replication_keys,
-                replication_method=stream.replication_method,
-            ),
-            "key_properties": stream.key_properties
-        }
+catalog_entry = {
+    "stream": stream_name,
+    "tap_stream_id": stream_name,
+    "schema": schema,
+    "metadata": metadata.get_standard_metadata(
+        schema=schema,
+        key_properties=stream.key_properties,
+        valid_replication_keys=stream.replication_keys,
+        replication_method=stream.replication_method,
+    ),
+    "key_properties": stream.key_properties
+}
 ```
 (see [here][adroll-discovery] for the full example)
 
@@ -116,6 +117,7 @@ handle this, the tap must grab parent ids in child stream sync function.
 ## Pylint
 
 In order to submit the tap, it's required that pylint is passing at 100% using the following disables:
+
 `broad-except,chained-comparison,empty-docstring,fixme,invalid-name,line-too-long,missing-class-docstring,missing-function-docstring,missing-module-docstring,no-else-raise,no-else-return,too-few-public-methods,too-many-arguments`
 
 The following command should be run from the root of the repo:
@@ -153,6 +155,7 @@ The CLA can be found [here][singer-cla]
 [singer-slack]: https://singer-slackin.herokuapp.com/
 [adroll-discovery]: https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/discover.py#L38
 [adroll-sync]: https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/sync.py#L10
+[adroll-streams]: https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/streams.py#L55
 [adroll-transformer]: https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/sync.py#L29
 [trello-streams]: https://github.com/singer-io/tap-trello/blob/374b80eca4bfb1263699ea1c4cd746b04dba4320/tap_trello/streams.py#L187
 [singer-cla]: https://stitch-cla-enforcer.herokuapp.com/
