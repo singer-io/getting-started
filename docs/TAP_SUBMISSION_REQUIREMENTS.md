@@ -12,7 +12,7 @@ Before submitting your tap for review, make sure that you have completed all of 
 - [Implemented field selection](#field-selection)
 - [Handled child streams correctly](#how-to-handle-child-streams)
 - [Run pylint](#pylint)
-- [Pypi](#pypi)
+- [PyPi](#pypi)
 - [Contributor License Agreement](#contributor-license-agreement)
 
 ## Project Structure
@@ -131,13 +131,13 @@ def get_format_values(self): # pylint: disable=no-self-use
     return []
 ```
 
-## Pypi
+## PyPi
 
-In order to run in Stitch, we require sole ownership a Pypi repo using the specific naming convention: `tap-<tap-name>`
+In order to run in Stitch, we require sole ownership a PyPi repo using the specific naming convention: `tap-<tap-name>`
 
-If you have a Pypi repo under this name, you will either need to:
+If you have a PyPi repo under this name, you will either need to:
    - add `singer_io` user as admin and remove yourself as admin
-   - delete the Pypi repo
+   - delete the PyPi repo
 
 ## Contributor License Agreement
 
