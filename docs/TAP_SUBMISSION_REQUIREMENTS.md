@@ -39,12 +39,12 @@ tap-<tap_name>
     └── base.py
 ```
 files/directories to note:
-`schemas`: This folder houses all the json schema files. Each stream has a json schema associated with it, as defined in this file.
-`client.py`: Calls to the api are made here.
-`discover.py`: Discovery code is here.
-`__init__.py`: The main function is in this file. Grab command line arguments and kick off discovery/sync here.
-`streams.py`: If using the class-based model, this is where all the stream classes and their corresponding functions live.
-`sync.py`: This is where the sync function is run
+- `schemas`: This folder houses all the json schema files. Each stream has a json schema associated with it, as defined in this file.
+- `client.py`: Calls to the api are made here.
+- `discover.py`: Discovery code is here.
+- `__init__.py`: The main function is in this file. Grab command line arguments and kick off discovery/sync here.
+- `streams.py`: If using the class-based model, this is where all the stream classes and their corresponding functions live.
+- `sync.py`: This is where the sync function is run
 
 
 ## Correct Catalog
@@ -130,8 +130,6 @@ If other disables are necessarys, use inline disables:
 def get_format_values(self): # pylint: disable=no-self-use
     return []
 ```
-See [Source][trello-streams] for example.
-
 
 ## Pypi
 
