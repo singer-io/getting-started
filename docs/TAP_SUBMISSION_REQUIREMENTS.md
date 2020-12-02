@@ -74,7 +74,7 @@ catalog_entry = {
 ## Stream Selection
 It's required that the tap implements stream selection so that when running the tap the user has control over what endpoints are hit.
 
-In order to implement stream selection, the tap must Iterate over only selected streams.
+In order to implement stream selection, the tap must iterate over only selected streams.
 
 The tap can get a list of the selected stream objects by calling `get_selected_streams()` on a singer-python
 `Catalog` object, as is done here:
