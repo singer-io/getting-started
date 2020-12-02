@@ -72,7 +72,7 @@ catalog_entry = {
 (see [here][adroll-discovery] for the full example)
 
 ## Stream Selection
-It's required that the tap implements stream selection so that in the Stitch product the user has control over what endpoints are hit.
+It's required that the tap implements stream selection so that when running the tap the user has control over what endpoints are hit.
 
 In order to implement stream selection, the tap must Iterate over only selected streams.
 
@@ -88,7 +88,7 @@ for stream in selected_streams:
 (see [here][adroll-sync] for an example)
 
 ## Field Selection
-It's required that the tap implements field selection so that in the Stitch product the user has control over which fields in the record are returned.
+It's required that the tap implements field selection so that when running the tap the user has control over which fields in the record are returned.
 
 To filter a record's fields using the selected metadata from the catalog, the supported approach is to pass every
 record through the transformer with a metadata dictionary, as is done here:
@@ -126,7 +126,7 @@ The following command should be run from the root of the repo:
 pylint tap_<tap_name> --disable 'broad-except,chained-comparison,empty-docstring,fixme,invalid-name,line-too-long,missing-class-docstring,missing-function-docstring,missing-module-docstring,no-else-raise,no-else-return,too-few-public-methods,too-many-arguments'
 ```
 
-If other disables are necessarys, use inline disables:
+If other disables are necessary, use inline disables:
 
 ``` python
 def get_format_values(self): # pylint: disable=no-self-use
@@ -135,7 +135,7 @@ def get_format_values(self): # pylint: disable=no-self-use
 
 ## PyPi
 
-In order to run in Stitch, we require sole ownership a PyPi repo using the specific naming convention: `tap-<tap-name>`
+In order to control the releases of Singer projects, Singer requires sole ownership of the PyPI repo `tap-<tap_name>`
 
 If you have a PyPi repo under this name, you will either need to:
    - add `singer_io` user as admin and remove yourself as admin
@@ -143,7 +143,7 @@ If you have a PyPi repo under this name, you will either need to:
 
 ## Contributor License Agreement
 
-To ensure the community can use the repo code, contributors are required to sign Singer CLA.
+To ensure the community can use the repo code, contributors are required to sign the Singer CLA.
 
 The CLA can be found [here][singer-cla]
 
@@ -157,6 +157,5 @@ The CLA can be found [here][singer-cla]
 [adroll-sync]: https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/sync.py#L10
 [adroll-streams]: https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/streams.py#L55
 [adroll-transformer]: https://github.com/singer-io/tap-adroll/blob/138fc92dc4fb17c4b9446a3cf998b34b288b3e4a/tap_adroll/sync.py#L29
-[trello-streams]: https://github.com/singer-io/tap-trello/blob/374b80eca4bfb1263699ea1c4cd746b04dba4320/tap_trello/streams.py#L187
 [singer-cla]: https://stitch-cla-enforcer.herokuapp.com/
 [catalog]: https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#the-catalog
