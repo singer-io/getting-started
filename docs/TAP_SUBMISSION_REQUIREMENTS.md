@@ -7,7 +7,7 @@ The [Singer website][singer-io] and the [Singer Slack][singer-slack] are great r
 
 Before submitting your tap for review, make sure that you have completed all of the following:
 
-- [Project Structure](#projectstructure)
+- [Project Structure](#project-structure)
 - [Catalog](#catalog)
 - [Stream selection](#stream-selection)
 - [Field selection](#field-selection)
@@ -18,7 +18,7 @@ Before submitting your tap for review, make sure that you have completed all of 
 
 ## Project Structure
 
-The project should have the following structure:
+The following structure is required to ensure clear and maintainable projects:
 
 ```
 tap-<tap_name>
@@ -37,8 +37,10 @@ tap-<tap_name>
 │   ├── streams.py
 │   └── sync.py
 └── tests
-    └── base.py
+    ├── base.py
+    └── test_bookmarks.py
 ```
+
 files/directories to note:
 - `schemas`: This folder houses all the json schema files. Each stream has a json schema associated with it, as defined in this file.
 - `client.py`: Calls to the api are made here.
@@ -53,7 +55,7 @@ In order for sync to run properly, the tap must correctly output a catalog durin
 
 The catalog structure is described [here][catalog]
 
-An easy way to construct the catalog is by using the following call:
+A catalog for a single stream is generally constructed as follows:
 
 ```
 catalog_entry = {
@@ -69,7 +71,7 @@ catalog_entry = {
     "key_properties": stream.key_properties
 }
 ```
-(see [here][adroll-discovery] for the full example)
+(see [tap-adroll][adroll-discovery] for the full example)
 
 ## Stream Selection
 It's required that the tap implements stream selection so that when running the tap the user has control over what endpoints are hit.
