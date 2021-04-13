@@ -75,16 +75,17 @@ If the schema is static, it should be stored in a `schemas` folder under
 the module directory as JSON files rather than as native dicts in the
 source code.
 
-Please avoid vague schemas:
+When reasonable for the data source, it is preferable to write schemas as
+explicitly as possible. For example:
 
-1. Do not use the empty schema `{}`. An empty schema means the target will
-   be unable to do validation or data type transformation.
+1. Explicitly named fields in object schemas instead of `patternProperties` if they are well defined.
+2. Eplicit types associated with fields instead of `{}` if the data type is consistent and documented.
+3. Specifying `additionalProperties: false` when the tap should fail if extra properties are added.
 
-2. Set `"additionalProperties": false` for all "object" schemas. If you do
-   not specify `"additionalProperties": false`, the target will be unable
-   to do any validation or data type transformation on properties that
-   aren't defined in the schema.
-
+In general, any valid JSON Schema is acceptable, and there are use cases
+that may work best when being more or less strict on validation. Targets
+should handle valid JSON Schemas and provide a best effort to load the
+data in a reasonable format.
 
 ## Code Quality
 
