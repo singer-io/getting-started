@@ -87,8 +87,8 @@ explicitly as possible. For example:
 
 In general, any valid JSON Schema is acceptable, and there are use cases
 that may work best when being more or less strict on validation. Targets
-should handle valid JSON Schemas and provide a best effort to load the
-data in a reasonable format.
+should handle valid JSON Schemas and provide a best effort approach to
+load the data in a reasonable format.
 
 ## Code Quality
 
