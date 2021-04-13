@@ -80,7 +80,7 @@ explicitly as possible. For example:
 
 1. Explicitly named fields in object schemas instead of
    `patternProperties` if they are well defined.
-2. Eplicit types associated with fields instead of `{}` if the data type
+2. Explicit types associated with fields instead of `{}` if the data type
    is consistent and documented.
 3. Specifying `additionalProperties: false` when the tap should fail if
    extra properties are added.
