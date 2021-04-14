@@ -143,3 +143,37 @@ install_requires=[
     "singer-python"
 ]
 ```
+
+## Parent-Child Relationships
+
+One of the most challenging API structures, especially in REST APIs, is to
+extract data from is a parent-child relationship. For example, a structure
+of `organization->project->ticket->comment`, where each sub-object
+requires the ID of the parent object.
+
+This can pose challenges for storing bookmarks in state, managing the case
+where records are changing as the tap is paginating results, and other
+edge cases and race conditions. The amount of things that can go wrong is
+very API specific, but there are some best practices that apply to almost
+all cases.
+
+1. Keep logic for child streams separate from parent streams. Each stream
+   should be able to be extracted without extracting data for the parent.
+   This opens up options in implementation that can provide efficiencies
+   like only requesting the parent object's ID field for the child
+   object's sync.
+2. Set a maximum bookmark value before the sync begins and store bookmarks
+   only up to that value. For large data sets, records are being updated
+   as the tap is requesting all of the data. This means that if you are
+   storing bookmarks for child objects, there is a race condition where an
+   object that has already been synced is updated, but is removed from the
+   result set being used by the tap. This will cause a missed record.
+3. Only store state for the deepest child object. This pattern removes the
+   need for a parent's `updated` value to be changed if a child is updated
+   or added. For many APIs, the parent is not feasibly able to be updated
+   for every child record. Instead, a child stream should request its
+   parents' IDs only and iterate over them individually, emitting only
+   records that have an updated value grater than the most recent
+   bookmark.
+
+TODO: Clean up.
