@@ -75,16 +75,32 @@ If the schema is static, it should be stored in a `schemas` folder under
 the module directory as JSON files rather than as native dicts in the
 source code.
 
-Please avoid vague schemas:
+When reasonable for the data source, it is preferable to write schemas as
+explicitly as possible. For example:
 
-1. Do not use the empty schema `{}`. An empty schema means the target will
-   be unable to do validation or data type transformation.
+1. Explicitly named fields in object schemas instead of
+   `patternProperties` if they are well defined.
+2. Explicit types associated with fields instead of `{}` if the data type
+   is consistent and documented.
+3. Specifying `additionalProperties: false` when the tap should fail if
+   extra properties are added.
 
-2. Set `"additionalProperties": false` for all "object" schemas. If you do
-   not specify `"additionalProperties": false`, the target will be unable
-   to do any validation or data type transformation on properties that
-   aren't defined in the schema.
+In general, any valid JSON Schema is acceptable, and there are use cases
+that may work best when being more or less strict on validation. Targets
+should handle valid JSON Schemas and provide a best effort approach to
+load the data in a reasonable format.
 
+**NOTE:** When modifying an existing schema, use extra caution when
+adding properties such as `additionalProperties: false` or an explicit
+type like `integer`. Schema changes such as this can be backwards
+incompatible. In Singer, we use [SemVer](https://semver.org/) to the best
+of our ability, so making the schema more restrictive (unless provable
+beyond question) will result in a major version release that will require
+all users of the tap to take special care when upgrading.
+
+Naturally, a major version release as a result of a small field addition
+is preferably avoided unless absolutely necessary (for example, if a
+REST API changes the primary key's name).
 
 ## Code Quality
 
