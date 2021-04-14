@@ -90,6 +90,15 @@ that may work best when being more or less strict on validation. Targets
 should handle valid JSON Schemas and provide a best effort approach to
 load the data in a reasonable format.
 
+***NOTE*** When modifying an existing schema, use extra caution when
+adding properties such as `additionalProperties: false` or an explicit
+type like `integer`. Schema changes such as this can either be backwards
+incompatible. In Singer, we use SemVer to the best of our ability, so
+marking fields required or otherwise making the schema more restrictive
+(unless provable beyond question) will will result in a major version
+release that will require all users of the tap to take special care when
+upgrading.
+
 ## Code Quality
 
 We recommend running pylint on your Tap and making sure that you
