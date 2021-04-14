@@ -93,10 +93,10 @@ load the data in a reasonable format.
 **NOTE:** When modifying an existing schema, use extra caution when
 adding properties such as `additionalProperties: false` or an explicit
 type like `integer`. Schema changes such as this can be backwards
-incompatible. In Singer, we use SemVer to the best of our ability, so
-making the schema more restrictive (unless provable beyond question) will
-result in a major version release that will require all users of the tap
-to take special care when upgrading.
+incompatible. In Singer, we use [SemVer](https://semver.org/) to the best
+of our ability, so making the schema more restrictive (unless provable
+beyond question) will result in a major version release that will require
+all users of the tap to take special care when upgrading.
 
 Naturally, a major version release as a result of a small field addition
 is preferably avoided unless absolutely necessary (for example, if a
