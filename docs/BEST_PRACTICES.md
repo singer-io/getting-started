@@ -154,22 +154,20 @@ request for `tickets` in this structure may look something like `GET
 /organizations/{org_id}/projects/{project_id}/tickets`.
 
 This is an efficient design for applications, but can pose challenges for
-bulk extraction. Some common challenges include multiple levels of state
-in play, differences in how updates are propagated among records in the
-hierarchy, race conditions between users of the API's front end and an
-ongoing extraction process, etc. The amount of things that can go wrong is
-very API specific, but there are some best practices that can provide
-guidance in many cases.
+bulk extraction. The specific challenges are very specific to an
+individual API's underlying implementation, but there are some best
+practices that can provide guidance in many cases.
 
-1. **Reduce Stream Dependencies** - Keep logic for child streams separate from
-   parent streams. Each stream should be able to be extracted without
-   extracting data for the parent. This opens up options in implementation
-   that can provide efficiencies like only requesting the parent object's
-   ID field for the child object's sync, and generally results in more
-   readable code.
+1. **Reduce Stream Dependencies** - Keep logic for child streams separate
+   from parent streams. Each stream should be able to be extracted without
+   requiring the parent to be selected and without complex boolean logic
+   to determine what data to emit.
+   - This opens up options in implementation that can provide efficiencies
+     like only requesting the parent object's ID field for the child
+     object's sync, and generally results in more readable code.
    - For REST APIs that provide a client library, the library functions
      usually try to make efficient use of this pattern by lazy loading the
-     parent object and only making requests as necessary.
+     parent object and only making HTTP requests as necessary.
    - [Example
    tap-shopify](https://github.com/singer-io/tap-shopify/blob/v1.2.9/tap_shopify/streams/order_refunds.py#L28-L31)
 2. **Signpost State Keeping** - Set a maximum bookmark value before the
@@ -182,8 +180,9 @@ guidance in many cases.
    - For timestamp bookmarks, this is usually something like
    `datetime.utcnow()`, but it can also be a value like a max event ID or
    log position queried before the sync begins.
-   - [Example
+   - [Date-Time Example
    tap-pardot](https://github.com/singer-io/tap-pardot/blob/v1.3.1/tap_pardot/streams.py#L231-L243)
+   - [Log ID Example tap-postgres](https://github.com/singer-io/tap-postgres/blob/v0.2.0/tap_postgres/__init__.py#L650-L652)
 3. **Limit State Growth** - Only store a constant set of bookmark keys for
    the deepest child object, rather than an unbounded list of bookmarks
    per parent-id. Along with #1 above, this pattern removes the need for
