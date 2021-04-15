@@ -146,34 +146,51 @@ install_requires=[
 
 ## Parent-Child Relationships
 
-One of the most challenging API structures, especially in REST APIs, is to
-extract data from is a parent-child relationship. For example, a structure
-of `organization->project->ticket->comment`, where each sub-object
-requires the ID of the parent object.
+One of the most challenging API structures for ELT, common with REST APIs,
+is the existence of a parent-child relationship. For example, resources
+can form a tree like a structure of `organization -> project -> ticket ->
+comment`, where each sub-object requires the ID of the parent object. A
+request for `tickets` in this structure may look something like `GET
+/organizations/{org_id}/projects/{project_id}/tickets`.
 
-This can pose challenges for storing bookmarks in state, managing the case
-where records are changing as the tap is paginating results, and other
-edge cases and race conditions. The amount of things that can go wrong is
-very API specific, but there are some best practices that apply to almost
-all cases.
+This is an efficient design for applications, but can pose challenges for
+bulk extraction. Some common challenges include multiple levels of state
+in play, differences in how updates are propagated among records in the
+hierarchy, race conditions between users of the API's front end and an
+ongoing extraction process, etc. The amount of things that can go wrong is
+very API specific, but there are some best practices that can provide
+guidance in many cases.
 
-1. Keep logic for child streams separate from parent streams. Each stream
-   should be able to be extracted without extracting data for the parent.
-   This opens up options in implementation that can provide efficiencies
-   like only requesting the parent object's ID field for the child
-   object's sync.
-2. Set a maximum bookmark value before the sync begins and store bookmarks
-   only up to that value. For large data sets, records are being updated
-   as the tap is requesting all of the data. This means that if you are
-   storing bookmarks for child objects, there is a race condition where an
-   object that has already been synced is updated, but is removed from the
-   result set being used by the tap. This will cause a missed record.
-3. Only store state for the deepest child object. This pattern removes the
-   need for a parent's `updated` value to be changed if a child is updated
-   or added. For many APIs, the parent is not feasibly able to be updated
-   for every child record. Instead, a child stream should request its
-   parents' IDs only and iterate over them individually, emitting only
-   records that have an updated value grater than the most recent
-   bookmark.
-
-TODO: Clean up.
+1. **Reduce Stream Dependencies** - Keep logic for child streams separate from
+   parent streams. Each stream should be able to be extracted without
+   extracting data for the parent. This opens up options in implementation
+   that can provide efficiencies like only requesting the parent object's
+   ID field for the child object's sync, and generally results in more
+   readable code.
+   - For REST APIs that provide a client library, the library functions
+     usually try to make efficient use of this pattern by lazy loading the
+     parent object and only making requests as necessary.
+   - [Example
+   tap-shopify](https://github.com/singer-io/tap-shopify/blob/v1.2.9/tap_shopify/streams/order_refunds.py#L28-L31)
+2. **Signpost State Keeping** - Set a maximum bookmark value before the
+   sync begins and store bookmarks only up to that value. For large data
+   sets, records are being updated as the tap is requesting all of the
+   data. As the tap's extraction intersects with the data changing in real
+   time, records can be missed, but setting a "signpost" bookmark as a
+   maximum value to be stored can help with many race conditions and
+   sorting issues.
+   - For timestamp bookmarks, this is usually something like
+   `datetime.utcnow()`, but it can also be a value like a max event ID or
+   log position queried before the sync begins.
+   - [Example
+   tap-pardot](https://github.com/singer-io/tap-pardot/blob/v1.3.1/tap_pardot/streams.py#L231-L243)
+3. **Limit State Growth** - Only store a constant set of bookmark keys for
+   the deepest child object, rather than an unbounded list of bookmarks
+   per parent-id. Along with #1 above, this pattern removes the need for
+   API features such as update propagation or sorting based on certain
+   fields. For many APIs and their backing data sources, these features
+   just aren't feasible without a lot of rework.
+   - Adding in bookmark keys at each level of the hierarchy trades
+     complexity in tap code for a more efficient usage of the API
+   - [Single Child Bookmark tap-square](https://github.com/singer-io/tap-square/blob/v1.3.0/tap_square/streams.py#L250)
+   - [Complex Multi-Bookmark tap-trello](https://github.com/singer-io/tap-trello/blob/v1.0.0/tap_trello/streams.py#L356)
