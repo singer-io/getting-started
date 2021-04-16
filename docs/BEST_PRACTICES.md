@@ -173,10 +173,12 @@ practices that can provide guidance in many cases.
 2. **Signpost State Keeping** - Set a maximum bookmark value before the
    sync begins and store bookmarks only up to that value. For large data
    sets, records are being updated as the tap is requesting all of the
-   data. As the tap's extraction intersects with the data changing in real
-   time, records can be missed, but setting a "signpost" bookmark as a
+   data. As the tap reads records that may be changing in real
+   time, setting a "signpost" bookmark as a
    maximum value to be stored can help with many race conditions and
-   sorting issues.
+   sorting issues. This signpost prevents the bookmark from advancing to
+   a point where subsequent executions of the tap would miss records 
+   that were modified while the extraction process was still running.
    - For timestamp bookmarks, this is usually something like
    `datetime.utcnow()`, but it can also be a value like a max event ID or
    log position queried before the sync begins.
