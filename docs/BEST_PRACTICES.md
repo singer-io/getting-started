@@ -185,12 +185,12 @@ practices that can provide guidance in many cases.
    - [Date-Time Example
    tap-pardot](https://github.com/singer-io/tap-pardot/blob/v1.3.1/tap_pardot/streams.py#L231-L243)
    - [Log ID Example tap-postgres](https://github.com/singer-io/tap-postgres/blob/v0.2.0/tap_postgres/__init__.py#L650-L652)
-3. **Limit State Growth** - Only store a constant set of bookmark keys for
-   the deepest child object, rather than an unbounded list of bookmarks
-   per parent-id. Along with #1 above, this pattern removes the need for
-   API features such as update propagation or sorting based on certain
-   fields. For many APIs and their backing data sources, these features
-   just aren't feasible without a lot of rework.
+3. **Limit State Growth** - Only store a single bookmark key, or a 
+   controlled number of keys, per each deepest child object type, rather
+   than an unbounded list of bookmarks per parent-id. Along with #1 above,
+   this pattern removes the need for API features such as update propagation 
+   or sorting based on certain fields. For many APIs and their backing
+   data sources, these features just aren't feasible without a lot of rework.
    - Adding in bookmark keys at each level of the hierarchy trades
      complexity in tap code for a more efficient usage of the API
    - [Single Child Bookmark tap-square](https://github.com/singer-io/tap-square/blob/v1.3.0/tap_square/streams.py#L250)
