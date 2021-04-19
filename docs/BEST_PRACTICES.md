@@ -168,8 +168,7 @@ practices that can provide guidance in many cases.
    - For REST APIs that provide a client library, the library functions
      usually try to make efficient use of this pattern by lazy loading the
      parent object and only making HTTP requests as necessary.
-   - [Example
-   tap-shopify](https://github.com/singer-io/tap-shopify/blob/v1.2.9/tap_shopify/streams/order_refunds.py#L28-L31)
+   - [Example tap-shopify](https://git.io/JOgi1)
 2. **Signpost State Keeping** - Set a maximum bookmark value before the
    sync begins and store bookmarks only up to that value. For large data
    sets, records are being updated as the tap is requesting all of the
@@ -182,9 +181,8 @@ practices that can provide guidance in many cases.
    - For timestamp bookmarks, this is usually something like
    `datetime.utcnow()`, but it can also be a value like a max event ID or
    log position queried before the sync begins.
-   - [Date-Time Example
-   tap-pardot](https://github.com/singer-io/tap-pardot/blob/v1.3.1/tap_pardot/streams.py#L231-L243)
-   - [Log ID Example tap-postgres](https://github.com/singer-io/tap-postgres/blob/v0.2.0/tap_postgres/__init__.py#L650-L652)
+   - [Date-Time Example tap-pardot](https://git.io/JOgiH)
+   - [Log ID Example tap-postgres](https://git.io/JOgid)
 3. **Limit State Growth** - Only store a single bookmark key, or a 
    controlled number of keys, per each deepest child object type, rather
    than an unbounded list of bookmarks per parent-id. Along with #1 above,
@@ -193,5 +191,5 @@ practices that can provide guidance in many cases.
    data sources, these features just aren't feasible without a lot of rework.
    - Adding in bookmark keys at each level of the hierarchy trades
      complexity in tap code for a more efficient usage of the API
-   - [Single Child Bookmark tap-square](https://github.com/singer-io/tap-square/blob/v1.3.0/tap_square/streams.py#L250)
-   - [Complex Multi-Bookmark tap-trello](https://github.com/singer-io/tap-trello/blob/v1.0.0/tap_trello/streams.py#L356)
+   - [Single Child Bookmark tap-square](https://git.io/JOgiN)
+   - [Complex Multi-Bookmark tap-trello](https://git.io/JOgPe)
