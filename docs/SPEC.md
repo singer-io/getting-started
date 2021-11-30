@@ -144,7 +144,8 @@ SCHEMA messages describe the datatypes of data in the stream. They
 must have the following properties:
 
  - `schema` **Required**. A [JSON Schema] describing the
-   `data` property of RECORDs from the same `stream`
+   `data` property of RECORDs from the same `stream`. The default 
+   JSON Schema version is [Draft-4](https://json-schema.org/specification-links.html#draft-4).
 
  - `stream` **Required**. The string name of the stream that this
    schema describes
