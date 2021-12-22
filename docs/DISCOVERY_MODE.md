@@ -104,7 +104,7 @@ The output of discovery mode should be a list of the data streams a Tap supports
 | `stream`          | string             | required  | The name of the stream.        |
 | `tap_stream_id`   | string             | required  | The unique identifier for the stream. This is allowed to be different from the name of the stream in order to allow for sources that have duplicate stream names. |
 | `schema`          | object             | required  | The JSON schema for the stream.  |
-| `table_name`      | string             | optional  | For a database source, the name of the table. |
+| `table`           | string             | optional  | For a database source, the name of the table. |
 | `metadata`        | array of metadata            | optional  | See metadata below for an explanation |
 
 ### Example
