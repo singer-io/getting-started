@@ -63,10 +63,10 @@ unrecoverable error is detected, exit the script with a non-zero error
 code (raise an exception or use `sys.exit(1)`)
 
 
-## Module Structure
+## Package Structure
 
-Source code should be in a module (folder with `__init__.py` file) and not
-just a script (`module.py` file).
+Source code should be in a package (folder with `__init__.py` file) and 
+not just a script (`module.py` file).
 
 
 ## Schemas
