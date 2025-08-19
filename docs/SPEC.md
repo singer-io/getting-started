@@ -2,10 +2,10 @@
 
 ### Version 0.3.0
 
-A *Tap* is an application that takes a *configuration* file and an
-optional *state* file as input and produces an ordered stream of *record*,
-*state* and *schema* messages as output. A *record* is json-encoded data
-of any kind. A *state* message is used to persist information between
+A *Tap* is an application that takes a *configuration* file and optional 
+*state* and *catalog* files as input and produces an ordered stream of 
+*record*, *state* and *schema* messages as output. A *record* is json-encoded
+data of any kind. A *state* message is used to persist information between
 invocations of a Tap. A *schema* message describes the datatypes of
 the *record*s in the stream. A Tap may be implemented in any
 programming language.
