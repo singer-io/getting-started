@@ -24,7 +24,7 @@ The [Catalog](DISCOVERY_MODE.md#the-catalog) provided to the Tap contains the st
 ## Replication Method
 Taps can support two replication methods, and should decide which to use by checking the `replication-method` metadata for a stream, which should be one of the following:
 
-- `INCREMENTAL` - The Tap saves it's progress via bookmarks or some other mechanism in the state. Only new or updated records are replicated during each sync.
+- `INCREMENTAL` - The Tap saves its progress via bookmarks or some other mechanism in the state. Only new or updated records are replicated during each sync.
 
 - `FULL_TABLE` - The Tap replicates all available records dating back to a `start_date`, defined in the config file, during every sync.
 
